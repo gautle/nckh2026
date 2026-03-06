@@ -1,0 +1,137 @@
+:root {
+  --bg: #eef5e9;
+  --panel: #f9fbf5;
+  --text: #17221a;
+  --muted: #496050;
+  --accent: #2d6a4f;
+  --accent-2: #40916c;
+  --line: #d7e3d1;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Sora", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at top right, #b7e4c7 0%, transparent 35%),
+    radial-gradient(circle at bottom left, #95d5b2 0%, transparent 30%),
+    var(--bg);
+}
+
+.hero {
+  text-align: center;
+  padding: 60px 20px 24px;
+}
+
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  font-size: 12px;
+}
+
+h1 {
+  margin: 10px 0;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+}
+
+.subtitle {
+  margin: 0;
+  color: var(--muted);
+}
+
+.layout {
+  max-width: 1020px;
+  margin: 0 auto 56px;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 18px;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 16px 28px rgba(23, 34, 26, 0.08);
+}
+
+h2 {
+  margin-top: 0;
+}
+
+.grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.card {
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: #ffffffcc;
+}
+
+.card h3 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.question {
+  margin: 8px 0 16px;
+  color: var(--muted);
+}
+
+.options {
+  display: grid;
+  gap: 10px;
+}
+
+.option {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 11px 14px;
+  text-align: left;
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+  transition: transform 140ms ease, border-color 140ms ease;
+}
+
+.option:hover {
+  transform: translateY(-1px);
+  border-color: var(--accent-2);
+}
+
+.result {
+  min-height: 22px;
+  margin: 14px 0 0;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+@media (max-width: 840px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bản đồ trải nghiệm - Google Maps JS API</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container top-inner">
+      <a class="brand" href="index.html">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <b>Bản đồ trải nghiệm</b>
+          <span>Pà Cò - Mai Châu</span>
+        </div>
+      </a>
+      <nav class="nav">
+        <a href="index.html">Trang chủ</a>
+        <a class="active" href="map.html">Bản đồ trải nghiệm</a>
+        <a href="booking.html">Đặt trải nghiệm</a>
+        <a href="admin-bookings.html">Quản lý đơn</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="map-layout">
+      <aside class="card sidebar">
+        <h3 style="margin:0">Bộ lọc điểm</h3>
+        <div class="search-box">
+          <input class="input" id="searchInput" placeholder="Tìm theo tên hoặc mô tả..." />
+        </div>
+
+        <div class="filter-box">
+          <h5>Loại điểm</h5>
+          <label class="check"><input type="checkbox" data-filter-type value="craft" checked /> Nghề</label>
+          <label class="check"><input type="checkbox" data-filter-type value="heritage" checked /> Di sản</label>
+          <label class="check"><input type="checkbox" data-filter-type value="service" checked /> Dịch vụ</label>
+          <label class="check"><input type="checkbox" data-filter-type value="landscape" checked /> Cảnh quan</label>
+        </div>
+
+        <div class="filter-box">
+          <h5>Quyền ghi hình</h5>
+          <label class="check"><input type="checkbox" data-filter-perm value="allowed" checked /> Được</label>
+          <label class="check"><input type="checkbox" data-filter-perm value="ask" checked /> Xin phép</label>
+          <label class="check"><input type="checkbox" data-filter-perm value="not_allowed" checked /> Không được</label>
+        </div>
+
+        <div class="filter-box">
+          <h5>Mức nhạy cảm</h5>
+          <label class="check"><input type="checkbox" data-filter-sens value="public" checked /> Công khai</label>
+          <label class="check"><input type="checkbox" data-filter-sens value="limited" checked /> Giới hạn</label>
+          <label class="check"><input type="checkbox" data-filter-sens value="sensitive" checked /> Nhạy cảm</label>
+        </div>
+
+        <div class="filter-box">
+          <div class="row" style="justify-content:space-between"><h5 style="margin:0">Danh sách điểm</h5><span id="pointCount" class="tag">0 điểm</span></div>
+          <div id="pointList" class="point-list"></div>
+        </div>
+      </aside>
+
+      <section class="card map-box">
+        <div id="map"></div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    // Demo key: thay bằng key của bạn, hoặc truyền ?key=YOUR_KEY trên URL.
+    window.GMAPS_API_KEY = "";
+  </script>
+  <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/map.js"></script>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quản lý đơn đặt trải nghiệm</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container top-inner">
+      <a class="brand" href="index.html">
+        <div class="logo"></div>
+        <div>
+          <b>Quản lý đơn</b>
+          <span>Supabase Bookings Dashboard</span>
+        </div>
+      </a>
+      <nav class="nav">
+        <a href="index.html">Trang chủ</a>
+        <a href="map.html">Bản đồ</a>
+        <a href="booking.html">Đặt trải nghiệm</a>
+        <a class="active" href="admin-bookings.html">Quản lý đơn</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container main">
+    <section id="loginCard" class="card form" style="max-width:560px">
+      <h2 style="margin:0">Đăng nhập quản trị</h2>
+      <p class="lead">Chỉ tài khoản admin mới xem và cập nhật đơn.</p>
+      <form id="loginForm" class="form" method="dialog" action="javascript:void(0)" novalidate onsubmit="event.preventDefault(); window.__forceLoginSubmit(event); return false;">
+        <label>Email admin
+          <input class="input" type="email" name="email" required />
+        </label>
+        <label>Mật khẩu
+          <input class="input" type="password" name="password" required />
+        </label>
+        <div class="row" style="justify-content:flex-start">
+          <button id="btnLogin" class="btn primary" type="submit" onclick="event.preventDefault(); window.__forceLoginSubmit(event); return false;">Đăng nhập</button>
+        </div>
+      </form>
+      <div id="loginState" class="note">Trạng thái: chờ đăng nhập.</div>
+      <div id="loginError" class="error">Đăng nhập thất bại.</div>
+    </section>
+
+    <section id="dashboardCard" class="card" style="padding:14px;display:none;gap:10px">
+      <div class="row" style="justify-content:space-between">
+        <h2 style="margin:0">Danh sách đơn</h2>
+        <div class="row" style="justify-content:flex-end">
+          <button id="btnReload" class="btn">Tải lại</button>
+          <button id="btnLogout" class="btn">Đăng xuất</button>
+        </div>
+      </div>
+      <div class="row" style="justify-content:flex-start">
+        <label class="check"><input type="checkbox" data-status-filter value="new" checked /> Mới</label>
+        <label class="check"><input type="checkbox" data-status-filter value="contacted" checked /> Đã liên hệ</label>
+        <label class="check"><input type="checkbox" data-status-filter value="confirmed" checked /> Đã chốt</label>
+        <label class="check"><input type="checkbox" data-status-filter value="cancelled" checked /> Đã hủy</label>
+      </div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Thời gian</th>
+              <th>Khách</th>
+              <th>Liên hệ</th>
+              <th>Điểm</th>
+              <th>Ngày đi</th>
+              <th>Số người</th>
+              <th>Gói</th>
+              <th>Ghi chú</th>
+              <th>Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody id="bookingRows"></tbody>
+        </table>
+      </div>
+      <div id="dashboardError" class="error">Không tải được dữ liệu đơn.</div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script>
+    (function () {
+      const SUPABASE_URL = 'https://ojqcwegtxzhoqdkmgzsa.supabase.co';
+      const SUPABASE_ANON_KEY = 'sb_publishable_a2vFhGf6JVqIMokJ4LnvXw_oVY89uOx';
+
+      let supabase = null;
+      let allRows = [];
+
+      function setState(message) {
+        const el = document.getElementById('loginState');
+        if (el) el.textContent = 'Trạng thái: ' + message;
+      }
+
+      function showError(message, target) {
+        const el = document.getElementById(target || 'loginError');
+        if (!el) return;
+        el.textContent = message;
+        el.style.display = 'block';
+      }
+
+      function clearErrors() {
+        const ids = ['loginError', 'dashboardError'];
+        ids.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+        });
+      }
+
+      function setAuthUI(isLoggedIn) {
+        document.getElementById('loginCard').style.display = isLoggedIn ? 'none' : 'grid';
+        document.getElementById('dashboardCard').style.display = isLoggedIn ? 'grid' : 'none';
+      }
+
+      function statusOptions(selected) {
+        const values = [
+          ['new', 'Mới'],
+          ['contacted', 'Đã liên hệ'],
+          ['confirmed', 'Đã chốt'],
+          ['cancelled', 'Đã hủy']
+        ];
+        return values.map(v => '<option value="' + v[0] + '"' + (selected === v[0] ? ' selected' : '') + '>' + v[1] + '</option>').join('');
+      }
+
+      function formatDate(v) {
+        if (!v) return '-';
+        const d = new Date(v);
+        return Number.isNaN(d.getTime()) ? v : d.toLocaleString('vi-VN');
+      }
+
+      function getStatusFilter() {
+        return Array.from(document.querySelectorAll('[data-status-filter]:checked')).map(i => i.value);
+      }
+
+      function renderRows() {
+        const allowed = getStatusFilter();
+        const rows = allRows.filter(r => allowed.includes(r.status));
+        const tbody = document.getElementById('bookingRows');
+        tbody.innerHTML = rows.map(r => (
+          '<tr>' +
+            '<td>' + formatDate(r.created_at) + '</td>' +
+            '<td>' + (r.customer_name || '') + '</td>' +
+            '<td>' + (r.customer_phone || '') + '</td>' +
+            '<td>' + (r.place_name || r.place_id || '') + '</td>' +
+            '<td>' + (r.travel_date || '') + '</td>' +
+            '<td>' + (r.people_count || '') + '</td>' +
+            '<td>' + (r.package_name || '') + '</td>' +
+            '<td>' + (r.note || '') + '</td>' +
+            '<td><select class="status-select" data-status-id="' + r.id + '">' + statusOptions(r.status) + '</select></td>' +
+          '</tr>'
+        )).join('');
+
+        tbody.querySelectorAll('[data-status-id]').forEach(sel => {
+          sel.addEventListener('change', async () => {
+            const id = sel.getAttribute('data-status-id');
+            const status = sel.value;
+            const res = await supabase.from('bookings').update({ status: status }).eq('id', id);
+            if (res.error) {
+              showError('Cập nhật trạng thái lỗi: ' + res.error.message, 'dashboardError');
+              return;
+            }
+            const hit = allRows.find(x => String(x.id) === String(id));
+            if (hit) hit.status = status;
+          });
+        });
+      }
+
+      async function loadBookings() {
+        clearErrors();
+        const res = await supabase.from('bookings').select('*').order('created_at', { ascending: false });
+        if (res.error) {
+          showError('Tải danh sách lỗi: ' + res.error.message, 'dashboardError');
+          return;
+        }
+        allRows = res.data || [];
+        renderRows();
+      }
+
+      async function doLogin(event) {
+        if (event) event.preventDefault();
+        clearErrors();
+        const form = document.getElementById('loginForm');
+        const data = new FormData(form);
+        const email = String(data.get('email') || '').trim();
+        const password = String(data.get('password') || '');
+        const btn = document.getElementById('btnLogin');
+
+        if (!email || !password) {
+          showError('Vui lòng nhập đủ email và mật khẩu.', 'loginError');
+          return false;
+        }
+        setState('đang gửi yêu cầu đăng nhập...');
+        if (btn) btn.textContent = 'Đang đăng nhập...';
+
+        const res = await supabase.auth.signInWithPassword({ email, password });
+        if (btn) btn.textContent = 'Đăng nhập';
+
+        if (res.error) {
+          showError('Đăng nhập lỗi: ' + res.error.message, 'loginError');
+          setState('đăng nhập thất bại.');
+          return false;
+        }
+        if (!res.data || !res.data.session) {
+          showError('Không tạo được session. Kiểm tra user đã xác thực email.', 'loginError');
+          setState('đăng nhập chưa có session.');
+          return false;
+        }
+
+        setAuthUI(true);
+        setState('đăng nhập thành công, đang tải dữ liệu...');
+        await loadBookings();
+        setState('đã tải xong dashboard.');
+        return false;
+      }
+
+      window.__forceLoginSubmit = doLogin;
+
+      async function init() {
+        if (!window.supabase) {
+          showError('Không tải được thư viện Supabase JS.', 'loginError');
+          setState('thiếu thư viện Supabase.');
+          return;
+        }
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        document.getElementById('loginForm').addEventListener('submit', doLogin);
+        document.getElementById('btnLogin').addEventListener('click', doLogin);
+        document.getElementById('btnReload').addEventListener('click', loadBookings);
+        document.getElementById('btnLogout').addEventListener('click', async () => {
+          await supabase.auth.signOut();
+          setAuthUI(false);
+          setState('đã đăng xuất.');
+        });
+        document.querySelectorAll('[data-status-filter]').forEach(c => c.addEventListener('change', renderRows));
+
+        const s = await supabase.auth.getSession();
+        const loggedIn = !!(s.data && s.data.session);
+        setAuthUI(loggedIn);
+        setState(loggedIn ? 'đã có session admin.' : 'chờ đăng nhập.');
+        if (loggedIn) await loadBookings();
+      }
+
+      window.addEventListener('DOMContentLoaded', function () {
+        init().catch(function (err) {
+          showError('Khởi tạo lỗi: ' + (err && err.message ? err.message : String(err)), 'loginError');
+          setState('khởi tạo lỗi.');
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
