@@ -20,7 +20,7 @@ function buildMapScriptUrl(key) {
 function loadGoogleMaps() {
   const key = getMapApiKey();
   if (!key) {
-    document.getElementById('map').innerHTML = '<div style="padding:14px;color:#fff">Thiếu Google Maps API Key. Thêm `window.GMAPS_API_KEY` trong map.html hoặc truyền `?key=...`.</div>';
+    document.getElementById('map').innerHTML = '<div style="padding:14px;color:#fff">Thiếu Google Maps API Key. List điểm vẫn hoạt động, map sẽ hiện khi thêm key.</div>';
     return;
   }
   const script = document.createElement('script');
@@ -133,12 +133,13 @@ function applyFilters() {
   const f = currentFilters();
   visiblePlaces = allPlaces.filter(p => matchPlace(p, f));
   renderList();
-  rebuildMarkers();
+  if (map && window.google) rebuildMarkers();
 }
 
 function focusPlace(placeId) {
   const place = visiblePlaces.find(p => p.id === placeId) || allPlaces.find(p => p.id === placeId);
   if (!place) return;
+  if (!map) return;
   const marker = markerById.get(place.id);
 
   map.panTo({ lat: place.lat, lng: place.lng });
@@ -166,7 +167,7 @@ async function setup() {
 
   const p = new URLSearchParams(window.location.search);
   const focusId = p.get('focus');
-  if (focusId) focusPlace(focusId);
+  if (focusId && map) focusPlace(focusId);
 }
 
 window.initMap = async function initMap() {
@@ -178,9 +179,19 @@ window.initMap = async function initMap() {
     fullscreenControl: true
   });
   infoWindow = new google.maps.InfoWindow();
-  await setup();
+  if (allPlaces.length) {
+    applyFilters();
+    const p = new URLSearchParams(window.location.search);
+    const focusId = p.get('focus');
+    if (focusId) focusPlace(focusId);
+  } else {
+    await setup();
+  }
 };
 
 window.addEventListener('DOMContentLoaded', () => {
+  setup().catch(err => {
+    document.getElementById('pointList').innerHTML = `<div class="point-item">Lỗi tải dữ liệu: ${err.message}</div>`;
+  });
   loadGoogleMaps();
 });

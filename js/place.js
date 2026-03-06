@@ -4,8 +4,25 @@ async function renderPlace() {
   const id = params.get('id');
 
   const places = await A.fetchPlaces();
-  const place = places.find(p => p.id === id) || places[0];
+  const place = places.find(p => p.id === id) || places.find(p => p.id === 'pc-001') || places[0];
   if (!place) return;
+
+  if (!id) {
+    const chooser = document.getElementById('placeChooser');
+    const chooserList = document.getElementById('chooserList');
+    chooser.style.display = 'block';
+    chooserList.innerHTML = places.slice(0, 10).map(p => `
+      <article class="card feature-card" style="grid-column:span 6">
+        <div class="feature-body">
+          <b>${A.escapeHtml(p.name)}</b>
+          <div class="tags">
+            <span class="tag">${A.escapeHtml(A.TYPE_LABELS[p.type] || p.type)}</span>
+          </div>
+          <a class="btn small" href="place.html?id=${encodeURIComponent(p.id)}">Mở hồ sơ</a>
+        </div>
+      </article>
+    `).join('');
+  }
 
   document.title = `${place.name} - Hồ sơ điểm`;
 
@@ -22,6 +39,8 @@ async function renderPlace() {
   document.getElementById('permissionBadge').className = `tag permission ${A.permissionClass(place.record_permission)}`;
   document.getElementById('sensitivityBadge').textContent = sensitivityLabel;
   document.getElementById('sourceNote').textContent = place.source_note || 'Đang cập nhật nguồn tư liệu và đồng thuận cộng đồng.';
+  const sensitiveAlert = document.getElementById('sensitiveAlert');
+  sensitiveAlert.style.display = place.sensitivity_level === 'sensitive' ? 'block' : 'none';
 
   document.getElementById('btnDirection').href = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}`;
   document.getElementById('btnBooking').href = `booking.html?item=${encodeURIComponent(place.id)}`;

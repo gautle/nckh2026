@@ -20,12 +20,17 @@
         <a href="index.html">Trang chủ</a>
         <a href="map.html">Bản đồ</a>
         <a class="active" href="place.html">Hồ sơ điểm</a>
-        <a href="admin-bookings.html">Quản lý đơn</a>
       </nav>
     </div>
   </header>
 
   <main class="container main">
+    <section id="placeChooser" class="card" style="padding:12px;display:none">
+      <h3 style="margin:0 0 8px">Chọn điểm để xem hồ sơ</h3>
+      <p style="margin:0 0 10px;color:var(--muted)">Bạn chưa chọn điểm cụ thể. Chọn nhanh một điểm bên dưới:</p>
+      <div id="chooserList" class="grid"></div>
+    </section>
+
     <section class="card" style="padding:14px">
       <h1 id="placeName" style="margin:0 0 8px">Đang tải...</h1>
       <div class="badges">
@@ -36,6 +41,7 @@
       </div>
       <p id="placeSummary" style="color:var(--muted)"></p>
       <p><b>Quy tắc ứng xử:</b> <span id="placeNotes"></span></p>
+      <p id="sensitiveAlert" class="error" style="display:none">Một phần thông tin được lược giản để tôn trọng cộng đồng.</p>
       <div class="row" style="justify-content:flex-start">
         <a id="btnDirection" class="btn" href="#" target="_blank" rel="noopener">Chỉ đường</a>
         <a id="btnBooking" class="btn primary" href="#">Đặt trải nghiệm</a>

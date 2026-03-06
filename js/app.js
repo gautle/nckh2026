@@ -31,7 +31,7 @@ function escapeHtml(v = '') {
 }
 
 async function fetchPlaces() {
-  const res = await fetch('data/places.json');
+  const res = await fetch('./data/places.json');
   if (!res.ok) throw new Error('Không đọc được data/places.json');
   return res.json();
 }
