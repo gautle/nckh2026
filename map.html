@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bản đồ trải nghiệm - Google Maps JS API</title>
+  <title>Bản đồ trải nghiệm - ArcGIS Embed</title>
   <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
@@ -61,16 +61,23 @@
       </aside>
 
       <section class="card map-box">
+        <div class="row" style="padding:10px 10px 0 10px;justify-content:space-between">
+          <span class="tag">ArcGIS Web Map</span>
+          <a id="btnOpenArcgisFull" class="btn small" href="#" target="_blank" rel="noopener">Mở bản đồ full</a>
+        </div>
+        <div id="mapHint" class="note" style="padding:0 10px 8px 10px;margin-top:6px">Nhúng ArcGIS đang hoạt động. Bạn có thể kéo/zoom trực tiếp trong khung.</div>
         <div id="map"></div>
       </section>
     </section>
   </main>
 
   <script>
-    // Demo key: thay bằng key của bạn, hoặc truyền ?key=YOUR_KEY trên URL.
-    window.GMAPS_API_KEY = "AIzaSyAN7Kc-Ccxzzao8vY1pBwE9ERr9mm7TeJ8";
+    // Dán link Embed từ ArcGIS Online (Share -> Embed) vào đây.
+    // Ví dụ: https://www.arcgis.com/apps/Embed/index.html?webmap=...
+    window.ARCGIS_EMBED_URL = "";
+    // (Tuỳ chọn) Link mở full tab, nếu bỏ trống sẽ dùng cùng link embed.
+    window.ARCGIS_FULL_URL = "";
   </script>
-  <script src="https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/demo-data.js"></script>
   <script src="js/metrics.js"></script>

@@ -1,11 +1,6 @@
-let map;
 let allPlaces = [];
 let visiblePlaces = [];
-let markers = [];
-let markerById = new Map();
-let clusterer;
-let infoWindow;
-let setupDone = false;
+let embedReady = false;
 
 const el = {};
 
@@ -15,34 +10,47 @@ function trackMetric(eventName, payload) {
   }
 }
 
-function getMapApiKey() {
-  const p = new URLSearchParams(window.location.search);
-  return p.get('key') || window.GMAPS_API_KEY || '';
+function getEmbedUrl() {
+  return String(window.ARCGIS_EMBED_URL || '').trim();
 }
 
-function buildMapScriptUrl(key) {
-  return `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&callback=initMap&v=weekly`;
+function getFullUrl() {
+  const full = String(window.ARCGIS_FULL_URL || '').trim();
+  return full || getEmbedUrl();
 }
 
-function loadGoogleMaps() {
-  const key = getMapApiKey();
-  if (!key) {
-    document.getElementById('map').innerHTML = '<div style="padding:14px;color:#fff">Thiếu Google Maps API Key. List điểm vẫn hoạt động, map sẽ hiện khi thêm key.</div>';
+function loadArcGISEmbed() {
+  const mapEl = document.getElementById('map');
+  const hintEl = document.getElementById('mapHint');
+  const openBtn = document.getElementById('btnOpenArcgisFull');
+  const embedUrl = getEmbedUrl();
+  const fullUrl = getFullUrl();
+
+  if (fullUrl) {
+    openBtn.href = fullUrl;
+  } else {
+    openBtn.href = '#';
+    openBtn.addEventListener('click', e => e.preventDefault());
+  }
+
+  if (!embedUrl) {
+    mapEl.innerHTML = '<div style="padding:14px;color:#fff">Chưa có ARCGIS_EMBED_URL. Mở map.html và dán link Embed từ ArcGIS Online.</div>';
+    hintEl.textContent = 'Bạn chưa cấu hình link ArcGIS embed.';
+    embedReady = false;
     return;
   }
-  window.gm_authFailure = function () {
-    document.getElementById('map').innerHTML =
-      '<div style="padding:14px;color:#fff">Google Maps API key bị từ chối. Kiểm tra: key đúng, Maps JavaScript API đã bật, billing đã bật, và Website restrictions khớp domain hiện tại.</div>';
-  };
-  const script = document.createElement('script');
-  script.src = buildMapScriptUrl(key);
-  script.async = true;
-  script.defer = true;
-  script.onerror = function () {
-    document.getElementById('map').innerHTML =
-      '<div style="padding:14px;color:#fff">Không tải được Google Maps script. Kiểm tra mạng hoặc cấu hình key.</div>';
-  };
-  document.head.appendChild(script);
+
+  mapEl.innerHTML =
+    `<iframe
+      title="ArcGIS Web Map"
+      src="${embedUrl}"
+      style="width:100%;min-height:78vh;border:0"
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      allowfullscreen
+    ></iframe>`;
+  hintEl.textContent = 'Nhúng ArcGIS đang hoạt động. Bạn có thể kéo/zoom trực tiếp trong khung.';
+  embedReady = true;
 }
 
 function currentFilters() {
@@ -63,39 +71,6 @@ function matchPlace(p, f) {
   );
 }
 
-function setMapOnAll(value) {
-  markers.forEach(m => m.setMap(value));
-}
-
-function clearCluster() {
-  if (clusterer && typeof clusterer.clearMarkers === 'function') {
-    clusterer.clearMarkers();
-  }
-  clusterer = null;
-}
-
-function rebuildMarkers() {
-  clearCluster();
-  setMapOnAll(null);
-  markers = [];
-  markerById = new Map();
-
-  visiblePlaces.forEach(place => {
-    const marker = new google.maps.Marker({
-      map,
-      position: { lat: place.lat, lng: place.lng },
-      title: place.name
-    });
-    marker.addListener('click', () => focusPlace(place.id));
-    markers.push(marker);
-    markerById.set(place.id, marker);
-  });
-
-  if (markers.length > 50 && window.markerClusterer && markerClusterer.MarkerClusterer) {
-    clusterer = new markerClusterer.MarkerClusterer({ map, markers });
-  }
-}
-
 function placeCard(place) {
   const A = window.AppData;
   const permission = A.PERMISSION_LABELS[place.record_permission] || place.record_permission;
@@ -111,27 +86,10 @@ function placeCard(place) {
       </div>
       <div style="color:var(--muted);font-size:13px">${A.escapeHtml(place.summary)}</div>
       <div class="row" style="justify-content:flex-start">
-        <button class="btn small" data-pan-id="${A.escapeHtml(place.id)}">Xem trên bản đồ</button>
+        <button class="btn small" data-focus-id="${A.escapeHtml(place.id)}">Xem trên ArcGIS</button>
         <a class="btn small" href="place.html?id=${encodeURIComponent(place.id)}">Mở hồ sơ</a>
       </div>
     </article>
-  `;
-}
-
-function infoContent(place) {
-  const A = window.AppData;
-  const permissionText = A.PERMISSION_LABELS[place.record_permission] || place.record_permission;
-  return `
-    <div style="max-width:260px;font-family:ui-sans-serif,system-ui">
-      <h3 style="margin:0 0 6px;font-size:16px">${A.escapeHtml(place.name)}</h3>
-      <p style="margin:0 0 8px;font-size:13px">${A.escapeHtml(place.summary)}</p>
-      <p style="margin:0 0 8px;font-size:12px"><b>${A.toPermissionIcon(place.record_permission)} ${A.escapeHtml(permissionText)}</b></p>
-      <p style="margin:0 0 10px;font-size:12px">${A.escapeHtml(place.cultural_notes)}</p>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <a href="place.html?id=${encodeURIComponent(place.id)}" style="padding:6px 8px;border:1px solid #ddd;border-radius:999px;font-size:12px;text-decoration:none;color:#111">Mở hồ sơ</a>
-        <a href="booking.html?item=${encodeURIComponent(place.id)}" style="padding:6px 8px;border:1px solid #ddd;border-radius:999px;font-size:12px;text-decoration:none;color:#111">Đặt trải nghiệm</a>
-      </div>
-    </div>
   `;
 }
 
@@ -144,8 +102,8 @@ function renderList() {
 
   el.list.innerHTML = visiblePlaces.map(placeCard).join('');
 
-  el.list.querySelectorAll('[data-pan-id]').forEach(btn => {
-    btn.addEventListener('click', () => focusPlace(btn.getAttribute('data-pan-id')));
+  el.list.querySelectorAll('[data-focus-id]').forEach(btn => {
+    btn.addEventListener('click', () => focusPlace(btn.getAttribute('data-focus-id')));
   });
 }
 
@@ -153,26 +111,23 @@ function applyFilters() {
   const f = currentFilters();
   visiblePlaces = allPlaces.filter(p => matchPlace(p, f));
   renderList();
-  if (map && window.google) rebuildMarkers();
 }
 
 function focusPlace(placeId) {
   const place = visiblePlaces.find(p => p.id === placeId) || allPlaces.find(p => p.id === placeId);
   if (!place) return;
-  if (!map) return;
-  const marker = markerById.get(place.id);
 
-  map.panTo({ lat: place.lat, lng: place.lng });
-  map.setZoom(14);
-
-  if (marker) {
-    infoWindow.setContent(infoContent(place));
-    infoWindow.open({ map, anchor: marker });
+  const hintEl = document.getElementById('mapHint');
+  if (embedReady) {
+    hintEl.textContent = `Đã chọn: ${place.name} (${place.lat.toFixed(5)}, ${place.lng.toFixed(5)}). Hãy định vị điểm trên ArcGIS ở khung bên phải.`;
+  } else {
+    hintEl.textContent = `Đã chọn: ${place.name}.`;
   }
+
+  document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 async function setup() {
-  if (setupDone) return;
   el.list = document.getElementById('pointList');
   el.search = document.getElementById('searchInput');
   el.count = document.getElementById('pointCount');
@@ -185,6 +140,7 @@ async function setup() {
   });
 
   el.search.addEventListener('input', applyFilters);
+
   if (!allPlaces.length) {
     visiblePlaces = [];
     el.count.textContent = '0 điểm';
@@ -195,30 +151,12 @@ async function setup() {
 
   const p = new URLSearchParams(window.location.search);
   const focusId = p.get('focus');
-  if (focusId && map) focusPlace(focusId);
-  setupDone = true;
+  if (focusId) focusPlace(focusId);
 }
 
-window.initMap = async function initMap() {
-  map = new google.maps.Map(document.getElementById('map'), {
-    center: { lat: 20.84, lng: 104.83 },
-    zoom: 12,
-    mapTypeControl: true,
-    streetViewControl: false,
-    fullscreenControl: true
-  });
-  infoWindow = new google.maps.InfoWindow();
-  if (allPlaces.length) {
-    applyFilters();
-    const p = new URLSearchParams(window.location.search);
-    const focusId = p.get('focus');
-    if (focusId) focusPlace(focusId);
-  } else {
-    await setup();
-  }
-};
-
 window.addEventListener('DOMContentLoaded', () => {
+  loadArcGISEmbed();
+
   document.addEventListener('click', event => {
     const link = event.target.closest('a[href*="booking.html?item="]');
     if (!link) return;
@@ -236,5 +174,4 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('pointCount').textContent = '0 điểm';
     console.error(err);
   });
-  loadGoogleMaps();
 });
