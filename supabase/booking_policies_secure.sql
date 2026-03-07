@@ -19,3 +19,8 @@ create policy "admin_update_bookings"
 on public.bookings for update
 using (auth.role() = 'authenticated')
 with check (auth.role() = 'authenticated');
+
+drop policy if exists "admin_delete_bookings" on public.bookings;
+create policy "admin_delete_bookings"
+on public.bookings for delete
+using (auth.role() = 'authenticated');

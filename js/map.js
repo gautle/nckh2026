@@ -5,8 +5,15 @@ let markers = [];
 let markerById = new Map();
 let clusterer;
 let infoWindow;
+let setupDone = false;
 
 const el = {};
+
+function trackMetric(eventName, payload) {
+  if (window.AppMetrics && typeof window.AppMetrics.track === 'function') {
+    window.AppMetrics.track(eventName, payload || {});
+  }
+}
 
 function getMapApiKey() {
   const p = new URLSearchParams(window.location.search);
@@ -23,10 +30,18 @@ function loadGoogleMaps() {
     document.getElementById('map').innerHTML = '<div style="padding:14px;color:#fff">Thiếu Google Maps API Key. List điểm vẫn hoạt động, map sẽ hiện khi thêm key.</div>';
     return;
   }
+  window.gm_authFailure = function () {
+    document.getElementById('map').innerHTML =
+      '<div style="padding:14px;color:#fff">Google Maps API key bị từ chối. Kiểm tra: key đúng, Maps JavaScript API đã bật, billing đã bật, và Website restrictions khớp domain hiện tại.</div>';
+  };
   const script = document.createElement('script');
   script.src = buildMapScriptUrl(key);
   script.async = true;
   script.defer = true;
+  script.onerror = function () {
+    document.getElementById('map').innerHTML =
+      '<div style="padding:14px;color:#fff">Không tải được Google Maps script. Kiểm tra mạng hoặc cấu hình key.</div>';
+  };
   document.head.appendChild(script);
 }
 
@@ -122,6 +137,11 @@ function infoContent(place) {
 
 function renderList() {
   el.count.textContent = `${visiblePlaces.length} điểm`;
+  if (!visiblePlaces.length) {
+    el.list.innerHTML = '<div class="point-item">Không có điểm phù hợp bộ lọc hiện tại.</div>';
+    return;
+  }
+
   el.list.innerHTML = visiblePlaces.map(placeCard).join('');
 
   el.list.querySelectorAll('[data-pan-id]').forEach(btn => {
@@ -152,22 +172,31 @@ function focusPlace(placeId) {
 }
 
 async function setup() {
+  if (setupDone) return;
   el.list = document.getElementById('pointList');
   el.search = document.getElementById('searchInput');
   el.count = document.getElementById('pointCount');
 
   allPlaces = await window.AppData.fetchPlaces();
+  if (!Array.isArray(allPlaces)) allPlaces = [];
 
   document.querySelectorAll('[data-filter-type],[data-filter-perm],[data-filter-sens]').forEach(input => {
     input.addEventListener('change', applyFilters);
   });
 
   el.search.addEventListener('input', applyFilters);
-  applyFilters();
+  if (!allPlaces.length) {
+    visiblePlaces = [];
+    el.count.textContent = '0 điểm';
+    el.list.innerHTML = '<div class="point-item">Chưa có dữ liệu điểm. Hãy kiểm tra data/places.json hoặc js/demo-data.js.</div>';
+  } else {
+    applyFilters();
+  }
 
   const p = new URLSearchParams(window.location.search);
   const focusId = p.get('focus');
   if (focusId && map) focusPlace(focusId);
+  setupDone = true;
 }
 
 window.initMap = async function initMap() {
@@ -190,8 +219,22 @@ window.initMap = async function initMap() {
 };
 
 window.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('click', event => {
+    const link = event.target.closest('a[href*="booking.html?item="]');
+    if (!link) return;
+    try {
+      const url = new URL(link.getAttribute('href'), window.location.href);
+      const placeId = url.searchParams.get('item') || '';
+      trackMetric('booking_click', { place_id: placeId, source: 'map' });
+    } catch (_err) {
+      trackMetric('booking_click', { place_id: '', source: 'map' });
+    }
+  });
+
   setup().catch(err => {
-    document.getElementById('pointList').innerHTML = `<div class="point-item">Lỗi tải dữ liệu: ${err.message}</div>`;
+    document.getElementById('pointList').innerHTML = '<div class="point-item">Không tải được dữ liệu bản đồ. Đang chờ dữ liệu demo.</div>';
+    document.getElementById('pointCount').textContent = '0 điểm';
+    console.error(err);
   });
   loadGoogleMaps();
 });

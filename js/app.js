@@ -30,10 +30,44 @@ function escapeHtml(v = '') {
     .replaceAll("'", '&#39;');
 }
 
+function isDemoMode() {
+  return Boolean(window.DEMO_MODE);
+}
+
+function getDemoPlaces() {
+  return Array.isArray(window.DEMO_PLACES) ? window.DEMO_PLACES : [];
+}
+
+let placesCache = null;
+
 async function fetchPlaces() {
-  const res = await fetch('./data/places.json');
-  if (!res.ok) throw new Error('Không đọc được data/places.json');
-  return res.json();
+  if (Array.isArray(placesCache)) return placesCache;
+
+  const demoPlaces = getDemoPlaces();
+  if (isDemoMode() && demoPlaces.length) {
+    placesCache = demoPlaces;
+    return placesCache;
+  }
+
+  try {
+    const res = await fetch('./data/places.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('Không đọc được data/places.json');
+    const data = await res.json();
+    if (Array.isArray(data) && data.length) {
+      placesCache = data;
+      return placesCache;
+    }
+    throw new Error('Dữ liệu điểm đang trống');
+  } catch (err) {
+    if (demoPlaces.length) {
+      console.warn('Fallback sang DEMO_PLACES:', err.message);
+      placesCache = demoPlaces;
+      return placesCache;
+    }
+    console.error('Không tải được dữ liệu điểm:', err);
+    placesCache = [];
+    return placesCache;
+  }
 }
 
 function toPermissionIcon(v) {
@@ -48,6 +82,7 @@ window.AppData = {
   SENSITIVITY_LABELS,
   permissionClass,
   escapeHtml,
+  isDemoMode,
   fetchPlaces,
   toPermissionIcon
 };

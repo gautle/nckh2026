@@ -33,7 +33,7 @@ Khuyen nghi:
 - Mo `booking.html`, gui 1 don (khong can dang nhap)
 - Mo `admin-bookings.html`
 - Dang nhap bang tai khoan admin
-- Xem/sua trang thai don
+- Xem/sua/xoa don
 
 ## 6) Bao mat nang cao (optional)
 - Thay policy `authenticated` bang danh sach admin user cu the

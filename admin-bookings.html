@@ -46,41 +46,64 @@
 
     <section id="dashboardCard" class="card" style="padding:14px;display:none;gap:10px">
       <div class="row" style="justify-content:space-between">
-        <h2 style="margin:0">Danh sách đơn</h2>
+        <h2 style="margin:0">Quản trị demo</h2>
         <div class="row" style="justify-content:flex-end">
           <button id="btnReload" class="btn">Tải lại</button>
           <button id="btnLogout" class="btn">Đăng xuất</button>
         </div>
       </div>
       <div class="row" style="justify-content:flex-start">
-        <label class="check"><input type="checkbox" data-status-filter value="new" checked /> Mới</label>
-        <label class="check"><input type="checkbox" data-status-filter value="contacted" checked /> Đã liên hệ</label>
-        <label class="check"><input type="checkbox" data-status-filter value="confirmed" checked /> Đã chốt</label>
-        <label class="check"><input type="checkbox" data-status-filter value="cancelled" checked /> Đã hủy</label>
+        <button class="btn small primary" type="button" data-admin-tab="orders">Đơn</button>
+        <button class="btn small" type="button" data-admin-tab="metrics">Chỉ số</button>
       </div>
-      <div class="table-wrap">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Thời gian</th>
-              <th>Khách</th>
-              <th>Liên hệ</th>
-              <th>Điểm</th>
-              <th>Ngày đi</th>
-              <th>Số người</th>
-              <th>Gói</th>
-              <th>Ghi chú</th>
-              <th>Trạng thái</th>
-            </tr>
-          </thead>
-          <tbody id="bookingRows"></tbody>
-        </table>
-      </div>
-      <div id="dashboardError" class="error">Không tải được dữ liệu đơn.</div>
+
+      <section id="ordersPanel">
+        <div class="row" style="justify-content:flex-start">
+          <label class="check"><input type="checkbox" data-status-filter value="new" checked /> Mới</label>
+          <label class="check"><input type="checkbox" data-status-filter value="contacted" checked /> Đã liên hệ</label>
+          <label class="check"><input type="checkbox" data-status-filter value="confirmed" checked /> Đã chốt</label>
+          <label class="check"><input type="checkbox" data-status-filter value="cancelled" checked /> Đã hủy</label>
+        </div>
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Thời gian</th>
+                <th>Khách</th>
+                <th>Liên hệ</th>
+                <th>Điểm</th>
+                <th>Ngày đi</th>
+                <th>Số người</th>
+                <th>Gói</th>
+                <th>Ghi chú</th>
+                <th>Trạng thái</th>
+                <th>Xoá</th>
+              </tr>
+            </thead>
+            <tbody id="bookingRows"></tbody>
+          </table>
+        </div>
+        <div id="dashboardError" class="error">Không tải được dữ liệu đơn.</div>
+      </section>
+
+      <section id="metricsPanel" style="display:none">
+        <div class="row" style="justify-content:space-between">
+          <h3 style="margin:0">Chỉ số hành vi (DEMO)</h3>
+          <button id="btnReloadMetrics" class="btn small" type="button">Làm mới chỉ số</button>
+        </div>
+        <div class="stats" style="margin-top:12px">
+          <div class="stat"><b id="metricProfileViews">0</b><span>Lượt xem hồ sơ điểm</span></div>
+          <div class="stat"><b id="metricBookingClicks">0</b><span>Lượt bấm đặt trải nghiệm</span></div>
+          <div class="stat"><b id="metricConsentRate">0%</b><span>Tỷ lệ đồng ý quy tắc ứng xử</span></div>
+          <div class="stat"><b id="metricConsentTotal">0</b><span>Tổng lượt trả lời popup ghi hình</span></div>
+        </div>
+        <div id="metricsState" class="note">Đang chờ dữ liệu METRICS trong localStorage.</div>
+      </section>
     </section>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/metrics.js"></script>
   <script>
     (function () {
       const SUPABASE_URL = 'https://ojqcwegtxzhoqdkmgzsa.supabase.co';
@@ -88,6 +111,13 @@
 
       let supabase = null;
       let allRows = [];
+      const EMPTY_METRICS = {
+        profile_views: 0,
+        booking_clicks: 0,
+        media_consent_yes: 0,
+        media_consent_no: 0,
+        last_updated: null
+      };
 
       function setState(message) {
         const el = document.getElementById('loginState');
@@ -112,6 +142,7 @@
       function setAuthUI(isLoggedIn) {
         document.getElementById('loginCard').style.display = isLoggedIn ? 'none' : 'grid';
         document.getElementById('dashboardCard').style.display = isLoggedIn ? 'grid' : 'none';
+        if (isLoggedIn) setAdminTab('orders');
       }
 
       function statusOptions(selected) {
@@ -134,6 +165,44 @@
         return Array.from(document.querySelectorAll('[data-status-filter]:checked')).map(i => i.value);
       }
 
+      function setAdminTab(tab) {
+        const isMetrics = tab === 'metrics';
+        document.getElementById('ordersPanel').style.display = isMetrics ? 'none' : 'block';
+        document.getElementById('metricsPanel').style.display = isMetrics ? 'block' : 'none';
+        document.querySelectorAll('[data-admin-tab]').forEach(btn => {
+          const active = btn.getAttribute('data-admin-tab') === tab;
+          btn.classList.toggle('primary', active);
+        });
+        if (isMetrics) renderMetrics();
+      }
+
+      function readMetrics() {
+        if (!window.AppMetrics || typeof window.AppMetrics.readMetrics !== 'function') {
+          return EMPTY_METRICS;
+        }
+        return window.AppMetrics.readMetrics();
+      }
+
+      function renderMetrics() {
+        const data = readMetrics();
+        const yes = Number(data.media_consent_yes) || 0;
+        const no = Number(data.media_consent_no) || 0;
+        const totalConsent = yes + no;
+        const consentRate = totalConsent ? ((yes / totalConsent) * 100).toFixed(1) + '%' : '0%';
+
+        document.getElementById('metricProfileViews').textContent = String(Number(data.profile_views) || 0);
+        document.getElementById('metricBookingClicks').textContent = String(Number(data.booking_clicks) || 0);
+        document.getElementById('metricConsentRate').textContent = consentRate;
+        document.getElementById('metricConsentTotal').textContent = String(totalConsent);
+
+        const stateEl = document.getElementById('metricsState');
+        if (!data.last_updated) {
+          stateEl.textContent = 'Chưa có dữ liệu tương tác. Hãy mở place.html và bấm Nghe audio / Xem 360 để tạo dữ liệu demo.';
+          return;
+        }
+        stateEl.textContent = 'Cập nhật gần nhất: ' + formatDate(data.last_updated);
+      }
+
       function renderRows() {
         const allowed = getStatusFilter();
         const rows = allRows.filter(r => allowed.includes(r.status));
@@ -149,6 +218,7 @@
             '<td>' + (r.package_name || '') + '</td>' +
             '<td>' + (r.note || '') + '</td>' +
             '<td><select class="status-select" data-status-id="' + r.id + '">' + statusOptions(r.status) + '</select></td>' +
+            '<td><button class="btn small" data-delete-id="' + r.id + '">Xoá</button></td>' +
           '</tr>'
         )).join('');
 
@@ -163,6 +233,20 @@
             }
             const hit = allRows.find(x => String(x.id) === String(id));
             if (hit) hit.status = status;
+          });
+        });
+
+        tbody.querySelectorAll('[data-delete-id]').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.getAttribute('data-delete-id');
+            if (!confirm('Xoá đơn này? Thao tác không thể hoàn tác.')) return;
+            const res = await supabase.from('bookings').delete().eq('id', id);
+            if (res.error) {
+              showError('Xoá đơn lỗi: ' + res.error.message, 'dashboardError');
+              return;
+            }
+            allRows = allRows.filter(x => String(x.id) !== String(id));
+            renderRows();
           });
         });
       }
@@ -228,18 +312,25 @@
         document.getElementById('loginForm').addEventListener('submit', doLogin);
         document.getElementById('btnLogin').addEventListener('click', doLogin);
         document.getElementById('btnReload').addEventListener('click', loadBookings);
+        document.getElementById('btnReloadMetrics').addEventListener('click', renderMetrics);
         document.getElementById('btnLogout').addEventListener('click', async () => {
           await supabase.auth.signOut();
           setAuthUI(false);
           setState('đã đăng xuất.');
         });
         document.querySelectorAll('[data-status-filter]').forEach(c => c.addEventListener('change', renderRows));
+        document.querySelectorAll('[data-admin-tab]').forEach(btn => {
+          btn.addEventListener('click', function () {
+            setAdminTab(btn.getAttribute('data-admin-tab'));
+          });
+        });
 
         const s = await supabase.auth.getSession();
         const loggedIn = !!(s.data && s.data.session);
         setAuthUI(loggedIn);
         setState(loggedIn ? 'đã có session admin.' : 'chờ đăng nhập.');
         if (loggedIn) await loadBookings();
+        renderMetrics();
       }
 
       window.addEventListener('DOMContentLoaded', function () {

@@ -1,7 +1,6 @@
-const DEMO_MODE = true;
-
 async function initBooking() {
   const A = window.AppData;
+  const DEMO_MODE = A.isDemoMode();
   const params = new URLSearchParams(window.location.search);
   const item = params.get('item');
   const places = await A.fetchPlaces();
@@ -49,7 +48,21 @@ async function initBooking() {
         const oldRows = JSON.parse(localStorage.getItem(key) || '[]');
         oldRows.unshift(payload);
         localStorage.setItem(key, JSON.stringify(oldRows));
-        console.log('DEMO booking saved:', payload);
+      } else {
+        const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
+        if (!supabase) throw new Error('Chưa cấu hình Supabase client');
+
+        const { error } = await supabase.from('bookings').insert({
+          customer_name: payload.customer_name,
+          customer_phone: payload.customer_phone,
+          people_count: payload.people_count,
+          travel_date: payload.travel_date,
+          package_name: payload.package_name,
+          note: payload.note,
+          place_id: payload.place_id,
+          place_name: payload.place_name
+        });
+        if (error) throw error;
       }
 
       e.currentTarget.reset();
@@ -57,7 +70,7 @@ async function initBooking() {
         pointIdInput.value = selectedPlace.id;
         pointNameInput.value = selectedPlace.name;
       }
-      successEl.textContent = 'Đã nhận đăng ký (demo).';
+      successEl.textContent = DEMO_MODE ? 'Đã nhận đăng ký (demo).' : 'Đã nhận đăng ký thành công.';
       successEl.style.display = 'block';
     } catch (err) {
       errorEl.textContent = `Lỗi gửi đăng ký: ${err.message}`;

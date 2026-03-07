@@ -1,0 +1,5 @@
+id,name,type,lat,lng,summary,cultural_notes,record_permission,sensitivity_level,audio_url,pano360_url,images,duration_minutes,price_range,contact_zalo,contact_phone,source_note
+pc-021,Homestay Ban Hoa,service,20.8412,104.8245,Luu tru cong dong gan diem trai nghiem,Giữ yên tĩnh sau 22h; tôn trọng không gian sinh hoạt chung,allowed,public,,,"",720,350k-600k/dem,@homestay-banhoa,0900000021,Du lieu mau de dien
+pc-022,Diem ngam nui ban cao,landscape,20.8531,104.8126,View ngam nui va binh minh dep,Khong xa rac; khong vuot qua khu vuc canh bao,allowed,public,,,"",45,Mien phi,,,Du lieu mau de dien
+pc-023,Khong gian trinh dien van hoa,heritage,20.8367,104.8298,Trinh dien khan, trang phuc va ke chuyen van hoa,Xin phep truoc khi quay chup can canh,ask,limited,,,"",60,Theo su kien,@vanhoa-paco,0900000023,Du lieu mau de dien
+pc-024,Xuong trai nghiem det lanh,craft,20.8441,104.8269,Thu mot cong doan det lanh voi nghe nhan,Khong tu y dung dung cu khi chua co huong dan,ask,limited,,,"",90,150k-250k/nguoi,@det-lanh-paco,0900000024,Du lieu mau de dien

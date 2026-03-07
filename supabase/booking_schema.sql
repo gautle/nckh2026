@@ -17,7 +17,7 @@ alter table public.bookings enable row level security;
 
 -- Secure policies:
 -- 1) Public can submit bookings
--- 2) Only authenticated users can read/update bookings (for admin dashboard)
+-- 2) Only authenticated users can read/update/delete bookings (for admin dashboard)
 
 drop policy if exists "public_insert_bookings" on public.bookings;
 create policy "public_insert_bookings"
@@ -34,3 +34,8 @@ create policy "admin_update_bookings"
 on public.bookings for update
 using (auth.role() = 'authenticated')
 with check (auth.role() = 'authenticated');
+
+drop policy if exists "admin_delete_bookings" on public.bookings;
+create policy "admin_delete_bookings"
+on public.bookings for delete
+using (auth.role() = 'authenticated');
