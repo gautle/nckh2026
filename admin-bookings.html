@@ -19,8 +19,10 @@
       <nav class="nav">
         <a href="index.html">Trang chủ</a>
         <a href="map.html">Bản đồ</a>
+        <a href="du-lich-ao-360.html">Du lịch ảo 360</a>
+        <a href="huong-dan.html">Các bài viết</a>
         <a href="booking.html">Đặt trải nghiệm</a>
-        <a class="active" href="admin-bookings.html">Quản lý đơn</a>
+        <a class="active" href="admin-bookings.html">Quản lý tài khoản</a>
       </nav>
     </div>
   </header>
@@ -64,10 +66,15 @@
           <label class="check"><input type="checkbox" data-status-filter value="confirmed" checked /> Đã chốt</label>
           <label class="check"><input type="checkbox" data-status-filter value="cancelled" checked /> Đã hủy</label>
         </div>
+        <div class="row" style="justify-content:flex-start">
+          <label class="check"><input type="checkbox" id="selectAllRows" /> Chọn tất cả (đang lọc)</label>
+          <button id="btnDeleteSelected" class="btn small danger" type="button" disabled>Xoá đã chọn (0)</button>
+        </div>
         <div class="table-wrap">
           <table class="table">
             <thead>
               <tr>
+                <th style="width:56px">Chọn</th>
                 <th>Thời gian</th>
                 <th>Khách</th>
                 <th>Liên hệ</th>
@@ -103,14 +110,19 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/metrics.js"></script>
   <script>
     (function () {
       const SUPABASE_URL = 'https://ojqcwegtxzhoqdkmgzsa.supabase.co';
       const SUPABASE_ANON_KEY = 'sb_publishable_a2vFhGf6JVqIMokJ4LnvXw_oVY89uOx';
+      const DEMO_BOOKINGS_KEY = 'demo_bookings';
+      const HIDDEN_REMOTE_IDS_KEY = 'admin_hidden_remote_booking_ids_v1';
+      const IS_DEMO_MODE = Boolean(window.DEMO_MODE);
 
       let supabase = null;
       let allRows = [];
+      let selectedBookingIds = new Set();
       const EMPTY_METRICS = {
         profile_views: 0,
         booking_clicks: 0,
@@ -118,6 +130,73 @@
         media_consent_no: 0,
         last_updated: null
       };
+
+      function readArraySafe(key) {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) return [];
+          const data = JSON.parse(raw);
+          return Array.isArray(data) ? data : [];
+        } catch (_err) {
+          return [];
+        }
+      }
+
+      function writeArraySafe(key, rows) {
+        const value = Array.isArray(rows) ? rows : [];
+        localStorage.setItem(key, JSON.stringify(value));
+      }
+
+      function readHiddenRemoteIds() {
+        return new Set(readArraySafe(HIDDEN_REMOTE_IDS_KEY).map(id => String(id)));
+      }
+
+      function saveHiddenRemoteIds(setOrArray) {
+        const ids = Array.isArray(setOrArray) ? setOrArray : Array.from(setOrArray || []);
+        writeArraySafe(HIDDEN_REMOTE_IDS_KEY, ids.map(id => String(id)));
+      }
+
+      function readDemoBookings() {
+        const rows = readArraySafe(DEMO_BOOKINGS_KEY);
+        let touched = false;
+        const mapped = rows.map((row, idx) => {
+          const next = row && typeof row === 'object' ? row : {};
+          if (!next._local_id) {
+            next._local_id = 'lb_' + Date.now() + '_' + idx + '_' + Math.random().toString(36).slice(2, 8);
+            touched = true;
+          }
+          return Object.assign({}, next, {
+            id: 'demo-' + String(next._local_id),
+            __source: 'demo',
+            __local_id: String(next._local_id),
+            status: next.status || 'new'
+          });
+        });
+        if (touched) writeArraySafe(DEMO_BOOKINGS_KEY, rows);
+        return mapped;
+      }
+
+      function updateDemoBookingStatus(localId, status) {
+        const rows = readArraySafe(DEMO_BOOKINGS_KEY);
+        let changed = false;
+        rows.forEach(row => {
+          if (!row || typeof row !== 'object') return;
+          if (String(row._local_id || '') === String(localId)) {
+            row.status = status;
+            changed = true;
+          }
+        });
+        if (changed) writeArraySafe(DEMO_BOOKINGS_KEY, rows);
+      }
+
+      function deleteDemoBookings(localIds) {
+        const target = new Set((localIds || []).map(id => String(id)));
+        if (!target.size) return 0;
+        const rows = readArraySafe(DEMO_BOOKINGS_KEY);
+        const next = rows.filter(row => !target.has(String((row && row._local_id) || '')));
+        writeArraySafe(DEMO_BOOKINGS_KEY, next);
+        return rows.length - next.length;
+      }
 
       function setState(message) {
         const el = document.getElementById('loginState');
@@ -165,6 +244,43 @@
         return Array.from(document.querySelectorAll('[data-status-filter]:checked')).map(i => i.value);
       }
 
+      function getVisibleRows() {
+        const allowed = getStatusFilter();
+        return allRows.filter(r => allowed.includes(r.status));
+      }
+
+      function syncSelectionByData() {
+        const available = new Set(allRows.map(r => String(r.id)));
+        selectedBookingIds.forEach(id => {
+          if (!available.has(String(id))) selectedBookingIds.delete(id);
+        });
+      }
+
+      function updateBulkUI() {
+        const rows = getVisibleRows();
+        const visibleIds = rows.map(r => String(r.id));
+        const selectedVisible = visibleIds.filter(id => selectedBookingIds.has(id));
+
+        const selectAll = document.getElementById('selectAllRows');
+        if (selectAll) {
+          if (!visibleIds.length) {
+            selectAll.checked = false;
+            selectAll.indeterminate = false;
+            selectAll.disabled = true;
+          } else {
+            selectAll.disabled = false;
+            selectAll.checked = selectedVisible.length === visibleIds.length;
+            selectAll.indeterminate = selectedVisible.length > 0 && selectedVisible.length < visibleIds.length;
+          }
+        }
+
+        const btnBulk = document.getElementById('btnDeleteSelected');
+        if (btnBulk) {
+          btnBulk.disabled = selectedVisible.length === 0;
+          btnBulk.textContent = 'Xoá đã chọn (' + selectedVisible.length + ')';
+        }
+      }
+
       function setAdminTab(tab) {
         const isMetrics = tab === 'metrics';
         document.getElementById('ordersPanel').style.display = isMetrics ? 'none' : 'block';
@@ -204,11 +320,11 @@
       }
 
       function renderRows() {
-        const allowed = getStatusFilter();
-        const rows = allRows.filter(r => allowed.includes(r.status));
+        const rows = getVisibleRows();
         const tbody = document.getElementById('bookingRows');
         tbody.innerHTML = rows.map(r => (
           '<tr>' +
+            '<td><input type="checkbox" data-row-select-id="' + r.id + '"' + (selectedBookingIds.has(String(r.id)) ? ' checked' : '') + ' /></td>' +
             '<td>' + formatDate(r.created_at) + '</td>' +
             '<td>' + (r.customer_name || '') + '</td>' +
             '<td>' + (r.customer_phone || '') + '</td>' +
@@ -222,43 +338,146 @@
           '</tr>'
         )).join('');
 
+        if (!rows.length) {
+          tbody.innerHTML = '<tr><td colspan="11" style="color:rgba(255,255,255,.72)">Không có đơn trong bộ lọc hiện tại.</td></tr>';
+        }
+
         tbody.querySelectorAll('[data-status-id]').forEach(sel => {
           sel.addEventListener('change', async () => {
             const id = sel.getAttribute('data-status-id');
             const status = sel.value;
+            const hit = allRows.find(x => String(x.id) === String(id));
+            if (!hit) return;
+
+            if (hit.__source === 'demo') {
+              updateDemoBookingStatus(hit.__local_id, status);
+              hit.status = status;
+              updateBulkUI();
+              return;
+            }
+
             const res = await supabase.from('bookings').update({ status: status }).eq('id', id);
             if (res.error) {
               showError('Cập nhật trạng thái lỗi: ' + res.error.message, 'dashboardError');
               return;
             }
-            const hit = allRows.find(x => String(x.id) === String(id));
             if (hit) hit.status = status;
+          });
+        });
+
+        tbody.querySelectorAll('[data-row-select-id]').forEach(box => {
+          box.addEventListener('change', () => {
+            const id = String(box.getAttribute('data-row-select-id'));
+            if (box.checked) selectedBookingIds.add(id);
+            else selectedBookingIds.delete(id);
+            updateBulkUI();
           });
         });
 
         tbody.querySelectorAll('[data-delete-id]').forEach(btn => {
           btn.addEventListener('click', async () => {
             const id = btn.getAttribute('data-delete-id');
-            if (!confirm('Xoá đơn này? Thao tác không thể hoàn tác.')) return;
-            const res = await supabase.from('bookings').delete().eq('id', id);
-            if (res.error) {
-              showError('Xoá đơn lỗi: ' + res.error.message, 'dashboardError');
-              return;
-            }
-            allRows = allRows.filter(x => String(x.id) !== String(id));
-            renderRows();
+            await deleteBookings([id]);
           });
         });
+
+        updateBulkUI();
+      }
+
+      async function deleteBookings(ids) {
+        const uniqueIds = Array.from(new Set((ids || []).map(id => String(id))));
+        if (!uniqueIds.length) return;
+        if (!confirm('Xoá ' + uniqueIds.length + ' đơn đã chọn? Thao tác không thể hoàn tác.')) return;
+
+        clearErrors();
+        const rowById = new Map(allRows.map(row => [String(row.id), row]));
+        const demoLocalIds = [];
+        const remoteIds = [];
+
+        uniqueIds.forEach(id => {
+          const row = rowById.get(String(id));
+          if (row && row.__source === 'demo') demoLocalIds.push(String(row.__local_id || ''));
+          else remoteIds.push(String(id));
+        });
+
+        let deletedDemoCount = 0;
+        if (demoLocalIds.length) {
+          deletedDemoCount = deleteDemoBookings(demoLocalIds);
+          demoLocalIds.forEach(localId => {
+            selectedBookingIds.delete('demo-' + localId);
+          });
+        }
+
+        if (!remoteIds.length) {
+          allRows = allRows.filter(row => !(row.__source === 'demo' && demoLocalIds.includes(String(row.__local_id || ''))));
+          syncSelectionByData();
+          renderRows();
+          setState('đã xoá ' + deletedDemoCount + ' đơn demo.');
+          return;
+        }
+
+        const res = await supabase.from('bookings').delete().in('id', remoteIds).select('id');
+        if (res.error) {
+          const hiddenIds = readHiddenRemoteIds();
+          remoteIds.forEach(id => hiddenIds.add(String(id)));
+          saveHiddenRemoteIds(hiddenIds);
+          remoteIds.forEach(id => selectedBookingIds.delete(String(id)));
+          allRows = allRows.filter(row => !hiddenIds.has(String(row.id)));
+          syncSelectionByData();
+          renderRows();
+          showError(
+            'Không đủ quyền DELETE trên Supabase. Hệ thống đã ẩn ' + remoteIds.length + ' đơn trên máy này để bạn demo mượt.',
+            'dashboardError'
+          );
+          setState('đã ẩn ' + remoteIds.length + ' đơn từ Supabase (local).');
+          return;
+        }
+
+        const deletedIds = new Set((res.data || []).map(r => String(r.id)));
+        deletedIds.forEach(id => selectedBookingIds.delete(id));
+
+        const missingIds = remoteIds.filter(id => !deletedIds.has(String(id)));
+        if (missingIds.length) {
+          const hiddenIds = readHiddenRemoteIds();
+          missingIds.forEach(id => hiddenIds.add(String(id)));
+          saveHiddenRemoteIds(hiddenIds);
+          missingIds.forEach(id => selectedBookingIds.delete(String(id)));
+          showError(
+            'Một số đơn chưa xoá được trên Supabase, đã tự ẩn local: ' + missingIds.length + ' đơn.',
+            'dashboardError'
+          );
+        } else {
+          setState('đã xoá ' + deletedIds.size + ' đơn trên Supabase' + (deletedDemoCount ? (' + ' + deletedDemoCount + ' đơn demo') : '') + '.');
+        }
+
+        await loadBookings();
       }
 
       async function loadBookings() {
         clearErrors();
+        const hiddenIds = readHiddenRemoteIds();
+        const demoRows = IS_DEMO_MODE ? readDemoBookings() : [];
+        let remoteRows = [];
+
         const res = await supabase.from('bookings').select('*').order('created_at', { ascending: false });
         if (res.error) {
-          showError('Tải danh sách lỗi: ' + res.error.message, 'dashboardError');
-          return;
+          if (!demoRows.length) {
+            showError('Tải danh sách lỗi: ' + res.error.message, 'dashboardError');
+            return;
+          }
+          showError('Không tải được Supabase, đang hiển thị dữ liệu demo local.', 'dashboardError');
+        } else {
+          remoteRows = (res.data || [])
+            .filter(row => !hiddenIds.has(String(row.id)))
+            .map(row => Object.assign({}, row, { __source: 'supabase' }));
         }
-        allRows = res.data || [];
+
+        allRows = demoRows.concat(remoteRows).sort((a, b) => {
+          const ta = new Date(a && a.created_at ? a.created_at : 0).getTime();
+          const tb = new Date(b && b.created_at ? b.created_at : 0).getTime();
+          return tb - ta;
+        });
+        syncSelectionByData();
         renderRows();
       }
 
@@ -313,12 +532,29 @@
         document.getElementById('btnLogin').addEventListener('click', doLogin);
         document.getElementById('btnReload').addEventListener('click', loadBookings);
         document.getElementById('btnReloadMetrics').addEventListener('click', renderMetrics);
+        document.getElementById('btnDeleteSelected').addEventListener('click', async () => {
+          const visibleIds = new Set(getVisibleRows().map(r => String(r.id)));
+          const ids = Array.from(selectedBookingIds).filter(id => visibleIds.has(id));
+          await deleteBookings(ids);
+        });
+        document.getElementById('selectAllRows').addEventListener('change', function () {
+          const rows = getVisibleRows();
+          const isChecked = this.checked;
+          rows.forEach(r => {
+            const id = String(r.id);
+            if (isChecked) selectedBookingIds.add(id);
+            else selectedBookingIds.delete(id);
+          });
+          renderRows();
+        });
         document.getElementById('btnLogout').addEventListener('click', async () => {
           await supabase.auth.signOut();
           setAuthUI(false);
           setState('đã đăng xuất.');
         });
-        document.querySelectorAll('[data-status-filter]').forEach(c => c.addEventListener('change', renderRows));
+        document.querySelectorAll('[data-status-filter]').forEach(c => c.addEventListener('change', function () {
+          renderRows();
+        }));
         document.querySelectorAll('[data-admin-tab]').forEach(btn => {
           btn.addEventListener('click', function () {
             setAdminTab(btn.getAttribute('data-admin-tab'));
@@ -341,5 +577,6 @@
       });
     })();
   </script>
+  <script src="js/chatbot.js"></script>
 </body>
 </html>

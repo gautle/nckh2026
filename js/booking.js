@@ -43,16 +43,29 @@ async function initBooking() {
         created_at: new Date().toISOString()
       };
 
+      function normalizePhone(v) {
+        return String(v || '').replace(/[^\d+]/g, '').trim();
+      }
+
+      function newLocalBookingId() {
+        return 'lb_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+      }
+
+      let lookupCode = '';
+      const phoneForLookup = normalizePhone(payload.customer_phone);
+
       if (DEMO_MODE) {
         const key = 'demo_bookings';
         const oldRows = JSON.parse(localStorage.getItem(key) || '[]');
+        payload._local_id = newLocalBookingId();
         oldRows.unshift(payload);
         localStorage.setItem(key, JSON.stringify(oldRows));
+        lookupCode = 'DEMO-' + payload._local_id;
       } else {
         const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
         if (!supabase) throw new Error('Chưa cấu hình Supabase client');
 
-        const { error } = await supabase.from('bookings').insert({
+        const { data, error } = await supabase.from('bookings').insert({
           customer_name: payload.customer_name,
           customer_phone: payload.customer_phone,
           people_count: payload.people_count,
@@ -61,8 +74,9 @@ async function initBooking() {
           note: payload.note,
           place_id: payload.place_id,
           place_name: payload.place_name
-        });
+        }).select('id,status,created_at').single();
         if (error) throw error;
+        lookupCode = data && data.id ? String(data.id) : '';
       }
 
       e.currentTarget.reset();
@@ -70,7 +84,11 @@ async function initBooking() {
         pointIdInput.value = selectedPlace.id;
         pointNameInput.value = selectedPlace.name;
       }
-      successEl.textContent = DEMO_MODE ? 'Đã nhận đăng ký (demo).' : 'Đã nhận đăng ký thành công.';
+      const lookupUrl = `tra-cuu-don.html?phone=${encodeURIComponent(phoneForLookup)}&code=${encodeURIComponent(lookupCode)}`;
+      const baseMessage = DEMO_MODE ? 'Đã nhận đăng ký (demo).' : 'Đã nhận đăng ký thành công.';
+      successEl.innerHTML = lookupCode
+        ? `${baseMessage} Mã tra cứu: <b>${lookupCode}</b>. <a href="${lookupUrl}">Xem trạng thái đơn</a>.`
+        : `${baseMessage} <a href="tra-cuu-don.html">Tra cứu đơn</a>.`;
       successEl.style.display = 'block';
     } catch (err) {
       errorEl.textContent = `Lỗi gửi đăng ký: ${err.message}`;

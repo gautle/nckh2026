@@ -40,11 +40,9 @@
     const A = window.AppData;
     const searchWrap = document.getElementById('homeSearchWrap');
     const input = document.getElementById('homeSearchInput');
-    const btnSearch = document.getElementById('homeSearchBtn');
-    const btnReset = document.getElementById('homeSearchReset');
     const historyEl = document.getElementById('homeSearchHistoryDropdown');
     const resultEl = document.getElementById('homeSearchResults');
-    if (!A || !searchWrap || !input || !btnSearch || !btnReset || !historyEl || !resultEl) return;
+    if (!A || !searchWrap || !input || !historyEl || !resultEl) return;
 
     let places = [];
 
@@ -119,6 +117,7 @@
       const q = normalize(rawQuery);
       if (!q) {
         renderEmpty(resultEl, 'Nhập từ khóa để tìm điểm phù hợp.');
+        showResults();
         return;
       }
 
@@ -136,6 +135,7 @@
       if (!hits.length) {
         renderEmpty(resultEl, `Không tìm thấy kết quả cho "${input.value}".`);
         saveKeyword(rawQuery);
+        showResults();
         return;
       }
 
@@ -144,13 +144,7 @@
         const typeLabel = A.TYPE_LABELS[place.type] || place.type;
         return placeCard(place, typeLabel);
       }).join('');
-    }
-
-    function doReset() {
-      input.value = '';
-      resultEl.innerHTML = '';
-      input.focus();
-      showHistory();
+      showResults();
     }
 
     function showHistory() {
@@ -162,31 +156,49 @@
       historyEl.style.display = 'none';
     }
 
-    btnSearch.addEventListener('click', () => {
-      doSearch();
-      hideHistory();
-    });
-    btnReset.addEventListener('click', doReset);
+    function showResults() {
+      resultEl.style.display = 'grid';
+    }
+
+    function hideResults() {
+      resultEl.style.display = 'none';
+      resultEl.innerHTML = '';
+    }
+
     input.addEventListener('keydown', event => {
       if (event.key === 'Enter') {
         event.preventDefault();
         doSearch();
         hideHistory();
+        return;
+      }
+      if (event.key === 'Escape') {
+        hideHistory();
+        hideResults();
       }
     });
-    input.addEventListener('focus', showHistory);
-    input.addEventListener('click', showHistory);
+    input.addEventListener('focus', () => {
+      hideResults();
+      showHistory();
+    });
+    input.addEventListener('click', () => {
+      hideResults();
+      showHistory();
+    });
     document.addEventListener('click', event => {
-      if (!searchWrap.contains(event.target)) hideHistory();
+      if (!searchWrap.contains(event.target)) {
+        hideHistory();
+        hideResults();
+      }
     });
 
     A.fetchPlaces()
       .then(data => {
         places = Array.isArray(data) ? data : [];
-        renderEmpty(resultEl, `Sẵn sàng tìm trong ${places.length} điểm.`);
       })
       .catch(() => {
         renderEmpty(resultEl, 'Chưa tải được dữ liệu điểm để tìm kiếm.');
+        showResults();
       });
   }
 

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tra cứu đơn trải nghiệm</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container top-inner">
+      <a class="brand" href="index.html">
+        <div class="logo"></div>
+        <div>
+          <b>Tra cứu đơn</b>
+          <span>Lịch sử đặt và trạng thái xử lý</span>
+        </div>
+      </a>
+      <nav class="nav">
+        <a href="index.html">Trang chủ</a>
+        <a href="map.html">Bản đồ</a>
+        <a href="du-lich-ao-360.html">Du lịch ảo 360</a>
+        <a href="huong-dan.html">Các bài viết</a>
+        <a href="booking.html">Đặt trải nghiệm</a>
+        <a href="admin-bookings.html">Quản lý tài khoản</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container main">
+    <section class="card form">
+      <h2 style="margin:0">Tra cứu lịch sử đặt</h2>
+      <p class="lead">Nhập số điện thoại đã dùng khi đặt. Có thể thêm mã đơn để lọc chính xác hơn.</p>
+
+      <form id="bookingLookupForm" class="form" autocomplete="off">
+        <div class="form-grid">
+          <label>Số điện thoại
+            <input id="lookupPhone" class="input" name="phone" required placeholder="Ví dụ: 09xx xxx xxx" />
+          </label>
+          <label>Mã đơn (không bắt buộc)
+            <input id="lookupCode" class="input" name="code" placeholder="Ví dụ: DEMO-lb_... hoặc 123" />
+          </label>
+        </div>
+        <div class="row" style="justify-content:flex-start">
+          <button class="btn primary" type="submit">Tra cứu</button>
+          <button id="lookupResetBtn" class="btn" type="button">Làm mới</button>
+          <a class="btn" href="booking.html">Quay lại đặt đơn</a>
+        </div>
+      </form>
+
+      <div id="lookupState" class="note">Trạng thái: chờ tra cứu.</div>
+      <div id="lookupError" class="error" style="display:none">Không tra cứu được.</div>
+    </section>
+
+    <section class="card" style="padding:14px;margin-top:12px">
+      <div class="row" style="justify-content:space-between">
+        <h3 style="margin:0">Kết quả tra cứu</h3>
+        <span id="lookupCount" class="tag">0 đơn</span>
+      </div>
+      <div class="table-wrap" style="margin-top:10px">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Mã đơn</th>
+              <th>Thời gian tạo</th>
+              <th>Điểm</th>
+              <th>Ngày đi</th>
+              <th>Số người</th>
+              <th>Gói</th>
+              <th>Trạng thái</th>
+              <th>Ghi chú</th>
+            </tr>
+          </thead>
+          <tbody id="lookupRows">
+            <tr><td colspan="8" style="color:rgba(255,255,255,.72)">Chưa có kết quả tra cứu.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/supabase-config.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/booking-tracking.js"></script>
+  <script src="js/chatbot.js"></script>
+</body>
+</html>
