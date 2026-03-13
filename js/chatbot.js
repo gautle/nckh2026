@@ -84,68 +84,6 @@
     limousine: 'Limousine',
     coach: 'Xe khách'
   };
-  const ROUTE_OPTIONS = [
-    {
-      id: 'rt-craft-halfday',
-      title: 'Lộ trình nghề thủ công ngắn',
-      duration: 'half_day',
-      groupMin: 2,
-      groupMax: 8,
-      budgetMin: 350000,
-      budgetMax: 650000,
-      transportModes: ['self_drive', 'limousine', 'coach'],
-      focusPlaceId: 'pc02',
-      placeIds: ['pc02', 'pc01']
-    },
-    {
-      id: 'rt-community-oneday',
-      title: 'Một ngày trải nghiệm cộng đồng',
-      duration: 'one_day',
-      groupMin: 4,
-      groupMax: 12,
-      budgetMin: 650000,
-      budgetMax: 1200000,
-      transportModes: ['self_drive', 'limousine', 'coach'],
-      focusPlaceId: 'pc01',
-      placeIds: ['pc01', 'pc02', 'pc03']
-    },
-    {
-      id: 'rt-homestay-2d1n',
-      title: 'Cuối tuần 2N1Đ cùng homestay',
-      duration: 'two_days',
-      groupMin: 4,
-      groupMax: 16,
-      budgetMin: 1200000,
-      budgetMax: 2200000,
-      transportModes: ['self_drive', 'limousine', 'coach'],
-      focusPlaceId: 'pc03',
-      placeIds: ['pc03', 'pc04', 'pc07']
-    },
-    {
-      id: 'rt-budget-group',
-      title: 'Lộ trình tiết kiệm cho nhóm đông',
-      duration: 'one_day',
-      groupMin: 8,
-      groupMax: 30,
-      budgetMin: 280000,
-      budgetMax: 700000,
-      transportModes: ['coach', 'self_drive'],
-      focusPlaceId: 'pc06',
-      placeIds: ['pc06', 'pc07', 'pc01']
-    },
-    {
-      id: 'rt-deep-3d2n',
-      title: 'Lộ trình chuyên sâu 3N2Đ',
-      duration: 'three_days',
-      groupMin: 4,
-      groupMax: 14,
-      budgetMin: 1800000,
-      budgetMax: 3500000,
-      transportModes: ['self_drive', 'limousine'],
-      focusPlaceId: 'pc01',
-      placeIds: ['pc01', 'pc02', 'pc03', 'pc04']
-    }
-  ];
   const CHAT_STATE = {
     lastIntent: '',
     lastRouteCriteria: null
@@ -902,9 +840,7 @@
   }
 
   async function buildRouteSuggestion(criteria) {
-    const routes = (Array.isArray(window.DEMO_ROUTE_OPTIONS) && window.DEMO_ROUTE_OPTIONS.length)
-      ? window.DEMO_ROUTE_OPTIONS
-      : ROUTE_OPTIONS;
+    const routes = Array.isArray(window.DEMO_ROUTE_OPTIONS) ? window.DEMO_ROUTE_OPTIONS : [];
     const places = await getPlaces();
     const placeById = new Map(places.map((place) => [place.id, place]));
 
@@ -918,8 +854,9 @@
         ROUTE_DURATION_LABELS[route.duration] || route.duration,
         route.groupMin + '-' + route.groupMax + ' người',
         toVnd(route.budgetMin) + '-' + toVnd(route.budgetMax) + '/người',
-        (Array.isArray(route.transportModes) ? route.transportModes : []).map((mode) => TRANSPORT_LABELS[mode] || mode).join('/')
-      ].join(' • ');
+        (Array.isArray(route.transportModes) ? route.transportModes : []).map((mode) => TRANSPORT_LABELS[mode] || mode).join('/'),
+        route.homestay ? ('Homestay: ' + route.homestay) : ''
+      ].filter(Boolean).join(' • ');
       const mapHref = focusId ? ('map.html?focus=' + encodeURIComponent(focusId)) : 'map.html';
       const bookingHref = focusId
         ? ('booking.html?item=' + encodeURIComponent(focusId) + '&route=' + encodeURIComponent(route.id))

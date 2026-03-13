@@ -29,6 +29,7 @@
         <div style="color:var(--muted);font-size:13px">${escapeHtml(place.summary || '')}</div>
         <div class="row" style="justify-content:flex-start">
           <a class="btn small" href="map.html?focus=${encodeURIComponent(place.id)}">Xem trên bản đồ</a>
+          <a class="btn small" href="du-lich-ao-360.html?id=${encodeURIComponent(place.id)}">Xem 360</a>
           <a class="btn small" href="place.html?id=${encodeURIComponent(place.id)}">Mở hồ sơ</a>
           <a class="btn small primary" href="booking.html?item=${encodeURIComponent(place.id)}">Đặt trải nghiệm</a>
         </div>

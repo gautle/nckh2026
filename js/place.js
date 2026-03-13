@@ -128,8 +128,8 @@ function setupMediaActions() {
   if (panoBtn) {
     panoBtn.addEventListener('click', () => {
       if (!askRecordConsent('360')) return;
-      if (currentPlace && currentPlace.pano360_url) {
-        window.open(currentPlace.pano360_url, '_blank', 'noopener');
+      if (currentPlace && currentPlace.id) {
+        window.location.href = `du-lich-ao-360.html?id=${encodeURIComponent(currentPlace.id)}`;
         return;
       }
       alert('Ảnh 360 đang cập nhật.');

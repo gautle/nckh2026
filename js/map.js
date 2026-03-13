@@ -87,6 +87,7 @@ function placeCard(place) {
       <div style="color:var(--muted);font-size:13px">${A.escapeHtml(place.summary)}</div>
       <div class="row" style="justify-content:flex-start">
         <button class="btn small" data-focus-id="${A.escapeHtml(place.id)}">Xem trên ArcGIS</button>
+        <a class="btn small" href="du-lich-ao-360.html?id=${encodeURIComponent(place.id)}">Xem 360</a>
         <a class="btn small" href="place.html?id=${encodeURIComponent(place.id)}">Mở hồ sơ</a>
       </div>
     </article>

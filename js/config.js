@@ -17,7 +17,12 @@ window.CHATBOT_AI_ENDPOINT = 'https://ojqcwegtxzhoqdkmgzsa.supabase.co/functions
 window.CHATBOT_AI_TOKEN = '';
 
 // 360 virtual tourism links
+window.VIRTUAL360_PORTAL_URL =
+  'https://23000908-cell.github.io/tour_Paco_BanLat/index.html';
 window.VIRTUAL360_DRIVE_FOLDER_URL =
   'https://drive.google.com/drive/folders/1eJflBBS3zaCUmGimnop2cQ9236IIT97P';
 window.VIRTUAL360_DRIVE_EMBED_URL =
   'https://drive.google.com/embeddedfolderview?id=1eJflBBS3zaCUmGimnop2cQ9236IIT97P#grid';
+
+// Fallback pano link for places that do not have pano360_url yet.
+window.DEFAULT_PANO360_URL = window.VIRTUAL360_PORTAL_URL;

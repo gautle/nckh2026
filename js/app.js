@@ -40,12 +40,24 @@ function getDemoPlaces() {
 
 let placesCache = null;
 
+function applyDefaultPano(places) {
+  const fallbackPano = String(window.DEFAULT_PANO360_URL || '').trim();
+  if (!fallbackPano || !Array.isArray(places)) return places;
+
+  return places.map((place) => {
+    if (!place || typeof place !== 'object') return place;
+    const hasPano = String(place.pano360_url || '').trim();
+    if (hasPano) return place;
+    return { ...place, pano360_url: fallbackPano };
+  });
+}
+
 async function fetchPlaces() {
   if (Array.isArray(placesCache)) return placesCache;
 
   const demoPlaces = getDemoPlaces();
   if (isDemoMode() && demoPlaces.length) {
-    placesCache = demoPlaces;
+    placesCache = applyDefaultPano(demoPlaces);
     return placesCache;
   }
 
@@ -54,14 +66,14 @@ async function fetchPlaces() {
     if (!res.ok) throw new Error('Không đọc được data/places.json');
     const data = await res.json();
     if (Array.isArray(data) && data.length) {
-      placesCache = data;
+      placesCache = applyDefaultPano(data);
       return placesCache;
     }
     throw new Error('Dữ liệu điểm đang trống');
   } catch (err) {
     if (demoPlaces.length) {
       console.warn('Fallback sang DEMO_PLACES:', err.message);
-      placesCache = demoPlaces;
+      placesCache = applyDefaultPano(demoPlaces);
       return placesCache;
     }
     console.error('Không tải được dữ liệu điểm:', err);
