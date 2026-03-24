@@ -18,7 +18,7 @@ window.CHATBOT_AI_TOKEN = '';
 
 // 360 virtual tourism links
 window.VIRTUAL360_PORTAL_URL =
-  'https://23000908-cell.github.io/tour_Paco_BanLat/index.html';
+  'https://23000908-cell.github.io/3Dvistar_premium/';
 window.VIRTUAL360_DRIVE_FOLDER_URL =
   'https://drive.google.com/drive/folders/1eJflBBS3zaCUmGimnop2cQ9236IIT97P';
 window.VIRTUAL360_DRIVE_EMBED_URL =
