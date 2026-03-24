@@ -26,3 +26,15 @@ window.VIRTUAL360_DRIVE_EMBED_URL =
 
 // Fallback pano link for places that do not have pano360_url yet.
 window.DEFAULT_PANO360_URL = window.VIRTUAL360_PORTAL_URL;
+
+// Optional 360 mapping by place id.
+// You can map one place to one or many 360 scenes.
+// Example:
+// window.PANO360_PLACE_MAP = {
+//   pc03: [
+//     { id: 'tong-quan', name: 'Tổng quan homestay', url: 'https://...' },
+//     { id: 'phong-nghi', name: 'Phòng nghỉ', url: 'https://...' }
+//   ],
+//   pc04: 'https://...'
+// };
+window.PANO360_PLACE_MAP = window.PANO360_PLACE_MAP || {};

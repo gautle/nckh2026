@@ -89,8 +89,17 @@ function renderPlaceDetails(place) {
     : '<div class="placeholder">Audio đang cập nhật.</div>';
 
   const pano = document.getElementById('panoWrap');
+  const panoScenes = Array.isArray(place.pano360_scenes) ? place.pano360_scenes : [];
   pano.innerHTML = place.pano360_url
-    ? `<iframe src="${A.escapeHtml(place.pano360_url)}" title="360" style="width:100%;min-height:260px;border:0;border-radius:10px"></iframe>`
+    ? `
+      <iframe src="${A.escapeHtml(place.pano360_url)}" title="360" style="width:100%;min-height:260px;border:0;border-radius:10px"></iframe>
+      <div style="margin-top:10px;display:grid;gap:8px">
+        <div class="note">Điểm này có ${panoScenes.length || 1} scene 360. Bạn có thể mở trang 360 để chuyển scene theo từng góc nhìn.</div>
+        <div class="row" style="justify-content:flex-start">
+          <a class="btn small primary" href="du-lich-ao-360.html?id=${encodeURIComponent(place.id)}">Mở trang 360 đầy đủ</a>
+        </div>
+      </div>
+    `
     : '<div class="placeholder">Ảnh 360 đang cập nhật.</div>';
 
   const imageWrap = document.getElementById('imageWrap');

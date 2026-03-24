@@ -40,15 +40,73 @@ function getDemoPlaces() {
 
 let placesCache = null;
 
+function normalizePanoSceneEntry(entry, index) {
+  if (!entry) return null;
+
+  if (typeof entry === 'string') {
+    const url = entry.trim();
+    if (!url) return null;
+    return {
+      id: `scene-${index + 1}`,
+      name: index === 0 ? 'Không gian chính' : `Góc nhìn ${index + 1}`,
+      url
+    };
+  }
+
+  if (typeof entry === 'object') {
+    const url = String(entry.url || entry.src || entry.pano360_url || '').trim();
+    if (!url) return null;
+    return {
+      id: String(entry.id || `scene-${index + 1}`),
+      name: String(entry.name || entry.title || (index === 0 ? 'Không gian chính' : `Góc nhìn ${index + 1}`)),
+      url,
+      description: String(entry.description || entry.summary || '').trim()
+    };
+  }
+
+  return null;
+}
+
+function resolveRawPanoConfig(place) {
+  const map = window.PANO360_PLACE_MAP;
+  if (map && place && Object.prototype.hasOwnProperty.call(map, place.id)) {
+    return map[place.id];
+  }
+  return place && place.pano360_scenes ? place.pano360_scenes : null;
+}
+
+function resolvePanoScenes(place, fallbackPano) {
+  const raw = resolveRawPanoConfig(place);
+  let entries = [];
+
+  if (Array.isArray(raw)) {
+    entries = raw;
+  } else if (raw) {
+    entries = [raw];
+  } else if (String(place.pano360_url || '').trim()) {
+    entries = [String(place.pano360_url || '').trim()];
+  } else if (fallbackPano) {
+    entries = [fallbackPano];
+  }
+
+  return entries
+    .map((entry, index) => normalizePanoSceneEntry(entry, index))
+    .filter(Boolean);
+}
+
 function applyDefaultPano(places) {
   const fallbackPano = String(window.DEFAULT_PANO360_URL || '').trim();
-  if (!fallbackPano || !Array.isArray(places)) return places;
+  if (!Array.isArray(places)) return places;
 
   return places.map((place) => {
     if (!place || typeof place !== 'object') return place;
-    const hasPano = String(place.pano360_url || '').trim();
-    if (hasPano) return place;
-    return { ...place, pano360_url: fallbackPano };
+    const panoScenes = resolvePanoScenes(place, fallbackPano);
+    const primaryPano = panoScenes[0] ? panoScenes[0].url : '';
+    return {
+      ...place,
+      pano360_url: primaryPano,
+      pano360_scenes: panoScenes
+    };
   });
 }
 

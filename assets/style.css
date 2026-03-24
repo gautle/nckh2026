@@ -496,6 +496,40 @@ a { color: inherit; text-decoration: none; }
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   max-height: none;
 }
+.virtual-side-block + .virtual-side-block {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+}
+.virtual-place-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+}
+.virtual-place-card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.68);
+  padding: 10px;
+  display: grid;
+  gap: 6px;
+}
+.virtual-place-card.is-active {
+  border-color: rgba(199, 106, 67, 0.78);
+  box-shadow: 0 0 0 1px rgba(199, 106, 67, 0.25) inset;
+  background:
+    linear-gradient(170deg, rgba(199, 106, 67, 0.16), rgba(226, 166, 91, 0.12)),
+    rgba(255, 255, 255, 0.86);
+}
+.virtual-place-card h4 {
+  margin: 0;
+  font-size: 14px;
+}
+.virtual-place-card p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
 .virtual-scene-card {
   border: 1px solid var(--line);
   border-radius: 10px;

@@ -47,9 +47,18 @@
       </article>
 
       <article class="card virtual-scenes-card">
-        <h3 style="margin:0 0 10px">Danh sách điểm có 360</h3>
+        <div class="virtual-side-block">
+          <h3 style="margin:0 0 10px">Chọn điểm có 360</h3>
+          <div id="virtual360PlaceList" class="virtual-place-grid">
+            <div class="search-empty">Đang tải danh sách điểm 360...</div>
+          </div>
+        </div>
+        <div class="virtual-side-block">
+          <h3 style="margin:0 0 10px">Scene của điểm đang chọn</h3>
+          <div id="virtual360SelectedPlace" class="note">Đang chuẩn bị scene 360...</div>
+        </div>
         <div id="virtual360SceneList" class="virtual-scene-grid">
-          <div class="search-empty">Đang tải danh sách điểm 360...</div>
+          <div class="search-empty">Đang tải scene 360...</div>
         </div>
       </article>
     </section>
