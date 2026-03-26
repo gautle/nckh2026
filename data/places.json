@@ -1,7 +1,7 @@
 [
   {
     "id": "mc00",
-    "name": "địa phận bản lác 2",
+    "name": "Địa phận Bản Lác 2",
     "type": "service",
     "lat": 20.6517741481822,
     "lng": 105.062365465313,
@@ -20,7 +20,7 @@
   },
   {
     "id": "mc01",
-    "name": "hoa ban lalastay",
+    "name": "Hoa Ban Lalastay",
     "type": "service",
     "lat": 20.649013833365,
     "lng": 105.068346121137,
@@ -39,7 +39,7 @@
   },
   {
     "id": "mc02",
-    "name": "mai châu farmstay",
+    "name": "Mai Châu Farmstay",
     "type": "service",
     "lat": 20.6487209050322,
     "lng": 105.068971173523,
@@ -58,7 +58,7 @@
   },
   {
     "id": "mc03",
-    "name": "mai châu village view homestay",
+    "name": "Mai Châu Village View Homestay",
     "type": "service",
     "lat": 20.6623108103279,
     "lng": 105.064455209491,
@@ -76,8 +76,8 @@
     "source_note": "Du lieu nhap tu Google Sheet (dữ liệu điểm - mau_google_sheet_places_template.csv)."
   },
   {
-    "id": "pc01",
-    "name": "mông space",
+    "id": "MS",
+    "name": "Mông Space",
     "type": "service",
     "lat": 20.7503095755877,
     "lng": 104.906796665878,
@@ -95,8 +95,8 @@
     "source_note": "Du lieu nhap tu Google Sheet (dữ liệu điểm - mau_google_sheet_places_template.csv)."
   },
   {
-    "id": "pc02",
-    "name": "mông lềnh space",
+    "id": "ML",
+    "name": "Mông Lềnh Space",
     "type": "service",
     "lat": 20.7464499105634,
     "lng": 104.874994117938,
@@ -115,7 +115,7 @@
   },
   {
     "id": "pc03",
-    "name": "homestay y múa",
+    "name": "Homestay Y Múa",
     "type": "service",
     "lat": 20.7483880083249,
     "lng": 104.883223290457,
@@ -133,8 +133,8 @@
     "source_note": "Du lieu nhap tu Google Sheet (dữ liệu điểm - mau_google_sheet_places_template.csv)."
   },
   {
-    "id": "pc04",
-    "name": "highland homestay",
+    "id": "HLM",
+    "name": "Mai Châu Homestay (Highland Homestay)",
     "type": "service",
     "lat": 20.7382768547763,
     "lng": 104.885965152384,
@@ -153,7 +153,7 @@
   },
   {
     "id": "pc05",
-    "name": "a dơ homestay",
+    "name": "A Dơ Homestay",
     "type": "service",
     "lat": 20.7484430347202,
     "lng": 104.885388380314,
@@ -172,7 +172,7 @@
   },
   {
     "id": "pc06",
-    "name": "homestay vườn đào hang kia",
+    "name": "Homestay Vườn Đào Hang Kia",
     "type": "service",
     "lat": 20.7458181783637,
     "lng": 104.88133368379,
@@ -191,7 +191,7 @@
   },
   {
     "id": "pc07",
-    "name": "homestay a thống",
+    "name": "Homestay A Thống",
     "type": "service",
     "lat": 20.7459856084086,
     "lng": 104.881996178973,
@@ -207,5 +207,62 @@
     "contact_zalo": "",
     "contact_phone": "0356662899",
     "source_note": "Du lieu nhap tu Google Sheet (dữ liệu điểm - mau_google_sheet_places_template.csv)."
+  },
+  {
+    "id": "pc08",
+    "name": "Yến Tuyền homestay",
+    "type": "service",
+    "lat": 20.65158,
+    "lng": 105.06312,
+    "summary": "lưu trú nhà dân tại khu vực Bản Lác",
+    "cultural_notes": "Tôn trọng không gian cộng đồng và xin phép trước khi ghi hình.",
+    "record_permission": "ask",
+    "sensitivity_level": "public",
+    "audio_url": "",
+    "pano360_url": "",
+    "images": [],
+    "duration_minutes": 60,
+    "price_range": "",
+    "contact_zalo": "",
+    "contact_phone": "",
+    "source_note": "Dữ liệu bổ sung từ file mapping 360."
+  },
+  {
+    "id": "pc09",
+    "name": "Đức Ngọc homestay",
+    "type": "service",
+    "lat": 20.65241,
+    "lng": 105.06422,
+    "summary": "lưu trú nhà dân tại khu vực Bản Lác",
+    "cultural_notes": "Tôn trọng không gian cộng đồng và xin phép trước khi ghi hình.",
+    "record_permission": "ask",
+    "sensitivity_level": "public",
+    "audio_url": "",
+    "pano360_url": "",
+    "images": [],
+    "duration_minutes": 60,
+    "price_range": "",
+    "contact_zalo": "",
+    "contact_phone": "",
+    "source_note": "Dữ liệu bổ sung từ file mapping 360."
+  },
+  {
+    "id": "BN",
+    "name": "Địa phận Bản Nhót",
+    "type": "landscape",
+    "lat": 20.66285,
+    "lng": 105.06496,
+    "summary": "điểm trải nghiệm và cảnh quan tại khu vực Bản Nhót",
+    "cultural_notes": "Tôn trọng không gian cộng đồng và xin phép trước khi ghi hình.",
+    "record_permission": "ask",
+    "sensitivity_level": "public",
+    "audio_url": "",
+    "pano360_url": "",
+    "images": [],
+    "duration_minutes": 60,
+    "price_range": "",
+    "contact_zalo": "",
+    "contact_phone": "",
+    "source_note": "Dữ liệu bổ sung từ file mapping 360."
   }
 ]

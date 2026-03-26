@@ -464,9 +464,66 @@ a { color: inherit; text-decoration: none; }
   gap: 12px;
   padding-top: 12px;
 }
+.virtual-hero-card {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  gap: 12px;
+  align-items: stretch;
+}
+.virtual-hero-copy {
+  display: grid;
+  gap: 8px;
+}
+.virtual-hero-copy h1 {
+  margin: 0;
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.12;
+  color: #3a231d;
+}
+.virtual-hero-highlight {
+  border: 1px solid rgba(125, 72, 54, 0.18);
+  border-radius: 12px;
+  padding: 14px;
+  display: grid;
+  gap: 8px;
+  background:
+    linear-gradient(160deg, rgba(199, 106, 67, 0.14), rgba(226, 166, 91, 0.12)),
+    rgba(255, 255, 255, 0.68);
+}
+.virtual-highlight-label {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.virtual-hero-highlight h3 {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.2;
+}
+.virtual-hero-highlight p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.virtual-highlight-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: auto;
+}
 .virtual-embed-card,
 .virtual-scenes-card {
   padding: 12px;
+}
+.virtual-block-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 #virtual360Embed {
   width: 100%;
@@ -513,6 +570,7 @@ a { color: inherit; text-decoration: none; }
   padding: 10px;
   display: grid;
   gap: 6px;
+  align-content: start;
 }
 .virtual-place-card.is-active {
   border-color: rgba(199, 106, 67, 0.78);
@@ -529,6 +587,7 @@ a { color: inherit; text-decoration: none; }
   margin: 0;
   font-size: 12px;
   color: var(--muted);
+  line-height: 1.45;
 }
 .virtual-scene-card {
   border: 1px solid var(--line);
@@ -553,6 +612,7 @@ a { color: inherit; text-decoration: none; }
   margin: 0;
   font-size: 12px;
   color: var(--muted);
+  line-height: 1.45;
 }
 .virtual-scene-actions {
   display: flex;
@@ -1236,6 +1296,9 @@ textarea.input { border-radius: 12px; min-height: 100px; }
     height: 200px;
   }
   .virtual-layout {
+    grid-template-columns: 1fr;
+  }
+  .virtual-hero-card {
     grid-template-columns: 1fr;
   }
   .virtual-main #virtual360Embed {

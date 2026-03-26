@@ -953,7 +953,7 @@
         '- "đi 8 người cuối tuần, tầm 1.5 triệu/người"',
         '- "gợi ý homestay yên tĩnh"',
         '- "mở bản đồ"',
-        '- "đặt trải nghiệm cho điểm pc01"'
+        '- "đặt trải nghiệm cho điểm MS"'
       ].join('<br>');
     }
 

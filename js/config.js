@@ -18,11 +18,7 @@ window.CHATBOT_AI_TOKEN = '';
 
 // 360 virtual tourism links
 window.VIRTUAL360_PORTAL_URL =
-  'https://23000908-cell.github.io/3Dvistar_premium/';
-window.VIRTUAL360_DRIVE_FOLDER_URL =
-  'https://drive.google.com/drive/folders/1eJflBBS3zaCUmGimnop2cQ9236IIT97P';
-window.VIRTUAL360_DRIVE_EMBED_URL =
-  'https://drive.google.com/embeddedfolderview?id=1eJflBBS3zaCUmGimnop2cQ9236IIT97P#grid';
+  'https://23000908-cell.github.io/3Dvistar_premium/#scene=Mong%20space';
 
 // Fallback pano link for places that do not have pano360_url yet.
 window.DEFAULT_PANO360_URL = window.VIRTUAL360_PORTAL_URL;
@@ -35,6 +31,338 @@ window.DEFAULT_PANO360_URL = window.VIRTUAL360_PORTAL_URL;
 //     { id: 'tong-quan', name: 'Tổng quan homestay', url: 'https://...' },
 //     { id: 'phong-nghi', name: 'Phòng nghỉ', url: 'https://...' }
 //   ],
-//   pc04: 'https://...'
+//   HLM: 'https://...'
 // };
-window.PANO360_PLACE_MAP = window.PANO360_PLACE_MAP || {};
+window.PANO360_PLACE_MAP = {
+  "mc00": [
+    {
+      "id": "scene-1",
+      "name": "Không gian chính",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=Ban%20Lat"
+    },
+    {
+      "id": "scene-2",
+      "name": "Góc nhìn 2",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_03"
+    },
+    {
+      "id": "scene-3",
+      "name": "Góc nhìn 3",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_04"
+    },
+    {
+      "id": "scene-4",
+      "name": "Góc nhìn 4",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_05"
+    },
+    {
+      "id": "scene-5",
+      "name": "Góc nhìn 5",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_11"
+    }
+  ],
+  "mc01": [
+    {
+      "id": "scene-1",
+      "name": "Không gian chính",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_18"
+    },
+    {
+      "id": "scene-2",
+      "name": "Góc nhìn 2",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_17"
+    },
+    {
+      "id": "scene-3",
+      "name": "Góc nhìn 3",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_15"
+    },
+    {
+      "id": "scene-4",
+      "name": "Góc nhìn 4",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_16"
+    },
+    {
+      "id": "scene-5",
+      "name": "Góc nhìn 5",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_13"
+    },
+    {
+      "id": "scene-6",
+      "name": "Góc nhìn 6",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_14"
+    },
+    {
+      "id": "scene-7",
+      "name": "Góc nhìn 7",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_01"
+    }
+  ],
+  "mc02": [
+    {
+      "id": "scene-1",
+      "name": "Không gian chính",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=ML_16"
+    },
+    {
+      "id": "scene-2",
+      "name": "Góc nhìn 2",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=ML_15"
+    },
+    {
+      "id": "scene-3",
+      "name": "Góc nhìn 3",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=ML_17"
+    }
+  ],
+  "mc03": [
+    {
+      "id": "scene-1",
+      "name": "Không gian chính",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BN_4"
+    },
+    {
+      "id": "scene-2",
+      "name": "Góc nhìn 2",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BN_5"
+    },
+    {
+      "id": "scene-3",
+      "name": "Góc nhìn 3",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BN_6"
+    },
+    {
+      "id": "scene-4",
+      "name": "Góc nhìn 4",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BN_8"
+    },
+    {
+      "id": "scene-5",
+      "name": "Góc nhìn 5",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BN_7"
+    },
+    {
+      "id": "scene-6",
+      "name": "Góc nhìn 6",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BN_9"
+    }
+  ],
+  "MS": [
+    {
+      "id": "scene-1",
+      "name": "Không gian chính",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=Mong%20space"
+    },
+    {
+      "id": "scene-2",
+      "name": "Góc nhìn 2",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=MS_1"
+    },
+    {
+      "id": "scene-3",
+      "name": "Góc nhìn 3",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=MS_3"
+    },
+    {
+      "id": "scene-4",
+      "name": "Góc nhìn 4",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=MS_4"
+    },
+    {
+      "id": "scene-5",
+      "name": "Góc nhìn 5",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=MS_2"
+    },
+    {
+      "id": "scene-6",
+      "name": "Góc nhìn 6",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=MS_5"
+    }
+  ],
+  "ML": [
+    {
+      "id": "scene-1",
+      "name": "Không gian chính",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=Mong%20Lenh%20"
+    },
+    {
+      "id": "scene-2",
+      "name": "Góc nhìn 2",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=ML_1"
+    },
+    {
+      "id": "scene-3",
+      "name": "Góc nhìn 3",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=ML_2"
+    },
+    {
+      "id": "scene-4",
+      "name": "Góc nhìn 4",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=MS_6"
+    }
+  ],
+  "pc03": [
+    {
+      "id": "scene-1",
+      "name": "Không gian chính",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=ML_13"
+    },
+    {
+      "id": "scene-2",
+      "name": "Góc nhìn 2",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=ML_14"
+    }
+  ],
+  "HLM": [
+    {
+      "id": "scene-1",
+      "name": "Không gian chính",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=HLM_1"
+    },
+    {
+      "id": "scene-2",
+      "name": "Góc nhìn 2",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=Highlandmong"
+    },
+    {
+      "id": "scene-3",
+      "name": "Góc nhìn 3",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=HLM_02"
+    },
+    {
+      "id": "scene-4",
+      "name": "Góc nhìn 4",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=HLM_03"
+    }
+  ],
+  "pc05": [
+    {
+      "id": "scene-1",
+      "name": "Không gian chính",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=HS_1"
+    },
+    {
+      "id": "scene-2",
+      "name": "Góc nhìn 2",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=HS_1.2"
+    },
+    {
+      "id": "scene-3",
+      "name": "Góc nhìn 3",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=HS_1.3"
+    },
+    {
+      "id": "scene-4",
+      "name": "Góc nhìn 4",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=HS_1.1"
+    }
+  ],
+  "pc06": [
+    {
+      "id": "scene-1",
+      "name": "Không gian chính",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=HS_2"
+    },
+    {
+      "id": "scene-2",
+      "name": "Góc nhìn 2",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=HS_2.1"
+    },
+    {
+      "id": "scene-3",
+      "name": "Góc nhìn 3",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=HS_2.2"
+    }
+  ],
+  "pc08": [
+    {
+      "id": "scene-1",
+      "name": "Không gian chính",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_05"
+    },
+    {
+      "id": "scene-2",
+      "name": "Góc nhìn 2",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_06"
+    },
+    {
+      "id": "scene-3",
+      "name": "Góc nhìn 3",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_07"
+    },
+    {
+      "id": "scene-4",
+      "name": "Góc nhìn 4",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_08"
+    },
+    {
+      "id": "scene-5",
+      "name": "Góc nhìn 5",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_09"
+    },
+    {
+      "id": "scene-6",
+      "name": "Góc nhìn 6",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_10"
+    },
+    {
+      "id": "scene-7",
+      "name": "Góc nhìn 7",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_12"
+    }
+  ],
+  "pc09": [
+    {
+      "id": "scene-1",
+      "name": "Không gian chính",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_26"
+    },
+    {
+      "id": "scene-2",
+      "name": "Góc nhìn 2",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_27"
+    },
+    {
+      "id": "scene-3",
+      "name": "Góc nhìn 3",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BL_25"
+    }
+  ],
+  "BN": [
+    {
+      "id": "scene-1",
+      "name": "Không gian chính",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=Ban%20Nhot"
+    },
+    {
+      "id": "scene-2",
+      "name": "Góc nhìn 2",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BN_3"
+    },
+    {
+      "id": "scene-3",
+      "name": "Góc nhìn 3",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BN_1"
+    },
+    {
+      "id": "scene-4",
+      "name": "Góc nhìn 4",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BN_10"
+    },
+    {
+      "id": "scene-5",
+      "name": "Góc nhìn 5",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BN_11"
+    },
+    {
+      "id": "scene-6",
+      "name": "Góc nhìn 6",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BN_12"
+    },
+    {
+      "id": "scene-7",
+      "name": "Góc nhìn 7",
+      "url": "https://23000908-cell.github.io/3Dvistar_premium/#scene=BN_13"
+    }
+  ]
+};

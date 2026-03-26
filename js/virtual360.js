@@ -1,23 +1,10 @@
 (function () {
-  function getDriveFolderId(url) {
-    const text = String(url || '');
-    const match = text.match(/\/folders\/([a-zA-Z0-9_-]+)/);
-    return match ? match[1] : '';
-  }
-
-  function buildDriveEmbedUrl(folderUrl) {
-    const id = getDriveFolderId(folderUrl);
-    if (!id) return '';
-    return 'https://drive.google.com/embeddedfolderview?id=' + id + '#grid';
-  }
+  let pendingEmbedTimer = null;
 
   function pickEmbedUrl() {
     const portal = String(window.VIRTUAL360_PORTAL_URL || '').trim();
     if (portal) return portal;
-    const explicit = String(window.VIRTUAL360_DRIVE_EMBED_URL || '').trim();
-    if (explicit) return explicit;
-    const folderUrl = String(window.VIRTUAL360_DRIVE_FOLDER_URL || '').trim();
-    return buildDriveEmbedUrl(folderUrl);
+    return String(window.DEFAULT_PANO360_URL || '').trim();
   }
 
   function esc(v) {
@@ -28,6 +15,34 @@
 
   function getScenes(place) {
     return Array.isArray(place && place.pano360_scenes) ? place.pano360_scenes.filter((scene) => String(scene && scene.url || '').trim()) : [];
+  }
+
+  function getDefaultPlaceId(places, fallbackEmbedUrl) {
+    const normalizedUrl = String(fallbackEmbedUrl || '').trim();
+    if (!normalizedUrl || !Array.isArray(places) || !places.length) return '';
+
+    const matchedPlace = places.find((place) =>
+      getScenes(place).some((scene) => String(scene && scene.url || '').trim() === normalizedUrl)
+    );
+
+    if (matchedPlace && matchedPlace.id) return String(matchedPlace.id);
+
+    const mongSpace = places.find((place) => String(place && place.id || '') === 'MS');
+    return mongSpace && mongSpace.id ? String(mongSpace.id) : '';
+  }
+
+  function prioritizePlaces(places, preferredPlaceId) {
+    if (!Array.isArray(places) || !places.length) return [];
+    const preferredId = String(preferredPlaceId || '').trim();
+    if (!preferredId) return places.slice();
+
+    return places
+      .slice()
+      .sort((a, b) => {
+        const aPreferred = String(a && a.id || '') === preferredId ? 1 : 0;
+        const bPreferred = String(b && b.id || '') === preferredId ? 1 : 0;
+        return bPreferred - aPreferred;
+      });
   }
 
   function readSelectionFromUrl() {
@@ -57,11 +72,62 @@
     }
   }
 
+  function createForcedReloadUrl(src) {
+    const raw = String(src || '').trim();
+    if (!raw) return '';
+
+    const parts = raw.split('#');
+    const base = parts[0] || '';
+    const hash = parts.length > 1 ? `#${parts.slice(1).join('#')}` : '';
+    const separator = base.includes('?') ? '&' : '?';
+    return `${base}${separator}v360_reload=${Date.now()}${hash}`;
+  }
+
   function setEmbedSource(src, title) {
     const embedEl = document.getElementById('virtual360Embed');
     if (!embedEl) return;
-    embedEl.src = src;
     if (title) embedEl.title = title;
+
+    const nextSrc = createForcedReloadUrl(src);
+    if (!nextSrc) return;
+
+    if (pendingEmbedTimer) {
+      window.clearTimeout(pendingEmbedTimer);
+      pendingEmbedTimer = null;
+    }
+
+    embedEl.src = 'about:blank';
+    pendingEmbedTimer = window.setTimeout(() => {
+      embedEl.src = nextSrc;
+      pendingEmbedTimer = null;
+    }, 30);
+  }
+
+  function updateCurrentPlaceCard(place, scene, scenesCount) {
+    const placeNameEl = document.getElementById('virtualCurrentPlaceName');
+    const placeSummaryEl = document.getElementById('virtualCurrentPlaceSummary');
+    const profileLinkEl = document.getElementById('virtualPlaceProfileLink');
+    const externalLinkEl = document.getElementById('virtualOpenExternalLink');
+    const sceneCountEl = document.getElementById('virtualSceneCount');
+
+    if (!placeNameEl || !placeSummaryEl || !profileLinkEl || !externalLinkEl || !sceneCountEl) return;
+
+    if (!place) {
+      placeNameEl.textContent = 'Chưa chọn điểm';
+      placeSummaryEl.textContent = 'Dữ liệu điểm và scene sẽ hiện tại đây khi bạn chọn.';
+      profileLinkEl.href = 'place.html';
+      externalLinkEl.href = '#';
+      sceneCountEl.textContent = '0 scene';
+      return;
+    }
+
+    placeNameEl.textContent = place.name || place.id || 'Điểm chưa đặt tên';
+    placeSummaryEl.textContent = place.summary
+      ? `${place.summary}${scene && scene.name ? ' • Đang xem: ' + scene.name : ''}`
+      : (scene && scene.name ? `Đang xem: ${scene.name}` : 'Đang cập nhật thông tin điểm.');
+    profileLinkEl.href = `place.html?id=${encodeURIComponent(place.id || '')}`;
+    externalLinkEl.href = scene && scene.url ? scene.url : (place.pano360_url || '#');
+    sceneCountEl.textContent = `${scenesCount || 0} scene`;
   }
 
   function renderPlaceList(places, selectedPlaceId, onSelectPlace) {
@@ -155,17 +221,22 @@
 
     try {
       const places = await window.AppData.fetchPlaces();
-      const placeOptions = (Array.isArray(places) ? places : []).filter((place) => getScenes(place).length);
+      const rawPlaceOptions = (Array.isArray(places) ? places : []).filter((place) => getScenes(place).length);
+      const defaultPlaceId = getDefaultPlaceId(rawPlaceOptions, fallbackEmbedUrl);
+      const placeOptions = prioritizePlaces(rawPlaceOptions, defaultPlaceId);
 
       if (!placeOptions.length) {
         renderPlaceList([], '', function () {});
         renderSceneList(null, '', function () {});
+        updateCurrentPlaceCard(null, null, 0);
         if (meta) meta.textContent = 'Hiện chưa có điểm nào gắn scene 360.';
         return;
       }
 
       const initial = readSelectionFromUrl();
-      let selectedPlace = placeOptions.find((place) => String(place.id) === String(initial.placeId)) || placeOptions[0];
+      let selectedPlace = placeOptions.find((place) => String(place.id) === String(initial.placeId))
+        || placeOptions.find((place) => String(place.id) === String(defaultPlaceId))
+        || placeOptions[0];
       let selectedSceneId = initial.sceneId || '';
 
       function applySelection(nextPlaceId, nextSceneId) {
@@ -185,6 +256,7 @@
         updateUrlSelection(place.id, selectedSceneId);
         renderPlaceList(placeOptions, place.id, (placeId) => applySelection(placeId, ''));
         renderSceneList(place, selectedSceneId, (sceneId) => applySelection(place.id, sceneId));
+        updateCurrentPlaceCard(place, scene, scenes.length);
 
         if (meta) {
           const sceneName = scene && scene.name ? scene.name : 'Không gian chính';
@@ -196,6 +268,7 @@
     } catch (_err) {
       renderPlaceList([], '', function () {});
       renderSceneList(null, '', function () {});
+      updateCurrentPlaceCard(null, null, 0);
       if (meta) meta.textContent = 'Không tải được dữ liệu 360.';
     }
   }

@@ -1,7 +1,7 @@
 window.DEMO_PLACES = [
   {
     "id": "mc00",
-    "name": "địa phận bản lác 2",
+    "name": "Địa phận Bản Lác 2",
     "type": "service",
     "lat": 20.6517741481822,
     "lng": 105.062365465313,
@@ -20,7 +20,7 @@ window.DEMO_PLACES = [
   },
   {
     "id": "mc01",
-    "name": "hoa ban lalastay",
+    "name": "Hoa Ban Lalastay",
     "type": "service",
     "lat": 20.649013833365,
     "lng": 105.068346121137,
@@ -39,7 +39,7 @@ window.DEMO_PLACES = [
   },
   {
     "id": "mc02",
-    "name": "mai châu farmstay",
+    "name": "Mai Châu Farmstay",
     "type": "service",
     "lat": 20.6487209050322,
     "lng": 105.068971173523,
@@ -58,7 +58,7 @@ window.DEMO_PLACES = [
   },
   {
     "id": "mc03",
-    "name": "mai châu village view homestay",
+    "name": "Mai Châu Village View Homestay",
     "type": "service",
     "lat": 20.6623108103279,
     "lng": 105.064455209491,
@@ -76,8 +76,8 @@ window.DEMO_PLACES = [
     "source_note": "Du lieu nhap tu Google Sheet (dữ liệu điểm - mau_google_sheet_places_template.csv)."
   },
   {
-    "id": "pc01",
-    "name": "mông space",
+    "id": "MS",
+    "name": "Mông Space",
     "type": "service",
     "lat": 20.7503095755877,
     "lng": 104.906796665878,
@@ -95,8 +95,8 @@ window.DEMO_PLACES = [
     "source_note": "Du lieu nhap tu Google Sheet (dữ liệu điểm - mau_google_sheet_places_template.csv)."
   },
   {
-    "id": "pc02",
-    "name": "mông lềnh space",
+    "id": "ML",
+    "name": "Mông Lềnh Space",
     "type": "service",
     "lat": 20.7464499105634,
     "lng": 104.874994117938,
@@ -115,7 +115,7 @@ window.DEMO_PLACES = [
   },
   {
     "id": "pc03",
-    "name": "homestay y múa",
+    "name": "Homestay Y Múa",
     "type": "service",
     "lat": 20.7483880083249,
     "lng": 104.883223290457,
@@ -133,8 +133,8 @@ window.DEMO_PLACES = [
     "source_note": "Du lieu nhap tu Google Sheet (dữ liệu điểm - mau_google_sheet_places_template.csv)."
   },
   {
-    "id": "pc04",
-    "name": "highland homestay",
+    "id": "HLM",
+    "name": "Mai Châu Homestay (Highland Homestay)",
     "type": "service",
     "lat": 20.7382768547763,
     "lng": 104.885965152384,
@@ -153,7 +153,7 @@ window.DEMO_PLACES = [
   },
   {
     "id": "pc05",
-    "name": "a dơ homestay",
+    "name": "A Dơ Homestay",
     "type": "service",
     "lat": 20.7484430347202,
     "lng": 104.885388380314,
@@ -172,7 +172,7 @@ window.DEMO_PLACES = [
   },
   {
     "id": "pc06",
-    "name": "homestay vườn đào hang kia",
+    "name": "Homestay Vườn Đào Hang Kia",
     "type": "service",
     "lat": 20.7458181783637,
     "lng": 104.88133368379,
@@ -191,7 +191,7 @@ window.DEMO_PLACES = [
   },
   {
     "id": "pc07",
-    "name": "homestay a thống",
+    "name": "Homestay A Thống",
     "type": "service",
     "lat": 20.7459856084086,
     "lng": 104.881996178973,
@@ -207,6 +207,63 @@ window.DEMO_PLACES = [
     "contact_zalo": "",
     "contact_phone": "0356662899",
     "source_note": "Du lieu nhap tu Google Sheet (dữ liệu điểm - mau_google_sheet_places_template.csv)."
+  },
+  {
+    "id": "pc08",
+    "name": "Yến Tuyền homestay",
+    "type": "service",
+    "lat": 20.65158,
+    "lng": 105.06312,
+    "summary": "lưu trú nhà dân tại khu vực Bản Lác",
+    "cultural_notes": "Tôn trọng không gian cộng đồng và xin phép trước khi ghi hình.",
+    "record_permission": "ask",
+    "sensitivity_level": "public",
+    "audio_url": "",
+    "pano360_url": "",
+    "images": [],
+    "duration_minutes": 60,
+    "price_range": "",
+    "contact_zalo": "",
+    "contact_phone": "",
+    "source_note": "Dữ liệu bổ sung từ file mapping 360."
+  },
+  {
+    "id": "pc09",
+    "name": "Đức Ngọc homestay",
+    "type": "service",
+    "lat": 20.65241,
+    "lng": 105.06422,
+    "summary": "lưu trú nhà dân tại khu vực Bản Lác",
+    "cultural_notes": "Tôn trọng không gian cộng đồng và xin phép trước khi ghi hình.",
+    "record_permission": "ask",
+    "sensitivity_level": "public",
+    "audio_url": "",
+    "pano360_url": "",
+    "images": [],
+    "duration_minutes": 60,
+    "price_range": "",
+    "contact_zalo": "",
+    "contact_phone": "",
+    "source_note": "Dữ liệu bổ sung từ file mapping 360."
+  },
+  {
+    "id": "BN",
+    "name": "Địa phận Bản Nhót",
+    "type": "landscape",
+    "lat": 20.66285,
+    "lng": 105.06496,
+    "summary": "điểm trải nghiệm và cảnh quan tại khu vực Bản Nhót",
+    "cultural_notes": "Tôn trọng không gian cộng đồng và xin phép trước khi ghi hình.",
+    "record_permission": "ask",
+    "sensitivity_level": "public",
+    "audio_url": "",
+    "pano360_url": "",
+    "images": [],
+    "duration_minutes": 60,
+    "price_range": "",
+    "contact_zalo": "",
+    "contact_phone": "",
+    "source_note": "Dữ liệu bổ sung từ file mapping 360."
   }
 ];
 
@@ -235,8 +292,8 @@ window.DEMO_ROUTE_OPTIONS = [
     budgetMin: 500000,
     budgetMax: 900000,
     transportModes: ['coach'],
-    focusPlaceId: 'pc02',
-    placeIds: ['pc02', 'pc01'],
+    focusPlaceId: 'ML',
+    placeIds: ['ML', 'MS'],
     description: 'Tham quan chợ, làng nghề và không gian văn hóa cộng đồng trong 1 ngày.',
     notes: ['Hà Nội', 'Chợ Pà Cò', 'Vườn hoa Hoa Phượng', 'Dệt thổ cẩm', 'Đồi Mai', 'Xã Pà Cò'],
     homestay: 'Homestay A La'
@@ -266,7 +323,7 @@ window.DEMO_ROUTE_OPTIONS = [
     budgetMax: 900000,
     transportModes: ['self_drive'],
     focusPlaceId: 'pc03',
-    placeIds: ['pc03', 'pc01'],
+    placeIds: ['pc03', 'MS'],
     description: 'Tour chụp ảnh phong cảnh với các điểm check-in nổi bật trong ngày.',
     notes: ['Hà Nội', 'Đồi chè Pà Cò', 'Ruộng bậc thang', 'Viewpoint', 'Chợ Pà Cò', 'Xã Pà Cò'],
     homestay: 'Homestay Y Múa'
@@ -280,8 +337,8 @@ window.DEMO_ROUTE_OPTIONS = [
     budgetMin: 500000,
     budgetMax: 900000,
     transportModes: ['self_drive', 'coach'],
-    focusPlaceId: 'pc01',
-    placeIds: ['pc01', 'pc02'],
+    focusPlaceId: 'MS',
+    placeIds: ['MS', 'ML'],
     description: 'Khám phá ẩm thực Mông kết hợp trải nghiệm nghề và không gian bản địa.',
     notes: ['Hà Nội', 'Chợ Pà Cò', 'Nhà dân', 'Dệt thổ cẩm', 'Ẩm thực Mông', 'Xã Pà Cò'],
     homestay: 'Homestay A Páo'
@@ -296,7 +353,7 @@ window.DEMO_ROUTE_OPTIONS = [
     budgetMax: 1500000,
     transportModes: ['limousine'],
     focusPlaceId: 'pc05',
-    placeIds: ['pc05', 'pc02', 'pc06'],
+    placeIds: ['pc05', 'ML', 'pc06'],
     description: 'Tour 2N1Đ kết hợp văn hoá, nghề thủ công và cảnh quan đặc trưng Pà Cò.',
     notes: ['Hà Nội', 'Chợ Pà Cò', 'Vườn hoa Hoa Phượng', 'Dệt thổ cẩm', 'Hang Kia săn mây', 'Đồi chè Pà Cò', 'Xã Pà Cò'],
     homestay: 'A Dơ Homestay'
@@ -341,7 +398,7 @@ window.DEMO_ROUTE_OPTIONS = [
     budgetMax: 500000,
     transportModes: ['self_drive'],
     focusPlaceId: 'pc03',
-    placeIds: ['pc03', 'pc01'],
+    placeIds: ['pc03', 'MS'],
     description: 'Lộ trình nửa ngày dành cho nhóm chụp ảnh cảnh quan và văn hóa địa phương.',
     notes: ['Hà Nội', 'Hang Láng', 'Ruộng bậc thang', 'Đồi chè', 'Hang Láng', 'Xã Pà Cò']
   },
@@ -355,7 +412,7 @@ window.DEMO_ROUTE_OPTIONS = [
     budgetMax: 3000000,
     transportModes: ['limousine'],
     focusPlaceId: 'pc07',
-    placeIds: ['pc07', 'pc02', 'pc06', 'pc01'],
+    placeIds: ['pc07', 'ML', 'pc06', 'MS'],
     description: 'Tour 3N2Đ chuyên sâu khám phá văn hóa, cảnh quan và sinh hoạt cộng đồng.',
     notes: ['Hà Nội', 'Chợ Pà Cò', 'Vườn hoa Hoa Phượng', 'Hang Chiều', 'Chợ đêm Pà Cò', 'Cột cờ Mai Châu', 'Hang Nhím', 'Xã Pà Cò'],
     homestay: 'Homestay A Thống'

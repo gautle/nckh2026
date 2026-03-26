@@ -28,18 +28,33 @@
   </header>
 
   <main class="container container-wide main virtual-main">
-    <section class="card" style="padding:14px">
-      <h1 style="margin:0 0 6px">Không gian du lịch ảo 360</h1>
-      <p class="lead">Khung 360 hiển thị trực tiếp toàn màn hình ngang để bạn thao tác ngay trên web.</p>
-      <div id="virtual360Meta" class="note">Đang tải dữ liệu 360...</div>
+    <section class="card virtual-hero-card">
+      <div class="virtual-hero-copy">
+        <div class="article-kicker">Du lịch ảo 360</div>
+        <h1>Khám phá không gian số theo từng điểm</h1>
+        <p class="lead">Chọn homestay, không gian văn hóa hoặc điểm cảnh quan để mở đúng scene 360 ngay trên web.</p>
+        <div id="virtual360Meta" class="note">Đang tải dữ liệu 360...</div>
+      </div>
+      <div class="virtual-hero-highlight">
+        <div class="virtual-highlight-label">Đang xem</div>
+        <h3 id="virtualCurrentPlaceName">Chưa chọn điểm</h3>
+        <p id="virtualCurrentPlaceSummary">Dữ liệu điểm và scene sẽ hiện tại đây khi bạn chọn.</p>
+        <div class="virtual-highlight-actions">
+          <a id="virtualPlaceProfileLink" class="btn small" href="place.html">Hồ sơ điểm</a>
+          <a id="virtualOpenExternalLink" class="btn small primary" href="#" target="_blank" rel="noopener">Mở 360 riêng</a>
+        </div>
+      </div>
     </section>
 
     <section class="virtual-layout section">
       <article class="card virtual-embed-card">
-        <h3 style="margin:0 0 10px">Không gian 360 trực tiếp</h3>
+        <div class="virtual-block-head">
+          <h3 style="margin:0">Không gian 360 trực tiếp</h3>
+          <span id="virtualSceneCount" class="tag">0 scene</span>
+        </div>
         <iframe
           id="virtual360Embed"
-          title="Thư viện 360 trên Google Drive"
+          title="Không gian du lịch ảo 360"
           loading="lazy"
           referrerpolicy="no-referrer"
           allowfullscreen
