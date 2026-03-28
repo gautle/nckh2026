@@ -1,5 +1,7 @@
 (function () {
   const DEMO_BOOKINGS_KEY = 'demo_bookings';
+  const LAST_BOOKING_PHONE_KEY = 'last_booking_phone';
+  const LAST_BOOKING_CODE_KEY = 'last_booking_code';
 
   const STATUS_LABELS = {
     new: 'Mới',
@@ -59,6 +61,8 @@
   function setCount(n) {
     const el = document.getElementById('lookupCount');
     if (el) el.textContent = String(n || 0) + ' đơn';
+    const summaryEl = document.getElementById('lookupSummaryCount');
+    if (summaryEl) summaryEl.textContent = String(n || 0) + ' đơn';
   }
 
   function statusBadge(status) {
@@ -92,6 +96,34 @@
     }).join('');
 
     setCount(rows.length);
+  }
+
+  function updateSummary(phone, rows) {
+    const phoneEl = document.getElementById('lookupSummaryPhone');
+    const hintEl = document.getElementById('lookupSummaryHint');
+    const latestEl = document.getElementById('lookupSummaryLatest');
+    const statusEl = document.getElementById('lookupSummaryStatus');
+
+    if (phoneEl) phoneEl.textContent = phone || '-';
+
+    if (!rows.length) {
+      if (hintEl) hintEl.textContent = phone ? 'Chưa tìm thấy đơn khớp với số điện thoại này.' : 'Nhập số điện thoại để xem lịch sử đặt trải nghiệm.';
+      if (latestEl) latestEl.textContent = '-';
+      if (statusEl) statusEl.textContent = 'Chưa có dữ liệu tra cứu.';
+      return;
+    }
+
+    const latest = rows[0];
+    if (hintEl) {
+      hintEl.textContent = `Đang hiển thị lịch sử đặt của số ${phone}.`;
+    }
+    if (latestEl) {
+      latestEl.textContent = String(latest.tracking_code || latest.id || '-');
+    }
+    if (statusEl) {
+      const statusText = STATUS_LABELS[String(latest.status || 'new')] || String(latest.status || 'new');
+      statusEl.textContent = `${statusText} • ${String(latest.place_name || latest.place_id || 'Chưa rõ điểm')}`;
+    }
   }
 
   function filterDemoRows(phone, code) {
@@ -134,6 +166,7 @@
     if (window.DEMO_MODE) {
       const rows = filterDemoRows(phone, code);
       renderRows(rows);
+      updateSummary(phone, rows);
       setState(rows.length ? ('tìm thấy ' + rows.length + ' đơn trong DEMO.') : 'không có đơn khớp trong DEMO.');
       return;
     }
@@ -141,9 +174,11 @@
     try {
       const rows = await filterSupabaseRows(phone, code);
       renderRows(rows);
+      updateSummary(phone, rows);
       setState(rows.length ? ('tìm thấy ' + rows.length + ' đơn.') : 'không tìm thấy đơn phù hợp.');
     } catch (err) {
       renderRows([]);
+      updateSummary(phone, []);
       showError(
         'Hiện chưa bật quyền tra cứu công khai trên Supabase. ' +
         'Bạn có thể dùng DEMO_MODE hoặc nhờ quản trị kiểm tra giúp. Chi tiết: ' + (err && err.message ? err.message : String(err))
@@ -169,6 +204,7 @@
       codeInput.value = '';
       clearError();
       renderRows([]);
+      updateSummary('', []);
       setState('đã làm mới biểu mẫu tra cứu.');
     });
   }
@@ -187,10 +223,19 @@
   window.addEventListener('DOMContentLoaded', async () => {
     bindForm();
     const pre = prefillFromUrl();
-    if (pre.phone) {
-      await runLookup(pre.phone, pre.code);
+    const fallbackPhone = localStorage.getItem(LAST_BOOKING_PHONE_KEY) || '';
+    const fallbackCode = localStorage.getItem(LAST_BOOKING_CODE_KEY) || '';
+    const phone = pre.phone || fallbackPhone;
+    const code = pre.code || fallbackCode;
+    const phoneInput = document.getElementById('lookupPhone');
+    const codeInput = document.getElementById('lookupCode');
+    if (phoneInput && phone && !phoneInput.value) phoneInput.value = phone;
+    if (codeInput && code && !codeInput.value) codeInput.value = code;
+    if (phone) {
+      await runLookup(phone, code);
     } else {
       renderRows([]);
+      updateSummary('', []);
     }
   });
 })();

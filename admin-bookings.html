@@ -38,9 +38,10 @@
         <label>Mật khẩu
           <input class="input" type="password" name="password" required />
         </label>
-        <div class="row" style="justify-content:flex-start">
-          <button id="btnLogin" class="btn primary" type="submit" onclick="event.preventDefault(); window.__forceLoginSubmit(event); return false;">Đăng nhập</button>
-        </div>
+      <div class="row" style="justify-content:flex-start">
+        <button id="btnLogin" class="btn primary" type="submit" onclick="event.preventDefault(); window.__forceLoginSubmit(event); return false;">Đăng nhập</button>
+        <button id="btnDemoAdmin" class="btn" type="button">Vào dashboard demo</button>
+      </div>
       </form>
       <div id="loginState" class="note">Trạng thái: chờ đăng nhập.</div>
       <div id="loginError" class="error">Đăng nhập thất bại.</div>
@@ -222,6 +223,18 @@
         document.getElementById('loginCard').style.display = isLoggedIn ? 'none' : 'grid';
         document.getElementById('dashboardCard').style.display = isLoggedIn ? 'grid' : 'none';
         if (isLoggedIn) setAdminTab('orders');
+      }
+
+      async function openDemoDashboard() {
+        clearErrors();
+        setAuthUI(true);
+        setState('đang mở dashboard demo...');
+        try {
+          await loadBookings();
+          setState('đã mở dashboard demo.');
+        } catch (err) {
+          showError('Không mở được dashboard demo: ' + (err && err.message ? err.message : String(err)), 'dashboardError');
+        }
       }
 
       function statusOptions(selected) {
@@ -501,7 +514,7 @@
         if (btn) btn.textContent = 'Đăng nhập';
 
         if (res.error) {
-          showError('Đăng nhập lỗi: ' + res.error.message, 'loginError');
+          showError('Đăng nhập lỗi: ' + res.error.message + (IS_DEMO_MODE ? ' Bạn có thể bấm "Vào dashboard demo" để tiếp tục quản lý đơn local.' : ''), 'loginError');
           setState('đăng nhập thất bại.');
           return false;
         }
@@ -530,6 +543,7 @@
 
         document.getElementById('loginForm').addEventListener('submit', doLogin);
         document.getElementById('btnLogin').addEventListener('click', doLogin);
+        document.getElementById('btnDemoAdmin').addEventListener('click', openDemoDashboard);
         document.getElementById('btnReload').addEventListener('click', loadBookings);
         document.getElementById('btnReloadMetrics').addEventListener('click', renderMetrics);
         document.getElementById('btnDeleteSelected').addEventListener('click', async () => {
@@ -564,7 +578,7 @@
         const s = await supabase.auth.getSession();
         const loggedIn = !!(s.data && s.data.session);
         setAuthUI(loggedIn);
-        setState(loggedIn ? 'đã có session admin.' : 'chờ đăng nhập.');
+        setState(loggedIn ? 'đã có session admin.' : (IS_DEMO_MODE ? 'chờ đăng nhập hoặc mở dashboard demo.' : 'chờ đăng nhập.'));
         if (loggedIn) await loadBookings();
         renderMetrics();
       }

@@ -50,8 +50,7 @@
 
         <div class="form-grid">
           <label>Điểm / hoạt động
-            <input class="input" id="bookingPointName" name="point_name" readonly />
-            <input type="hidden" id="bookingPoint" name="point" />
+            <select class="input" id="bookingPoint" name="point"></select>
           </label>
           <label>Gói trải nghiệm
             <select class="input" name="package">
@@ -75,6 +74,25 @@
 
       <div id="bookingSuccess" class="success">Đã nhận đăng ký (demo). Nhóm điều phối sẽ liên hệ sớm.</div>
       <div id="bookingError" class="error">Lỗi gửi đăng ký.</div>
+
+      <section id="bookingNextSteps" class="booking-next-steps" hidden>
+        <div class="booking-next-card">
+          <span class="booking-next-label">Mã tra cứu gần nhất</span>
+          <b id="bookingLatestCode">-</b>
+          <p id="bookingLatestNote">Bạn có thể dùng mã này để tra cứu nhanh trạng thái đơn.</p>
+        </div>
+        <div class="booking-next-card">
+          <span class="booking-next-label">Bước tiếp theo</span>
+          <ul class="booking-next-list">
+            <li>Lưu lại số điện thoại và mã tra cứu.</li>
+            <li>Vào trang Tra cứu đơn để xem trạng thái mới nhất.</li>
+            <li>Nếu thay đổi kế hoạch, liên hệ cộng đồng để cập nhật sớm.</li>
+          </ul>
+          <div class="row" style="justify-content:flex-start">
+            <a id="bookingTrackNow" class="btn small primary" href="tra-cuu-don.html">Tra cứu ngay</a>
+          </div>
+        </div>
+      </section>
     </section>
   </main>
 
