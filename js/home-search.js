@@ -1,6 +1,20 @@
 (function () {
+  const I18N = window.SiteI18n || { lang: 'vi', t: (_key, fallback) => fallback };
   const HISTORY_KEY = 'HOME_SEARCH_HISTORY';
   const HISTORY_LIMIT = 8;
+  const TXT = {
+    emptyHistory: I18N.lang === 'en' ? 'No recent searches yet.' : 'Chưa có lịch sử tìm kiếm.',
+    removeHistory: I18N.lang === 'en' ? 'Remove search history item' : 'Xoá lịch sử tìm kiếm',
+    emptyQuery: I18N.lang === 'en' ? 'Enter a keyword to search for a suitable point.' : 'Nhập từ khóa để tìm điểm phù hợp.',
+    noMatch: (keyword) => I18N.lang === 'en'
+      ? `No results found for "${keyword}".`
+      : `Không tìm thấy kết quả cho "${keyword}".`,
+    loadFail: I18N.lang === 'en' ? 'Could not load place data for search.' : 'Chưa tải được dữ liệu điểm để tìm kiếm.',
+    viewMap: I18N.t('common.viewMap', 'Xem bản đồ'),
+    view360: I18N.t('common.explore360', 'Xem 360'),
+    openProfile: I18N.t('common.openProfile', 'Mở hồ sơ'),
+    bookNow: I18N.t('common.bookNow', 'Đặt trải nghiệm')
+  };
 
   function normalize(v) {
     return String(v || '')
@@ -18,20 +32,20 @@
     el.innerHTML = `<div class="search-empty">${escapeHtml(message)}</div>`;
   }
 
-  function placeCard(place, typeLabel) {
+  function placeCard(place, typeLabel, permissionLabel) {
     return `
       <article class="search-result">
         <h4>${escapeHtml(place.name)}</h4>
         <div class="tags">
           <span class="tag">${escapeHtml(typeLabel)}</span>
-          <span class="tag">${escapeHtml(place.record_permission || '')}</span>
+          <span class="tag">${escapeHtml(permissionLabel)}</span>
         </div>
         <div style="color:var(--muted);font-size:13px">${escapeHtml(place.summary || '')}</div>
         <div class="row" style="justify-content:flex-start">
-          <a class="btn small" href="map.html?focus=${encodeURIComponent(place.id)}">Xem trên bản đồ</a>
-          <a class="btn small" href="du-lich-ao-360.html?id=${encodeURIComponent(place.id)}">Xem 360</a>
-          <a class="btn small" href="place.html?id=${encodeURIComponent(place.id)}">Mở hồ sơ</a>
-          <a class="btn small primary" href="booking.html?item=${encodeURIComponent(place.id)}">Đặt trải nghiệm</a>
+          <a class="btn small" href="map.html?focus=${encodeURIComponent(place.id)}">${escapeHtml(TXT.viewMap)}</a>
+          <a class="btn small" href="du-lich-ao-360.html?id=${encodeURIComponent(place.id)}">${escapeHtml(TXT.view360)}</a>
+          <a class="btn small" href="place.html?id=${encodeURIComponent(place.id)}">${escapeHtml(TXT.openProfile)}</a>
+          <a class="btn small primary" href="booking.html?item=${encodeURIComponent(place.id)}">${escapeHtml(TXT.bookNow)}</a>
         </div>
       </article>
     `;
@@ -71,14 +85,14 @@
     function renderHistory() {
       const history = readHistory();
       if (!history.length) {
-        historyEl.innerHTML = '<div class="search-history-empty">Chưa có lịch sử tìm kiếm.</div>';
+        historyEl.innerHTML = `<div class="search-history-empty">${escapeHtml(TXT.emptyHistory)}</div>`;
         return;
       }
 
       historyEl.innerHTML = history.map((keyword, idx) => (
         `<div class="search-history-row">
           <button class="history-keyword" type="button" data-history-pick="${idx}">${escapeHtml(keyword)}</button>
-          <button class="history-remove" type="button" data-history-delete="${idx}" aria-label="Xoá lịch sử tìm kiếm">×</button>
+          <button class="history-remove" type="button" data-history-delete="${idx}" aria-label="${escapeHtml(TXT.removeHistory)}">×</button>
         </div>`
       )).join('');
 
@@ -117,7 +131,7 @@
       const rawQuery = String(input.value || '').trim();
       const q = normalize(rawQuery);
       if (!q) {
-        renderEmpty(resultEl, 'Nhập từ khóa để tìm điểm phù hợp.');
+        renderEmpty(resultEl, TXT.emptyQuery);
         showResults();
         return;
       }
@@ -134,7 +148,7 @@
       });
 
       if (!hits.length) {
-        renderEmpty(resultEl, `Không tìm thấy kết quả cho "${input.value}".`);
+        renderEmpty(resultEl, TXT.noMatch(input.value));
         saveKeyword(rawQuery);
         showResults();
         return;
@@ -143,7 +157,8 @@
       saveKeyword(rawQuery);
       resultEl.innerHTML = hits.slice(0, 8).map(place => {
         const typeLabel = A.TYPE_LABELS[place.type] || place.type;
-        return placeCard(place, typeLabel);
+        const permissionLabel = A.PERMISSION_LABELS[place.record_permission] || place.record_permission || '';
+        return placeCard(place, typeLabel, permissionLabel);
       }).join('');
       showResults();
     }
@@ -198,7 +213,7 @@
         places = Array.isArray(data) ? data : [];
       })
       .catch(() => {
-        renderEmpty(resultEl, 'Chưa tải được dữ liệu điểm để tìm kiếm.');
+        renderEmpty(resultEl, TXT.loadFail);
         showResults();
       });
   }

@@ -1,15 +1,34 @@
 (function () {
+  const I18N = window.SiteI18n || { lang: 'vi', locale: 'vi-VN' };
+  const LANG = I18N.lang === 'en' ? 'en' : 'vi';
+  const LOCALE = I18N.locale || (LANG === 'en' ? 'en-US' : 'vi-VN');
+
   const DURATION_LABELS = {
-    half_day: 'Nửa ngày',
-    one_day: '1 ngày',
-    two_days: '2N1Đ',
-    three_days: '3N2Đ'
+    half_day: LANG === 'en' ? 'Half day' : 'Nửa ngày',
+    one_day: LANG === 'en' ? '1 day' : '1 ngày',
+    two_days: LANG === 'en' ? '2D1N' : '2N1Đ',
+    three_days: LANG === 'en' ? '3D2N' : '3N2Đ'
   };
 
   const TRANSPORT_LABELS = {
-    self_drive: 'Tự đi xe',
-    limousine: 'Limousine',
-    coach: 'Xe khách'
+    self_drive: LANG === 'en' ? 'Self-drive' : 'Tự đi xe',
+    limousine: LANG === 'en' ? 'Limousine' : 'Limousine',
+    coach: LANG === 'en' ? 'Coach / bus' : 'Xe khách'
+  };
+
+  const TXT = {
+    guests: LANG === 'en' ? 'guests' : 'người',
+    flexible: LANG === 'en' ? 'Flexible' : 'Linh hoạt',
+    perPerson: LANG === 'en' ? 'VND/person' : '/người',
+    viewMap: I18N.t ? I18N.t('common.viewMap', 'Xem bản đồ') : 'Xem bản đồ',
+    bookRoute: LANG === 'en' ? 'Book this route' : 'Đặt theo lộ trình',
+    found: (n) => LANG === 'en'
+      ? `Found ${n} route${n > 1 ? 's' : ''} matching your current preferences.`
+      : `Tìm thấy ${n} lộ trình phù hợp với nhu cầu hiện tại.`,
+    nearest: LANG === 'en'
+      ? 'No exact route matches yet. Here are the closest suggestions:'
+      : 'Chưa có lộ trình khớp 100%. Gợi ý gần nhất để bạn tham khảo:',
+    noData: LANG === 'en' ? 'No route data yet.' : 'Chưa có dữ liệu lộ trình.'
   };
 
   function escapeHtml(v) {
@@ -17,7 +36,9 @@
   }
 
   function toVnd(value) {
-    return Number(value || 0).toLocaleString('vi-VN') + 'đ';
+    const number = Number(value || 0);
+    const formatted = new Intl.NumberFormat(LOCALE).format(number);
+    return LANG === 'en' ? `${formatted} VND` : `${formatted}đ`;
   }
 
   function getBudgetRange(budgetKey) {
@@ -121,16 +142,16 @@
         <h3>${escapeHtml(route.title || '')}</h3>
         <div class="route-result-badges">
           <span class="route-badge">${escapeHtml(DURATION_LABELS[route.duration] || route.duration || '')}</span>
-          <span class="route-badge">${escapeHtml((route.groupMin || 1) + '-' + (route.groupMax || 0) + ' người')}</span>
-          <span class="route-badge">${escapeHtml(toVnd(route.budgetMin || 0) + ' - ' + toVnd(route.budgetMax || 0) + '/người')}</span>
-          <span class="route-badge">${escapeHtml(transportText || 'Linh hoạt')}</span>
+          <span class="route-badge">${escapeHtml((route.groupMin || 1) + '-' + (route.groupMax || 0) + ' ' + TXT.guests)}</span>
+          <span class="route-badge">${escapeHtml(toVnd(route.budgetMin || 0) + ' - ' + toVnd(route.budgetMax || 0) + ' ' + TXT.perPerson)}</span>
+          <span class="route-badge">${escapeHtml(transportText || TXT.flexible)}</span>
           ${homestayText}
         </div>
         <p class="route-result-desc">${escapeHtml(route.description || '')}</p>
         ${displayStops.length ? `<ul class="route-stop-list">${displayStops.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>` : ''}
         <div class="route-result-actions">
-          <a class="btn small" href="${mapHref}">Xem trên bản đồ</a>
-          <a class="btn small primary" href="${bookingHref}">Đặt theo lộ trình</a>
+          <a class="btn small" href="${mapHref}">${escapeHtml(TXT.viewMap)}</a>
+          <a class="btn small primary" href="${bookingHref}">${escapeHtml(TXT.bookRoute)}</a>
         </div>
       </article>
     `;
@@ -163,7 +184,7 @@
       const matched = routes.filter((route) => routeMatches(route, criteria));
 
       if (matched.length) {
-        resultMeta.textContent = `Tìm thấy ${matched.length} lộ trình phù hợp với nhu cầu hiện tại.`;
+        resultMeta.textContent = TXT.found(matched.length);
         resultEl.innerHTML = matched.map((route) => renderRouteCard(route, placeById)).join('');
         return;
       }
@@ -174,9 +195,9 @@
         .slice(0, 3)
         .map((entry) => entry.route);
 
-      resultMeta.textContent = 'Chưa có lộ trình khớp 100%. Gợi ý gần nhất để bạn tham khảo:';
+      resultMeta.textContent = TXT.nearest;
       if (!nearest.length) {
-        resultEl.innerHTML = '<div class="search-empty">Chưa có dữ liệu lộ trình.</div>';
+        resultEl.innerHTML = `<div class="search-empty">${escapeHtml(TXT.noData)}</div>`;
         return;
       }
       resultEl.innerHTML = nearest.map((route) => renderRouteCard(route, placeById)).join('');

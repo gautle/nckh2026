@@ -1,4 +1,23 @@
 let currentPlace = null;
+const I18N = window.SiteI18n || { lang: 'vi', t: (_key, fallback) => fallback };
+const TXT = {
+  noPlaceData: I18N.lang === 'en' ? 'No point data available' : 'Chưa có dữ liệu hồ sơ điểm',
+  noPointList: I18N.lang === 'en' ? 'No point data to display yet.' : 'Chưa có dữ liệu điểm để hiển thị.',
+  openProfile: I18N.t('common.openProfile', 'Mở hồ sơ'),
+  selectPlace: I18N.lang === 'en' ? 'Choose a point to view its profile' : 'Chọn điểm để xem hồ sơ',
+  waitingSummary: I18N.lang === 'en' ? 'Choose a point to view audio, 360, and archive images.' : 'Chọn điểm để xem audio, ảnh 360 và ảnh tư liệu.',
+  waitingSource: I18N.lang === 'en' ? 'Waiting for a specific point selection.' : 'Đang chờ chọn điểm cụ thể.',
+  audioUpdating: I18N.lang === 'en' ? 'Audio is being updated.' : 'Audio đang cập nhật.',
+  panoUpdating: I18N.lang === 'en' ? '360 content is being updated.' : 'Ảnh 360 đang cập nhật.',
+  imageUpdating: I18N.lang === 'en' ? 'The image archive is being updated.' : 'Thư viện ảnh đang cập nhật.',
+  full360Page: I18N.lang === 'en' ? 'Open full 360 page' : 'Mở trang 360 đầy đủ',
+  sceneCount: (n) => I18N.lang === 'en' ? `This point has ${n || 1} available 360 scenes. Open the 360 page to switch between views.` : `Điểm này có ${n || 1} scene 360. Bạn có thể mở trang 360 để chuyển scene theo từng góc nhìn.`,
+  sourceUpdating: I18N.lang === 'en' ? 'Source details and community consent are being updated.' : 'Đang cập nhật nguồn tư liệu và đồng thuận cộng đồng.',
+  consentPrompt: I18N.lang === 'en' ? 'Do you agree to follow the recording guidelines?' : 'Bạn có đồng ý tuân thủ quy tắc ghi hình không?',
+  notFound: (id) => I18N.lang === 'en' ? `ID "${id}" does not exist in the current dataset.` : `ID "${id}" không tồn tại trong dữ liệu hiện tại.`,
+  loadError: I18N.lang === 'en' ? 'Could not load point profile' : 'Không tải được hồ sơ điểm',
+  chooseDifferent: I18N.lang === 'en' ? 'Choose another point from the demo list below:' : 'Hãy chọn một điểm khác trong danh sách demo bên dưới:'
+};
 
 function trackMetric(eventName, payload) {
   if (window.AppMetrics && typeof window.AppMetrics.track === 'function') {
@@ -18,7 +37,7 @@ function renderChooser(places, title, description) {
   chooserDesc.textContent = description;
 
   if (!places.length) {
-    chooserList.innerHTML = '<div class="card" style="padding:12px">Chưa có dữ liệu điểm để hiển thị.</div>';
+    chooserList.innerHTML = `<div class="card" style="padding:12px">${TXT.noPointList}</div>`;
     return;
   }
 
@@ -29,7 +48,7 @@ function renderChooser(places, title, description) {
         <div class="tags">
           <span class="tag">${A.escapeHtml(A.TYPE_LABELS[p.type] || p.type)}</span>
         </div>
-        <a class="btn small" href="place.html?id=${encodeURIComponent(p.id)}">Mở hồ sơ</a>
+        <a class="btn small" href="place.html?id=${encodeURIComponent(p.id)}">${TXT.openProfile}</a>
       </div>
     </article>
   `).join('');
@@ -37,7 +56,7 @@ function renderChooser(places, title, description) {
 
 function resetPlaceDetails(message) {
   currentPlace = null;
-  document.title = 'Hồ sơ điểm';
+  document.title = I18N.t('place.title', 'Hồ sơ điểm');
   document.getElementById('placeName').textContent = message;
   document.getElementById('placeType').textContent = '-';
   document.getElementById('placeCoords').textContent = '-';
@@ -49,17 +68,17 @@ function resetPlaceDetails(message) {
   document.getElementById('sensitiveAlert').style.display = 'none';
   document.getElementById('btnDirection').href = '#';
   document.getElementById('btnBooking').href = 'booking.html';
-  document.getElementById('audioWrap').innerHTML = '<div class="placeholder">Chọn điểm để xem audio.</div>';
-  document.getElementById('panoWrap').innerHTML = '<div class="placeholder">Chọn điểm để xem ảnh 360.</div>';
-  document.getElementById('imageWrap').innerHTML = '<div class="placeholder">Chọn điểm để xem ảnh tư liệu.</div>';
-  document.getElementById('sourceNote').textContent = 'Đang chờ chọn điểm cụ thể.';
+  document.getElementById('audioWrap').innerHTML = `<div class="placeholder">${TXT.waitingSummary}</div>`;
+  document.getElementById('panoWrap').innerHTML = `<div class="placeholder">${TXT.waitingSummary}</div>`;
+  document.getElementById('imageWrap').innerHTML = `<div class="placeholder">${TXT.waitingSummary}</div>`;
+  document.getElementById('sourceNote').textContent = TXT.waitingSource;
 }
 
 function renderPlaceDetails(place) {
   const A = window.AppData;
   currentPlace = place;
   trackMetric('profile_view', { place_id: place.id, source: 'place' });
-  document.title = `${place.name} - Hồ sơ điểm`;
+  document.title = `${place.name} - ${I18N.t('place.title', 'Hồ sơ điểm')}`;
 
   const permissionLabel = A.PERMISSION_LABELS[place.record_permission] || place.record_permission;
   const sensitivityLabel = A.SENSITIVITY_LABELS[place.sensitivity_level] || place.sensitivity_level;
@@ -73,7 +92,7 @@ function renderPlaceDetails(place) {
   document.getElementById('permissionBadge').textContent = permissionLabel;
   document.getElementById('permissionBadge').className = `tag permission ${A.permissionClass(place.record_permission)}`;
   document.getElementById('sensitivityBadge').textContent = sensitivityLabel;
-  document.getElementById('sourceNote').textContent = place.source_note || 'Đang cập nhật nguồn tư liệu và đồng thuận cộng đồng.';
+  document.getElementById('sourceNote').textContent = place.source_note || TXT.sourceUpdating;
   document.getElementById('sensitiveAlert').style.display = place.sensitivity_level === 'sensitive' ? 'block' : 'none';
 
   document.getElementById('btnDirection').href = `https://www.google.com/maps/dir/?api=1&destination=${place.lat},${place.lng}`;
@@ -86,7 +105,7 @@ function renderPlaceDetails(place) {
   const audio = document.getElementById('audioWrap');
   audio.innerHTML = place.audio_url
     ? `<audio controls style="width:100%"><source src="${A.escapeHtml(place.audio_url)}" /></audio>`
-    : '<div class="placeholder">Audio đang cập nhật.</div>';
+    : `<div class="placeholder">${TXT.audioUpdating}</div>`;
 
   const pano = document.getElementById('panoWrap');
   const panoScenes = Array.isArray(place.pano360_scenes) ? place.pano360_scenes : [];
@@ -94,26 +113,26 @@ function renderPlaceDetails(place) {
     ? `
       <iframe src="${A.escapeHtml(place.pano360_url)}" title="360" style="width:100%;min-height:260px;border:0;border-radius:10px"></iframe>
       <div style="margin-top:10px;display:grid;gap:8px">
-        <div class="note">Điểm này có ${panoScenes.length || 1} scene 360. Bạn có thể mở trang 360 để chuyển scene theo từng góc nhìn.</div>
+        <div class="note">${TXT.sceneCount(panoScenes.length)}</div>
         <div class="row" style="justify-content:flex-start">
-          <a class="btn small primary" href="du-lich-ao-360.html?id=${encodeURIComponent(place.id)}">Mở trang 360 đầy đủ</a>
+          <a class="btn small primary" href="du-lich-ao-360.html?id=${encodeURIComponent(place.id)}">${TXT.full360Page}</a>
         </div>
       </div>
     `
-    : '<div class="placeholder">Ảnh 360 đang cập nhật.</div>';
+    : `<div class="placeholder">${TXT.panoUpdating}</div>`;
 
   const imageWrap = document.getElementById('imageWrap');
   if (Array.isArray(place.images) && place.images.length) {
     imageWrap.innerHTML = place.images.map(src => `<img src="${A.escapeHtml(src)}" alt="${A.escapeHtml(place.name)}" style="width:100%;border-radius:10px" />`).join('');
   } else {
-    imageWrap.innerHTML = '<div class="placeholder">Thư viện ảnh đang cập nhật.</div>';
+    imageWrap.innerHTML = `<div class="placeholder">${TXT.imageUpdating}</div>`;
   }
 }
 
 function askRecordConsent(mediaType) {
   const placeId = currentPlace && currentPlace.id ? currentPlace.id : '';
   trackMetric('media_prompt', { place_id: placeId, source: 'place', media: mediaType });
-  const agreed = window.confirm('Bạn có đồng ý tuân thủ quy tắc ghi hình không?');
+  const agreed = window.confirm(TXT.consentPrompt);
   trackMetric(agreed ? 'media_consent_yes' : 'media_consent_no', { place_id: placeId, source: 'place', media: mediaType });
   return agreed;
 }
@@ -127,7 +146,7 @@ function setupMediaActions() {
       if (!askRecordConsent('audio')) return;
       const player = document.querySelector('#audioWrap audio');
       if (!player) {
-        alert('Audio đang cập nhật.');
+        alert(TXT.audioUpdating);
         return;
       }
       player.play().catch(() => {});
@@ -141,7 +160,7 @@ function setupMediaActions() {
         window.location.href = `du-lich-ao-360.html?id=${encodeURIComponent(currentPlace.id)}`;
         return;
       }
-      alert('Ảnh 360 đang cập nhật.');
+      alert(TXT.panoUpdating);
     });
   }
 }
@@ -153,22 +172,22 @@ async function renderPlace() {
   const places = await A.fetchPlaces();
 
   if (!places.length) {
-    resetPlaceDetails('Chưa có dữ liệu hồ sơ điểm');
-    renderChooser([], 'Danh sách điểm', 'Hiện chưa có dữ liệu. Vui lòng bổ sung file dữ liệu.');
+    resetPlaceDetails(TXT.noPlaceData);
+    renderChooser([], I18N.t('place.chooserTitle', 'Chọn điểm để xem hồ sơ'), I18N.t('place.chooserDesc', 'Bạn chưa chọn điểm cụ thể. Chọn nhanh một điểm bên dưới:'));
     return;
   }
 
   if (!id) {
-    resetPlaceDetails('Chọn điểm để xem hồ sơ');
-    renderChooser(places, 'Chọn điểm để xem hồ sơ', 'Bạn chưa chọn điểm cụ thể. Chọn nhanh một điểm bên dưới:');
+    resetPlaceDetails(TXT.selectPlace);
+    renderChooser(places, I18N.t('place.chooserTitle', 'Chọn điểm để xem hồ sơ'), I18N.t('place.chooserDesc', 'Bạn chưa chọn điểm cụ thể. Chọn nhanh một điểm bên dưới:'));
     return;
   }
 
   const place = places.find(p => p.id === id);
   if (!place) {
-    resetPlaceDetails('Không tìm thấy hồ sơ điểm');
-    document.getElementById('placeSummary').textContent = `ID "${id}" không tồn tại trong dữ liệu hiện tại.`;
-    renderChooser(places, 'Không tìm thấy điểm phù hợp', 'Hãy chọn một điểm khác trong danh sách demo bên dưới:');
+    resetPlaceDetails(I18N.lang === 'en' ? 'Point profile not found' : 'Không tìm thấy hồ sơ điểm');
+    document.getElementById('placeSummary').textContent = TXT.notFound(id);
+    renderChooser(places, I18N.lang === 'en' ? 'Point not found' : 'Không tìm thấy điểm phù hợp', TXT.chooseDifferent);
     return;
   }
 
@@ -179,7 +198,7 @@ async function renderPlace() {
 window.addEventListener('DOMContentLoaded', () => {
   setupMediaActions();
   renderPlace().catch(err => {
-    resetPlaceDetails('Không tải được hồ sơ điểm');
+    resetPlaceDetails(TXT.loadError);
     document.getElementById('placeSummary').textContent = err.message;
     console.error(err);
   });

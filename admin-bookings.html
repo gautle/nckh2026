@@ -22,6 +22,7 @@
         <a href="du-lich-ao-360.html">Du lịch ảo 360</a>
         <a href="huong-dan.html">Các bài viết</a>
         <a href="booking.html">Đặt trải nghiệm</a>
+        <a href="san-pham.html">Gian sản phẩm</a>
         <a class="active" href="admin-bookings.html">Quản lý tài khoản</a>
       </nav>
     </div>
@@ -113,6 +114,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
   <script src="js/config.js"></script>
   <script src="js/metrics.js"></script>
+  <script src="js/i18n.js"></script>
   <script>
     (function () {
       const SUPABASE_URL = 'https://ojqcwegtxzhoqdkmgzsa.supabase.co';
@@ -120,6 +122,61 @@
       const DEMO_BOOKINGS_KEY = 'demo_bookings';
       const HIDDEN_REMOTE_IDS_KEY = 'admin_hidden_remote_booking_ids_v1';
       const IS_DEMO_MODE = Boolean(window.DEMO_MODE);
+      const I18N = window.SiteI18n || { lang: 'vi', locale: 'vi-VN', t: (_key, fallback) => fallback };
+      const LANG = I18N.lang === 'en' ? 'en' : 'vi';
+      const LOCALE = I18N.locale || (LANG === 'en' ? 'en-US' : 'vi-VN');
+      const TXT = {
+        statePrefix: LANG === 'en' ? 'Status: ' : 'Trạng thái: ',
+        openingDemo: LANG === 'en' ? 'opening demo dashboard...' : 'đang mở dashboard demo...',
+        openedDemo: LANG === 'en' ? 'demo dashboard is ready.' : 'đã mở dashboard demo.',
+        demoOpenFail: (message) => LANG === 'en' ? `Could not open the demo dashboard: ${message}` : `Không mở được dashboard demo: ${message}`,
+        statusLabels: {
+          new: I18N.t('admin.statusNew', 'Mới'),
+          contacted: I18N.t('admin.statusContacted', 'Đã liên hệ'),
+          confirmed: I18N.t('admin.statusConfirmed', 'Đã chốt'),
+          cancelled: I18N.t('admin.statusCancelled', 'Đã hủy')
+        },
+        selectedCount: (count) => LANG === 'en' ? `Delete selected (${count})` : `Xoá đã chọn (${count})`,
+        noMetrics: LANG === 'en'
+          ? 'No interaction data yet. Open place.html and click Play audio / Open 360 to generate demo metrics.'
+          : 'Chưa có dữ liệu tương tác. Hãy mở place.html và bấm Nghe audio / Xem 360 để tạo dữ liệu demo.',
+        updatedAt: (value) => LANG === 'en' ? `Last updated: ${value}` : `Cập nhật gần nhất: ${value}`,
+        deleteBtn: LANG === 'en' ? 'Delete' : 'Xoá',
+        emptyRows: LANG === 'en' ? 'No bookings match the current filters.' : 'Không có đơn trong bộ lọc hiện tại.',
+        statusUpdateFail: (message) => LANG === 'en' ? `Status update failed: ${message}` : `Cập nhật trạng thái lỗi: ${message}`,
+        deleteConfirm: (count) => LANG === 'en' ? `Delete ${count} selected booking(s)? This cannot be undone.` : `Xoá ${count} đơn đã chọn? Thao tác không thể hoàn tác.`,
+        deletedDemo: (count) => LANG === 'en' ? `deleted ${count} demo booking(s).` : `đã xoá ${count} đơn demo.`,
+        hideRemoteWarn: (count) => LANG === 'en'
+          ? `DELETE is not allowed on Supabase. The system hid ${count} booking(s) on this machine for demo use.`
+          : `Không đủ quyền DELETE trên Supabase. Hệ thống đã ẩn ${count} đơn trên máy này để bạn demo mượt.`,
+        hiddenRemoteState: (count) => LANG === 'en' ? `hid ${count} Supabase booking(s) locally.` : `đã ẩn ${count} đơn từ Supabase (local).`,
+        partialDeleteWarn: (count) => LANG === 'en'
+          ? `Some bookings could not be deleted on Supabase and were hidden locally: ${count} booking(s).`
+          : `Một số đơn chưa xoá được trên Supabase, đã tự ẩn local: ${count} đơn.`,
+        deletedRemote: (remoteCount, demoCount) => LANG === 'en'
+          ? `deleted ${remoteCount} Supabase booking(s)${demoCount ? ` and ${demoCount} demo booking(s)` : ''}.`
+          : `đã xoá ${remoteCount} đơn trên Supabase${demoCount ? (' + ' + demoCount + ' đơn demo') : ''}.`,
+        loadListError: (message) => LANG === 'en' ? `Could not load booking list: ${message}` : `Tải danh sách lỗi: ${message}`,
+        fallbackDemoWarn: LANG === 'en' ? 'Supabase is unavailable, showing local demo data instead.' : 'Không tải được Supabase, đang hiển thị dữ liệu demo local.',
+        missingCredentials: LANG === 'en' ? 'Please enter both email and password.' : 'Vui lòng nhập đủ email và mật khẩu.',
+        sendingLogin: LANG === 'en' ? 'sending sign-in request...' : 'đang gửi yêu cầu đăng nhập...',
+        loggingIn: LANG === 'en' ? 'Signing in...' : 'Đang đăng nhập...',
+        loginButton: I18N.t('admin.loginBtn', 'Đăng nhập'),
+        loginError: (message) => LANG === 'en'
+          ? `Sign-in failed: ${message}${IS_DEMO_MODE ? ' You can still open the demo dashboard to continue.' : ''}`
+          : `Đăng nhập lỗi: ${message}${IS_DEMO_MODE ? ' Bạn có thể bấm "Vào dashboard demo" để tiếp tục quản lý đơn local.' : ''}`,
+        noSession: LANG === 'en' ? 'No session was created. Check whether the user has a confirmed email.' : 'Không tạo được session. Kiểm tra user đã xác thực email.',
+        loginSuccessLoading: LANG === 'en' ? 'sign-in succeeded, loading data...' : 'đăng nhập thành công, đang tải dữ liệu...',
+        dashboardReady: LANG === 'en' ? 'dashboard is ready.' : 'đã tải xong dashboard.',
+        missingSupabaseJs: LANG === 'en' ? 'Could not load the Supabase JS library.' : 'Không tải được thư viện Supabase JS.',
+        missingSupabaseState: LANG === 'en' ? 'missing Supabase library.' : 'thiếu thư viện Supabase.',
+        signedOut: LANG === 'en' ? 'signed out.' : 'đã đăng xuất.',
+        adminSessionReady: LANG === 'en' ? 'admin session detected.' : 'đã có session admin.',
+        waitLoginOrDemo: LANG === 'en' ? 'waiting for sign-in or demo dashboard.' : 'chờ đăng nhập hoặc mở dashboard demo.',
+        waitLogin: LANG === 'en' ? 'waiting for sign-in.' : 'chờ đăng nhập.',
+        initError: (message) => LANG === 'en' ? `Initialization error: ${message}` : `Khởi tạo lỗi: ${message}`,
+        initStateError: LANG === 'en' ? 'initialization failed.' : 'khởi tạo lỗi.'
+      };
 
       let supabase = null;
       let allRows = [];
@@ -201,7 +258,7 @@
 
       function setState(message) {
         const el = document.getElementById('loginState');
-        if (el) el.textContent = 'Trạng thái: ' + message;
+        if (el) el.textContent = TXT.statePrefix + message;
       }
 
       function showError(message, target) {
@@ -228,21 +285,21 @@
       async function openDemoDashboard() {
         clearErrors();
         setAuthUI(true);
-        setState('đang mở dashboard demo...');
+        setState(TXT.openingDemo);
         try {
           await loadBookings();
-          setState('đã mở dashboard demo.');
+          setState(TXT.openedDemo);
         } catch (err) {
-          showError('Không mở được dashboard demo: ' + (err && err.message ? err.message : String(err)), 'dashboardError');
+          showError(TXT.demoOpenFail(err && err.message ? err.message : String(err)), 'dashboardError');
         }
       }
 
       function statusOptions(selected) {
         const values = [
-          ['new', 'Mới'],
-          ['contacted', 'Đã liên hệ'],
-          ['confirmed', 'Đã chốt'],
-          ['cancelled', 'Đã hủy']
+          ['new', TXT.statusLabels.new],
+          ['contacted', TXT.statusLabels.contacted],
+          ['confirmed', TXT.statusLabels.confirmed],
+          ['cancelled', TXT.statusLabels.cancelled]
         ];
         return values.map(v => '<option value="' + v[0] + '"' + (selected === v[0] ? ' selected' : '') + '>' + v[1] + '</option>').join('');
       }
@@ -250,7 +307,7 @@
       function formatDate(v) {
         if (!v) return '-';
         const d = new Date(v);
-        return Number.isNaN(d.getTime()) ? v : d.toLocaleString('vi-VN');
+        return Number.isNaN(d.getTime()) ? v : d.toLocaleString(LOCALE);
       }
 
       function getStatusFilter() {
@@ -290,7 +347,7 @@
         const btnBulk = document.getElementById('btnDeleteSelected');
         if (btnBulk) {
           btnBulk.disabled = selectedVisible.length === 0;
-          btnBulk.textContent = 'Xoá đã chọn (' + selectedVisible.length + ')';
+          btnBulk.textContent = TXT.selectedCount(selectedVisible.length);
         }
       }
 
@@ -326,10 +383,10 @@
 
         const stateEl = document.getElementById('metricsState');
         if (!data.last_updated) {
-          stateEl.textContent = 'Chưa có dữ liệu tương tác. Hãy mở place.html và bấm Nghe audio / Xem 360 để tạo dữ liệu demo.';
+          stateEl.textContent = TXT.noMetrics;
           return;
         }
-        stateEl.textContent = 'Cập nhật gần nhất: ' + formatDate(data.last_updated);
+        stateEl.textContent = TXT.updatedAt(formatDate(data.last_updated));
       }
 
       function renderRows() {
@@ -347,12 +404,12 @@
             '<td>' + (r.package_name || '') + '</td>' +
             '<td>' + (r.note || '') + '</td>' +
             '<td><select class="status-select" data-status-id="' + r.id + '">' + statusOptions(r.status) + '</select></td>' +
-            '<td><button class="btn small" data-delete-id="' + r.id + '">Xoá</button></td>' +
+            '<td><button class="btn small" data-delete-id="' + r.id + '">' + TXT.deleteBtn + '</button></td>' +
           '</tr>'
         )).join('');
 
         if (!rows.length) {
-          tbody.innerHTML = '<tr><td colspan="11" style="color:rgba(255,255,255,.72)">Không có đơn trong bộ lọc hiện tại.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="11" style="color:rgba(255,255,255,.72)">' + TXT.emptyRows + '</td></tr>';
         }
 
         tbody.querySelectorAll('[data-status-id]').forEach(sel => {
@@ -371,7 +428,7 @@
 
             const res = await supabase.from('bookings').update({ status: status }).eq('id', id);
             if (res.error) {
-              showError('Cập nhật trạng thái lỗi: ' + res.error.message, 'dashboardError');
+              showError(TXT.statusUpdateFail(res.error.message), 'dashboardError');
               return;
             }
             if (hit) hit.status = status;
@@ -400,7 +457,7 @@
       async function deleteBookings(ids) {
         const uniqueIds = Array.from(new Set((ids || []).map(id => String(id))));
         if (!uniqueIds.length) return;
-        if (!confirm('Xoá ' + uniqueIds.length + ' đơn đã chọn? Thao tác không thể hoàn tác.')) return;
+        if (!confirm(TXT.deleteConfirm(uniqueIds.length))) return;
 
         clearErrors();
         const rowById = new Map(allRows.map(row => [String(row.id), row]));
@@ -425,7 +482,7 @@
           allRows = allRows.filter(row => !(row.__source === 'demo' && demoLocalIds.includes(String(row.__local_id || ''))));
           syncSelectionByData();
           renderRows();
-          setState('đã xoá ' + deletedDemoCount + ' đơn demo.');
+          setState(TXT.deletedDemo(deletedDemoCount));
           return;
         }
 
@@ -438,11 +495,8 @@
           allRows = allRows.filter(row => !hiddenIds.has(String(row.id)));
           syncSelectionByData();
           renderRows();
-          showError(
-            'Không đủ quyền DELETE trên Supabase. Hệ thống đã ẩn ' + remoteIds.length + ' đơn trên máy này để bạn demo mượt.',
-            'dashboardError'
-          );
-          setState('đã ẩn ' + remoteIds.length + ' đơn từ Supabase (local).');
+          showError(TXT.hideRemoteWarn(remoteIds.length), 'dashboardError');
+          setState(TXT.hiddenRemoteState(remoteIds.length));
           return;
         }
 
@@ -455,12 +509,9 @@
           missingIds.forEach(id => hiddenIds.add(String(id)));
           saveHiddenRemoteIds(hiddenIds);
           missingIds.forEach(id => selectedBookingIds.delete(String(id)));
-          showError(
-            'Một số đơn chưa xoá được trên Supabase, đã tự ẩn local: ' + missingIds.length + ' đơn.',
-            'dashboardError'
-          );
+          showError(TXT.partialDeleteWarn(missingIds.length), 'dashboardError');
         } else {
-          setState('đã xoá ' + deletedIds.size + ' đơn trên Supabase' + (deletedDemoCount ? (' + ' + deletedDemoCount + ' đơn demo') : '') + '.');
+          setState(TXT.deletedRemote(deletedIds.size, deletedDemoCount));
         }
 
         await loadBookings();
@@ -475,10 +526,10 @@
         const res = await supabase.from('bookings').select('*').order('created_at', { ascending: false });
         if (res.error) {
           if (!demoRows.length) {
-            showError('Tải danh sách lỗi: ' + res.error.message, 'dashboardError');
+            showError(TXT.loadListError(res.error.message), 'dashboardError');
             return;
           }
-          showError('Không tải được Supabase, đang hiển thị dữ liệu demo local.', 'dashboardError');
+          showError(TXT.fallbackDemoWarn, 'dashboardError');
         } else {
           remoteRows = (res.data || [])
             .filter(row => !hiddenIds.has(String(row.id)))
@@ -504,30 +555,30 @@
         const btn = document.getElementById('btnLogin');
 
         if (!email || !password) {
-          showError('Vui lòng nhập đủ email và mật khẩu.', 'loginError');
+          showError(TXT.missingCredentials, 'loginError');
           return false;
         }
-        setState('đang gửi yêu cầu đăng nhập...');
-        if (btn) btn.textContent = 'Đang đăng nhập...';
+        setState(TXT.sendingLogin);
+        if (btn) btn.textContent = TXT.loggingIn;
 
         const res = await supabase.auth.signInWithPassword({ email, password });
-        if (btn) btn.textContent = 'Đăng nhập';
+        if (btn) btn.textContent = TXT.loginButton;
 
         if (res.error) {
-          showError('Đăng nhập lỗi: ' + res.error.message + (IS_DEMO_MODE ? ' Bạn có thể bấm "Vào dashboard demo" để tiếp tục quản lý đơn local.' : ''), 'loginError');
-          setState('đăng nhập thất bại.');
+          showError(TXT.loginError(res.error.message), 'loginError');
+          setState(LANG === 'en' ? 'sign-in failed.' : 'đăng nhập thất bại.');
           return false;
         }
         if (!res.data || !res.data.session) {
-          showError('Không tạo được session. Kiểm tra user đã xác thực email.', 'loginError');
-          setState('đăng nhập chưa có session.');
+          showError(TXT.noSession, 'loginError');
+          setState(LANG === 'en' ? 'sign-in returned no session.' : 'đăng nhập chưa có session.');
           return false;
         }
 
         setAuthUI(true);
-        setState('đăng nhập thành công, đang tải dữ liệu...');
+        setState(TXT.loginSuccessLoading);
         await loadBookings();
-        setState('đã tải xong dashboard.');
+        setState(TXT.dashboardReady);
         return false;
       }
 
@@ -535,8 +586,8 @@
 
       async function init() {
         if (!window.supabase) {
-          showError('Không tải được thư viện Supabase JS.', 'loginError');
-          setState('thiếu thư viện Supabase.');
+          showError(TXT.missingSupabaseJs, 'loginError');
+          setState(TXT.missingSupabaseState);
           return;
         }
         supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -564,7 +615,7 @@
         document.getElementById('btnLogout').addEventListener('click', async () => {
           await supabase.auth.signOut();
           setAuthUI(false);
-          setState('đã đăng xuất.');
+          setState(TXT.signedOut);
         });
         document.querySelectorAll('[data-status-filter]').forEach(c => c.addEventListener('change', function () {
           renderRows();
@@ -578,15 +629,15 @@
         const s = await supabase.auth.getSession();
         const loggedIn = !!(s.data && s.data.session);
         setAuthUI(loggedIn);
-        setState(loggedIn ? 'đã có session admin.' : (IS_DEMO_MODE ? 'chờ đăng nhập hoặc mở dashboard demo.' : 'chờ đăng nhập.'));
+        setState(loggedIn ? TXT.adminSessionReady : (IS_DEMO_MODE ? TXT.waitLoginOrDemo : TXT.waitLogin));
         if (loggedIn) await loadBookings();
         renderMetrics();
       }
 
       window.addEventListener('DOMContentLoaded', function () {
         init().catch(function (err) {
-          showError('Khởi tạo lỗi: ' + (err && err.message ? err.message : String(err)), 'loginError');
-          setState('khởi tạo lỗi.');
+          showError(TXT.initError(err && err.message ? err.message : String(err)), 'loginError');
+          setState(TXT.initStateError);
         });
       });
     })();

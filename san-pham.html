@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gian sản phẩm</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container top-inner">
+      <a class="brand" href="index.html">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <b>Gian sản phẩm</b>
+          <span>Trưng bày sản phẩm thủ công và thổ cẩm</span>
+        </div>
+      </a>
+      <nav class="nav">
+        <a href="index.html">Trang chủ</a>
+        <a href="map.html">Bản đồ</a>
+        <a href="du-lich-ao-360.html">Du lịch ảo 360</a>
+        <a href="huong-dan.html">Các bài viết</a>
+        <a href="booking.html">Đặt trải nghiệm</a>
+        <a class="active" href="san-pham.html">Gian sản phẩm</a>
+        <a href="admin-bookings.html">Quản lý tài khoản</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container main product-page">
+    <section class="card product-hero">
+      <div class="product-hero-copy">
+        <span id="productsKicker" class="article-kicker">GIAN SẢN PHẨM</span>
+        <h1 id="productsHeroTitle">Trang phục, phụ kiện và chất liệu thủ công để người xem hình dung rõ hơn giá trị của nghề</h1>
+        <p id="productsHeroLead" class="lead">Trang này hoạt động như một gian trưng bày mềm: bạn có thể xem nhóm sản phẩm, giá tham khảo và gửi nhu cầu đặt hàng hoặc hỏi thêm thông tin về chất liệu, size và cách sử dụng.</p>
+        <div class="article-meta-chips product-meta-chips">
+          <span id="productsChip1" class="article-chip">Trang phục và phụ kiện</span>
+          <span id="productsChip2" class="article-chip">Giá tham khảo</span>
+          <span id="productsChip3" class="article-chip">Có thể đặt may / đặt theo nhu cầu</span>
+        </div>
+        <div class="home-copy-actions product-hero-actions">
+          <a id="productsPrimaryBtn" class="btn primary" href="#productGrid">Xem sản phẩm</a>
+          <a id="productsSecondaryBtn" class="btn" href="booking.html">Gửi nhu cầu đặt hàng</a>
+        </div>
+      </div>
+      <aside class="card product-usage-card">
+        <span id="productsUsageKicker" class="home-section-kicker">Cách sử dụng</span>
+        <h2 id="productsUsageTitle">Dùng gian này như một catalog gọn để giới thiệu và chốt nhu cầu</h2>
+        <ul class="product-usage-list">
+          <li id="productsUsage1">Xem nhanh loại sản phẩm, ảnh và giá tham khảo trước khi liên hệ.</li>
+          <li id="productsUsage2">So sánh giữa đồ mặc, phụ kiện và chất liệu để chọn đúng nhu cầu.</li>
+          <li id="productsUsage3">Nếu muốn may theo size hoặc đặt số lượng, dùng nút gửi nhu cầu ở từng thẻ.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <section class="section product-filter-section">
+      <div class="product-filter-head">
+        <div>
+          <span id="productsFilterKicker" class="home-section-kicker">Nhóm sản phẩm</span>
+          <h2 id="productsFilterTitle">Lọc nhanh theo nhu cầu sử dụng</h2>
+        </div>
+      </div>
+      <div class="product-filter-row" role="tablist" aria-label="Lọc nhóm sản phẩm">
+        <button id="productsFilterAll" class="btn small product-filter-btn is-active" type="button" data-product-filter="all">Tất cả</button>
+        <button id="productsFilterWear" class="btn small product-filter-btn" type="button" data-product-filter="wear">Trang phục</button>
+        <button id="productsFilterFabric" class="btn small product-filter-btn" type="button" data-product-filter="fabric">Vải / thổ cẩm</button>
+        <button id="productsFilterAccessory" class="btn small product-filter-btn" type="button" data-product-filter="accessory">Phụ kiện</button>
+        <button id="productsFilterCustom" class="btn small product-filter-btn" type="button" data-product-filter="custom">Đặt theo yêu cầu</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div id="productGrid" class="product-grid">
+        <article class="card product-card" data-product-category="wear">
+          <div class="product-card-media">
+            <img src="assets/blog/hmong-women-traditional-costume.jpg" alt="Áo thổ cẩm Hmông" loading="lazy" />
+          </div>
+          <div class="product-card-body">
+            <div class="product-card-top">
+              <span id="productBadge1" class="product-card-badge">Trang phục</span>
+              <strong class="product-price">1.250.000đ</strong>
+            </div>
+            <h3>Áo thổ cẩm Hmông</h3>
+            <p id="productDesc1">Phù hợp cho trưng bày, chụp ảnh, tham gia hoạt động cộng đồng hoặc dùng như một sản phẩm quà tặng mang tính nhận diện văn hoá.</p>
+            <ul class="product-card-notes">
+              <li id="productNote1a">Có thể hỏi thêm về size, màu và mức độ thêu tay.</li>
+              <li id="productNote1b">Phù hợp người muốn một món đồ mặc được ngay và dễ giới thiệu với khách.</li>
+            </ul>
+            <div class="product-card-actions">
+              <a id="productAction1" class="btn small primary" href="booking.html">Gửi nhu cầu đặt hàng</a>
+              <a class="btn small" href="huong-dan.html">Xem câu chuyện chất liệu</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card product-card" data-product-category="wear">
+          <div class="product-card-media">
+            <img src="assets/blog/hmong-girl-phocao.jpg" alt="Váy xòe thổ cẩm" loading="lazy" />
+          </div>
+          <div class="product-card-body">
+            <div class="product-card-top">
+              <span id="productBadge2" class="product-card-badge">Trang phục</span>
+              <strong class="product-price">1.850.000đ</strong>
+            </div>
+            <h3>Váy xòe thổ cẩm</h3>
+            <p id="productDesc2">Món nổi bật để trưng bày hoặc phục vụ các hoạt động trình diễn, chụp ảnh và kể chuyện về nghề may mặc truyền thống.</p>
+            <ul class="product-card-notes">
+              <li id="productNote2a">Nên hỏi trước về size, độ nặng và cách bảo quản.</li>
+              <li id="productNote2b">Phù hợp người cần một sản phẩm giàu tính hình ảnh và biểu tượng.</li>
+            </ul>
+            <div class="product-card-actions">
+              <a id="productAction2" class="btn small primary" href="booking.html">Gửi nhu cầu đặt hàng</a>
+              <a class="btn small" href="du-lich-ao-360.html">Xem không gian 360 liên quan</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card product-card" data-product-category="accessory">
+          <div class="product-card-media">
+            <img src="assets/intro/hinh-03.jpg" alt="Mũ thêu tay" loading="lazy" />
+          </div>
+          <div class="product-card-body">
+            <div class="product-card-top">
+              <span id="productBadge3" class="product-card-badge">Phụ kiện</span>
+              <strong class="product-price">420.000đ</strong>
+            </div>
+            <h3>Mũ thêu tay</h3>
+            <p id="productDesc3">Một lựa chọn gọn, dễ mang theo và phù hợp làm quà tặng hoặc trưng bày cùng bộ trang phục chính.</p>
+            <ul class="product-card-notes">
+              <li id="productNote3a">Thích hợp khách muốn bắt đầu bằng một sản phẩm nhỏ, dễ dùng.</li>
+              <li id="productNote3b">Có thể hỏi thêm về hoạ tiết, màu chủ đạo và độ phù hợp với từng độ tuổi.</li>
+            </ul>
+            <div class="product-card-actions">
+              <a id="productAction3" class="btn small primary" href="booking.html">Gửi nhu cầu đặt hàng</a>
+              <a class="btn small" href="place.html?id=MS">Xem điểm gắn với nghề</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card product-card" data-product-category="fabric">
+          <div class="product-card-media">
+            <img src="assets/blog/hmong-textile-indigo.jpg" alt="Tấm vải lanh nhuộm chàm" loading="lazy" />
+          </div>
+          <div class="product-card-body">
+            <div class="product-card-top">
+              <span id="productBadge4" class="product-card-badge">Vải / thổ cẩm</span>
+              <strong class="product-price">480.000đ / mét</strong>
+            </div>
+            <h3>Tấm vải lanh nhuộm chàm</h3>
+            <p id="productDesc4">Phù hợp để làm tư liệu minh hoạ, trưng bày mẫu chất liệu hoặc dùng làm nguyên liệu cho các ứng dụng may mặc và trang trí.</p>
+            <ul class="product-card-notes">
+              <li id="productNote4a">Nên hỏi trước về khổ vải, độ dày và khả năng đặt tiếp số lượng.</li>
+              <li id="productNote4b">Phù hợp người quan tâm tới giá trị vật liệu hơn là chỉ sản phẩm hoàn thiện.</li>
+            </ul>
+            <div class="product-card-actions">
+              <a id="productAction4" class="btn small primary" href="booking.html">Gửi nhu cầu đặt hàng</a>
+              <a class="btn small" href="huong-dan.html">Đọc thêm về cây lanh</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card product-card" data-product-category="accessory">
+          <div class="product-card-media">
+            <img src="assets/intro/hinh-08.jpeg" alt="Túi vải thổ cẩm mini" loading="lazy" />
+          </div>
+          <div class="product-card-body">
+            <div class="product-card-top">
+              <span id="productBadge5" class="product-card-badge">Phụ kiện</span>
+              <strong class="product-price">260.000đ</strong>
+            </div>
+            <h3>Túi vải thổ cẩm mini</h3>
+            <p id="productDesc5">Một sản phẩm dễ tiếp cận, phù hợp làm quà tặng, đồ lưu niệm hoặc món thử đầu tiên cho người mới quan tâm tới thổ cẩm.</p>
+            <ul class="product-card-notes">
+              <li id="productNote5a">Dễ bán, dễ giới thiệu và phù hợp với khách muốn mua nhanh.</li>
+              <li id="productNote5b">Có thể hỏi thêm về màu sắc, số lượng và kiểu dây đeo.</li>
+            </ul>
+            <div class="product-card-actions">
+              <a id="productAction5" class="btn small primary" href="booking.html">Gửi nhu cầu đặt hàng</a>
+              <a class="btn small" href="map.html">Xem điểm mua / trải nghiệm</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card product-card" data-product-category="custom">
+          <div class="product-card-media">
+            <img src="assets/intro/hinh-01.jpg" alt="Bộ vải và mảnh thổ cẩm đặt theo yêu cầu" loading="lazy" />
+          </div>
+          <div class="product-card-body">
+            <div class="product-card-top">
+              <span id="productBadge6" class="product-card-badge">Đặt theo yêu cầu</span>
+              <strong class="product-price">Từ 190.000đ</strong>
+            </div>
+            <h3>Bộ vải / mảnh thổ cẩm đặt theo yêu cầu</h3>
+            <p id="productDesc6">Phù hợp cho người cần mảnh vải, bộ mẫu nhỏ hoặc sản phẩm đặt riêng để làm quà, học liệu, trưng bày hoặc ứng dụng thiết kế.</p>
+            <ul class="product-card-notes">
+              <li id="productNote6a">Nên ghi rõ kích thước, màu mong muốn và thời gian cần nhận.</li>
+              <li id="productNote6b">Phù hợp khi bạn muốn đặt ít nhưng cần đúng nhu cầu sử dụng.</li>
+            </ul>
+            <div class="product-card-actions">
+              <a id="productAction6" class="btn small primary" href="booking.html">Gửi nhu cầu đặt hàng</a>
+              <a class="btn small" href="booking.html">Trao đổi thêm với cộng đồng</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section">
+      <article class="card product-note-card">
+        <h2 id="productsNoteTitle">Lưu ý khi dùng gian sản phẩm</h2>
+        <ul class="checklist">
+          <li id="productsNote1">Giá trên trang là giá tham khảo để người xem dễ hình dung trước khi liên hệ.</li>
+          <li id="productsNote2">Sản phẩm thủ công có thể thay đổi theo chất liệu, mức độ thêu tay và số lượng đặt.</li>
+          <li id="productsNote3">Với các mẫu đặt riêng, nên trao đổi trước về size, thời gian và mục đích sử dụng.</li>
+        </ul>
+        <p id="productsNoteMeta" class="note">Trang này hiệu quả nhất khi dùng như một catalog giới thiệu và ghi nhận nhu cầu trước khi chốt đơn trực tiếp với cộng đồng.</p>
+      </article>
+    </section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/demo-data.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/products.js"></script>
+  <script src="js/chatbot.js"></script>
+</body>
+</html>

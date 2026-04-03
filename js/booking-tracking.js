@@ -1,13 +1,36 @@
 (function () {
+  const I18N = window.SiteI18n || { lang: 'vi', locale: 'vi-VN', t: (_key, fallback) => fallback };
+  const LANG = I18N.lang === 'en' ? 'en' : 'vi';
+  const LOCALE = I18N.locale || (LANG === 'en' ? 'en-US' : 'vi-VN');
   const DEMO_BOOKINGS_KEY = 'demo_bookings';
   const LAST_BOOKING_PHONE_KEY = 'last_booking_phone';
   const LAST_BOOKING_CODE_KEY = 'last_booking_code';
 
   const STATUS_LABELS = {
-    new: 'Mới',
-    contacted: 'Đã liên hệ',
-    confirmed: 'Đã chốt',
-    cancelled: 'Đã huỷ'
+    new: LANG === 'en' ? 'New' : 'Mới',
+    contacted: LANG === 'en' ? 'Contacted' : 'Đã liên hệ',
+    confirmed: LANG === 'en' ? 'Confirmed' : 'Đã chốt',
+    cancelled: LANG === 'en' ? 'Cancelled' : 'Đã huỷ'
+  };
+
+  const TXT = {
+    waiting: LANG === 'en' ? 'waiting for lookup.' : 'chờ tra cứu.',
+    missingPhone: LANG === 'en' ? 'Please enter a phone number.' : 'Vui lòng nhập số điện thoại.',
+    noMatch: LANG === 'en' ? 'No matching bookings found.' : 'Không tìm thấy đơn phù hợp.',
+    count: (n) => LANG === 'en' ? `${n} bookings` : `${n} đơn`,
+    summaryHint: LANG === 'en' ? 'Enter a phone number to view booking history.' : 'Nhập số điện thoại để xem lịch sử đặt trải nghiệm.',
+    summaryNone: LANG === 'en' ? 'No tracking data yet.' : 'Chưa có dữ liệu tra cứu.',
+    summaryPhone: (phone) => LANG === 'en' ? `Showing booking history for ${phone}.` : `Đang hiển thị lịch sử đặt của số ${phone}.`,
+    statusPlace: (statusText, placeText) => `${statusText} • ${placeText}`,
+    demoFound: (n) => LANG === 'en' ? `found ${n} booking(s) in DEMO.` : `tìm thấy ${n} đơn trong DEMO.`,
+    demoNone: LANG === 'en' ? 'no matching booking in DEMO.' : 'không có đơn khớp trong DEMO.',
+    found: (n) => LANG === 'en' ? `found ${n} booking(s).` : `tìm thấy ${n} đơn.`,
+    none: LANG === 'en' ? 'no matching booking found.' : 'không tìm thấy đơn phù hợp.',
+    lookupError: LANG === 'en'
+      ? 'Public lookup is not enabled on Supabase yet. You can use DEMO_MODE or ask the administrator to check for you. Details: '
+      : 'Hiện chưa bật quyền tra cứu công khai trên Supabase. Bạn có thể dùng DEMO_MODE hoặc nhờ quản trị kiểm tra giúp. Chi tiết: ',
+    accessErrorState: LANG === 'en' ? 'lookup failed due to access permissions.' : 'tra cứu lỗi quyền truy cập.',
+    refreshState: LANG === 'en' ? 'lookup form reset.' : 'đã làm mới biểu mẫu tra cứu.'
   };
 
   function normalizePhone(v) {
@@ -21,7 +44,7 @@
   function formatDate(v) {
     if (!v) return '-';
     const d = new Date(v);
-    return Number.isNaN(d.getTime()) ? v : d.toLocaleString('vi-VN');
+    return Number.isNaN(d.getTime()) ? v : d.toLocaleString(LOCALE);
   }
 
   function readDemoBookings() {
@@ -43,7 +66,7 @@
 
   function setState(message) {
     const el = document.getElementById('lookupState');
-    if (el) el.textContent = 'Trạng thái: ' + message;
+    if (el) el.textContent = (LANG === 'en' ? 'Status: ' : 'Trạng thái: ') + message;
   }
 
   function showError(message) {
@@ -59,10 +82,11 @@
   }
 
   function setCount(n) {
+    const text = TXT.count(n || 0);
     const el = document.getElementById('lookupCount');
-    if (el) el.textContent = String(n || 0) + ' đơn';
+    if (el) el.textContent = text;
     const summaryEl = document.getElementById('lookupSummaryCount');
-    if (summaryEl) summaryEl.textContent = String(n || 0) + ' đơn';
+    if (summaryEl) summaryEl.textContent = text;
   }
 
   function statusBadge(status) {
@@ -75,7 +99,7 @@
     if (!tbody) return;
 
     if (!rows.length) {
-      tbody.innerHTML = '<tr><td colspan="8" style="color:rgba(255,255,255,.72)">Không tìm thấy đơn phù hợp.</td></tr>';
+      tbody.innerHTML = `<tr><td colspan="8" style="color:var(--muted)">${TXT.noMatch}</td></tr>`;
       setCount(0);
       return;
     }
@@ -107,22 +131,19 @@
     if (phoneEl) phoneEl.textContent = phone || '-';
 
     if (!rows.length) {
-      if (hintEl) hintEl.textContent = phone ? 'Chưa tìm thấy đơn khớp với số điện thoại này.' : 'Nhập số điện thoại để xem lịch sử đặt trải nghiệm.';
+      if (hintEl) hintEl.textContent = phone ? (LANG === 'en' ? 'No bookings match this phone number.' : 'Chưa tìm thấy đơn khớp với số điện thoại này.') : TXT.summaryHint;
       if (latestEl) latestEl.textContent = '-';
-      if (statusEl) statusEl.textContent = 'Chưa có dữ liệu tra cứu.';
+      if (statusEl) statusEl.textContent = TXT.summaryNone;
       return;
     }
 
     const latest = rows[0];
-    if (hintEl) {
-      hintEl.textContent = `Đang hiển thị lịch sử đặt của số ${phone}.`;
-    }
-    if (latestEl) {
-      latestEl.textContent = String(latest.tracking_code || latest.id || '-');
-    }
+    if (hintEl) hintEl.textContent = TXT.summaryPhone(phone);
+    if (latestEl) latestEl.textContent = String(latest.tracking_code || latest.id || '-');
     if (statusEl) {
       const statusText = STATUS_LABELS[String(latest.status || 'new')] || String(latest.status || 'new');
-      statusEl.textContent = `${statusText} • ${String(latest.place_name || latest.place_id || 'Chưa rõ điểm')}`;
+      const placeText = String(latest.place_name || latest.place_id || (LANG === 'en' ? 'Unknown point' : 'Chưa rõ điểm'));
+      statusEl.textContent = TXT.statusPlace(statusText, placeText);
     }
   }
 
@@ -143,7 +164,7 @@
 
   async function filterSupabaseRows(phone, code) {
     const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
-    if (!supabase) throw new Error('Thiếu cấu hình Supabase client.');
+    if (!supabase) throw new Error(LANG === 'en' ? 'Missing Supabase client configuration.' : 'Thiếu cấu hình Supabase client.');
 
     let query = supabase.from('bookings').select('*').eq('customer_phone', phone).order('created_at', { ascending: false });
     if (code && /^\d+$/.test(code)) {
@@ -158,8 +179,8 @@
   async function runLookup(phone, code) {
     clearError();
     if (!phone) {
-      showError('Vui lòng nhập số điện thoại.');
-      setState('thiếu số điện thoại.');
+      showError(TXT.missingPhone);
+      setState(TXT.waiting);
       return;
     }
 
@@ -167,7 +188,7 @@
       const rows = filterDemoRows(phone, code);
       renderRows(rows);
       updateSummary(phone, rows);
-      setState(rows.length ? ('tìm thấy ' + rows.length + ' đơn trong DEMO.') : 'không có đơn khớp trong DEMO.');
+      setState(rows.length ? TXT.demoFound(rows.length) : TXT.demoNone);
       return;
     }
 
@@ -175,15 +196,12 @@
       const rows = await filterSupabaseRows(phone, code);
       renderRows(rows);
       updateSummary(phone, rows);
-      setState(rows.length ? ('tìm thấy ' + rows.length + ' đơn.') : 'không tìm thấy đơn phù hợp.');
+      setState(rows.length ? TXT.found(rows.length) : TXT.none);
     } catch (err) {
       renderRows([]);
       updateSummary(phone, []);
-      showError(
-        'Hiện chưa bật quyền tra cứu công khai trên Supabase. ' +
-        'Bạn có thể dùng DEMO_MODE hoặc nhờ quản trị kiểm tra giúp. Chi tiết: ' + (err && err.message ? err.message : String(err))
-      );
-      setState('tra cứu lỗi quyền truy cập.');
+      showError(TXT.lookupError + (err && err.message ? err.message : String(err)));
+      setState(TXT.accessErrorState);
     }
   }
 
@@ -205,7 +223,7 @@
       clearError();
       renderRows([]);
       updateSummary('', []);
-      setState('đã làm mới biểu mẫu tra cứu.');
+      setState(TXT.refreshState);
     });
   }
 

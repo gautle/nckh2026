@@ -3,6 +3,28 @@ let visiblePlaces = [];
 let embedReady = false;
 
 const el = {};
+const I18N = window.SiteI18n || { lang: 'vi', t: (_key, fallback) => fallback };
+const TXT = {
+  noArcgisTitle: I18N.lang === 'en' ? 'ArcGIS link is missing.' : 'Chưa có link ArcGIS.',
+  noArcgisBody: I18N.lang === 'en' ? 'Open map.html and paste the Embed link from ArcGIS Online.' : 'Mở map.html và dán link Embed từ ArcGIS Online.',
+  noArcgisHint: I18N.lang === 'en' ? 'You have not configured the ArcGIS embed link yet.' : 'Bạn chưa cấu hình link ArcGIS embed.',
+  loadingTitle: I18N.lang === 'en' ? 'Loading ArcGIS map...' : 'Đang tải bản đồ ArcGIS...',
+  loadingBody: I18N.lang === 'en' ? 'The map is quite heavy, so it may take a few seconds. Point filters still work while you wait.' : 'Bản đồ nặng nên có thể mất vài giây. Bộ lọc điểm vẫn dùng được trong lúc chờ.',
+  liveHint: I18N.lang === 'en' ? 'The ArcGIS embed is active. You can drag and zoom directly in the frame.' : 'Nhúng ArcGIS đang hoạt động. Bạn có thể kéo/zoom trực tiếp trong khung.',
+  slowHint: I18N.lang === 'en' ? 'ArcGIS is loading a bit slowly. You can still filter points or open the full map if needed.' : 'ArcGIS đang tải hơi chậm. Bạn có thể tiếp tục lọc điểm và mở bản đồ full nếu cần.',
+  viewOnMap: I18N.lang === 'en' ? 'View on ArcGIS' : 'Xem trên ArcGIS',
+  view360: I18N.t('common.explore360', 'Xem 360'),
+  openProfile: I18N.t('common.openProfile', 'Mở hồ sơ'),
+  noPointsMatch: I18N.lang === 'en' ? 'No points match the current filters.' : 'Không có điểm phù hợp bộ lọc hiện tại.',
+  noPointData: I18N.lang === 'en' ? 'No point data yet. Please check data/places.json or js/demo-data.js.' : 'Chưa có dữ liệu điểm. Hãy kiểm tra data/places.json hoặc js/demo-data.js.',
+  focusHint: (place) => embedReady
+    ? (I18N.lang === 'en'
+      ? `Selected: ${place.name} (${place.lat.toFixed(5)}, ${place.lng.toFixed(5)}). Locate it in the ArcGIS frame on the right.`
+      : `Đã chọn: ${place.name} (${place.lat.toFixed(5)}, ${place.lng.toFixed(5)}). Hãy định vị điểm trên ArcGIS ở khung bên phải.`)
+    : (I18N.lang === 'en' ? `Selected: ${place.name}.` : `Đã chọn: ${place.name}.`),
+  count: (n) => I18N.lang === 'en' ? `${n} points` : `${n} điểm`,
+  loadFail: I18N.lang === 'en' ? 'Could not load map data. Waiting for demo data.' : 'Không tải được dữ liệu bản đồ. Đang chờ dữ liệu demo.'
+};
 
 function trackMetric(eventName, payload) {
   if (window.AppMetrics && typeof window.AppMetrics.track === 'function') {
@@ -34,23 +56,47 @@ function loadArcGISEmbed() {
   }
 
   if (!embedUrl) {
-    mapEl.innerHTML = '<div style="padding:14px;color:#fff">Chưa có ARCGIS_EMBED_URL. Mở map.html và dán link Embed từ ArcGIS Online.</div>';
-    hintEl.textContent = 'Bạn chưa cấu hình link ArcGIS embed.';
+    mapEl.innerHTML = `<div class="map-loading map-loading-error"><b>${TXT.noArcgisTitle}</b><span>${TXT.noArcgisBody}</span></div>`;
+    hintEl.textContent = TXT.noArcgisHint;
     embedReady = false;
     return;
   }
 
-  mapEl.innerHTML =
-    `<iframe
-      title="ArcGIS Web Map"
-      src="${embedUrl}"
-      style="width:100%;min-height:78vh;border:0"
-      loading="lazy"
-      referrerpolicy="no-referrer-when-downgrade"
-      allowfullscreen
-    ></iframe>`;
-  hintEl.textContent = 'Nhúng ArcGIS đang hoạt động. Bạn có thể kéo/zoom trực tiếp trong khung.';
-  embedReady = true;
+  mapEl.innerHTML = `
+    <div class="map-loading" id="mapLoading">
+      <div class="map-loading-card">
+        <div class="map-loading-pulse"></div>
+        <b>${TXT.loadingTitle}</b>
+        <span>${TXT.loadingBody}</span>
+      </div>
+    </div>
+  `;
+
+  const iframe = document.createElement('iframe');
+  iframe.title = 'ArcGIS Web Map';
+  iframe.src = embedUrl;
+  iframe.loading = 'lazy';
+  iframe.referrerPolicy = 'no-referrer-when-downgrade';
+  iframe.allowFullscreen = true;
+  iframe.className = 'map-iframe';
+
+  const onReady = () => {
+    const loadingEl = document.getElementById('mapLoading');
+    if (loadingEl) loadingEl.remove();
+    hintEl.textContent = TXT.liveHint;
+    embedReady = true;
+  };
+
+  iframe.addEventListener('load', onReady, { once: true });
+
+  requestAnimationFrame(() => {
+    mapEl.appendChild(iframe);
+    window.setTimeout(() => {
+      if (!embedReady) {
+        hintEl.textContent = TXT.slowHint;
+      }
+    }, 2200);
+  });
 }
 
 function currentFilters() {
@@ -86,18 +132,18 @@ function placeCard(place) {
       </div>
       <div style="color:var(--muted);font-size:13px">${A.escapeHtml(place.summary)}</div>
       <div class="row" style="justify-content:flex-start">
-        <button class="btn small" data-focus-id="${A.escapeHtml(place.id)}">Xem trên ArcGIS</button>
-        <a class="btn small" href="du-lich-ao-360.html?id=${encodeURIComponent(place.id)}">Xem 360</a>
-        <a class="btn small" href="place.html?id=${encodeURIComponent(place.id)}">Mở hồ sơ</a>
+        <button class="btn small" data-focus-id="${A.escapeHtml(place.id)}">${A.escapeHtml(TXT.viewOnMap)}</button>
+        <a class="btn small" href="du-lich-ao-360.html?id=${encodeURIComponent(place.id)}">${A.escapeHtml(TXT.view360)}</a>
+        <a class="btn small" href="place.html?id=${encodeURIComponent(place.id)}">${A.escapeHtml(TXT.openProfile)}</a>
       </div>
     </article>
   `;
 }
 
 function renderList() {
-  el.count.textContent = `${visiblePlaces.length} điểm`;
+  el.count.textContent = TXT.count(visiblePlaces.length);
   if (!visiblePlaces.length) {
-    el.list.innerHTML = '<div class="point-item">Không có điểm phù hợp bộ lọc hiện tại.</div>';
+    el.list.innerHTML = `<div class="point-item">${TXT.noPointsMatch}</div>`;
     return;
   }
 
@@ -119,12 +165,7 @@ function focusPlace(placeId) {
   if (!place) return;
 
   const hintEl = document.getElementById('mapHint');
-  if (embedReady) {
-    hintEl.textContent = `Đã chọn: ${place.name} (${place.lat.toFixed(5)}, ${place.lng.toFixed(5)}). Hãy định vị điểm trên ArcGIS ở khung bên phải.`;
-  } else {
-    hintEl.textContent = `Đã chọn: ${place.name}.`;
-  }
-
+  if (hintEl) hintEl.textContent = TXT.focusHint(place);
   document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
@@ -144,8 +185,8 @@ async function setup() {
 
   if (!allPlaces.length) {
     visiblePlaces = [];
-    el.count.textContent = '0 điểm';
-    el.list.innerHTML = '<div class="point-item">Chưa có dữ liệu điểm. Hãy kiểm tra data/places.json hoặc js/demo-data.js.</div>';
+    el.count.textContent = TXT.count(0);
+    el.list.innerHTML = `<div class="point-item">${TXT.noPointData}</div>`;
   } else {
     applyFilters();
   }
@@ -171,8 +212,8 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 
   setup().catch(err => {
-    document.getElementById('pointList').innerHTML = '<div class="point-item">Không tải được dữ liệu bản đồ. Đang chờ dữ liệu demo.</div>';
-    document.getElementById('pointCount').textContent = '0 điểm';
+    document.getElementById('pointList').innerHTML = `<div class="point-item">${TXT.loadFail}</div>`;
+    document.getElementById('pointCount').textContent = TXT.count(0);
     console.error(err);
   });
 });

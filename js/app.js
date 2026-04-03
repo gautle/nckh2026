@@ -1,20 +1,26 @@
+const I18N = window.SiteI18n || {
+  lang: 'vi',
+  locale: 'vi-VN',
+  t: (_key, fallback) => (fallback == null ? '' : fallback)
+};
+
 const TYPE_LABELS = {
-  craft: 'Nghề',
-  heritage: 'Di sản',
-  service: 'Dịch vụ',
-  landscape: 'Cảnh quan'
+  craft: I18N.t('js.typeCraft', 'Nghề'),
+  heritage: I18N.t('js.typeHeritage', 'Di sản'),
+  service: I18N.t('js.typeService', 'Dịch vụ'),
+  landscape: I18N.t('js.typeLandscape', 'Cảnh quan')
 };
 
 const PERMISSION_LABELS = {
-  allowed: 'Được ghi hình',
-  ask: 'Xin phép trước',
-  not_allowed: 'Không ghi hình'
+  allowed: I18N.t('js.permAllowed', 'Được ghi hình'),
+  ask: I18N.t('js.permAsk', 'Xin phép trước'),
+  not_allowed: I18N.t('js.permNo', 'Không ghi hình')
 };
 
 const SENSITIVITY_LABELS = {
-  public: 'Công khai',
-  limited: 'Giới hạn',
-  sensitive: 'Nhạy cảm'
+  public: I18N.t('js.sensPublic', 'Công khai'),
+  limited: I18N.t('js.sensLimited', 'Giới hạn'),
+  sensitive: I18N.t('js.sensSensitive', 'Nhạy cảm')
 };
 
 function permissionClass(v) {
@@ -43,12 +49,16 @@ let placesCache = null;
 function normalizePanoSceneEntry(entry, index) {
   if (!entry) return null;
 
+  const defaultName = index === 0
+    ? (I18N.lang === 'en' ? 'Main scene' : 'Không gian chính')
+    : (I18N.lang === 'en' ? `View ${index + 1}` : `Góc nhìn ${index + 1}`);
+
   if (typeof entry === 'string') {
     const url = entry.trim();
     if (!url) return null;
     return {
       id: `scene-${index + 1}`,
-      name: index === 0 ? 'Không gian chính' : `Góc nhìn ${index + 1}`,
+      name: defaultName,
       url
     };
   }
@@ -58,7 +68,7 @@ function normalizePanoSceneEntry(entry, index) {
     if (!url) return null;
     return {
       id: String(entry.id || `scene-${index + 1}`),
-      name: String(entry.name || entry.title || (index === 0 ? 'Không gian chính' : `Góc nhìn ${index + 1}`)),
+      name: String(entry.name || entry.title || defaultName),
       url,
       description: String(entry.description || entry.summary || '').trim()
     };
@@ -121,20 +131,20 @@ async function fetchPlaces() {
 
   try {
     const res = await fetch('./data/places.json', { cache: 'no-store' });
-    if (!res.ok) throw new Error('Không đọc được data/places.json');
+    if (!res.ok) throw new Error(I18N.lang === 'en' ? 'Could not read data/places.json' : 'Không đọc được data/places.json');
     const data = await res.json();
     if (Array.isArray(data) && data.length) {
       placesCache = applyDefaultPano(data);
       return placesCache;
     }
-    throw new Error('Dữ liệu điểm đang trống');
+    throw new Error(I18N.lang === 'en' ? 'Place data is empty' : 'Dữ liệu điểm đang trống');
   } catch (err) {
     if (demoPlaces.length) {
-      console.warn('Fallback sang DEMO_PLACES:', err.message);
+      console.warn(I18N.lang === 'en' ? 'Fallback to DEMO_PLACES:' : 'Fallback sang DEMO_PLACES:', err.message);
       placesCache = applyDefaultPano(demoPlaces);
       return placesCache;
     }
-    console.error('Không tải được dữ liệu điểm:', err);
+    console.error(I18N.lang === 'en' ? 'Could not load place data:' : 'Không tải được dữ liệu điểm:', err);
     placesCache = [];
     return placesCache;
   }
@@ -147,6 +157,8 @@ function toPermissionIcon(v) {
 }
 
 window.AppData = {
+  lang: I18N.lang,
+  locale: I18N.locale,
   TYPE_LABELS,
   PERMISSION_LABELS,
   SENSITIVITY_LABELS,

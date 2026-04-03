@@ -1,4 +1,28 @@
 (function () {
+  const I18N = window.SiteI18n || { lang: 'vi', t: (_key, fallback) => fallback };
+  const TXT = {
+    emptyName: I18N.lang === 'en' ? 'No point selected' : 'Chưa chọn điểm',
+    emptySummary: I18N.lang === 'en' ? 'Point and scene data will appear here once you select one.' : 'Dữ liệu điểm và scene sẽ hiện tại đây khi bạn chọn.',
+    noPlaceWith360: I18N.lang === 'en' ? 'No points have 360 scenes yet.' : 'Hiện chưa có điểm nào gắn scene 360.',
+    choosePointFirst: I18N.lang === 'en' ? 'Choose a point to view its scenes.' : 'Chưa chọn điểm để xem scene.',
+    promptPickPoint: I18N.lang === 'en' ? 'Please choose a point with 360 first.' : 'Hãy chọn một điểm có 360 ở phía trên.',
+    availableScenes: (place, count) => I18N.lang === 'en' ? `${place} • ${count} scenes available` : `${place} • ${count} scene khả dụng`,
+    noSpecificScene: I18N.lang === 'en' ? 'This point does not have specific 360 scenes yet.' : 'Điểm này chưa có scene 360 cụ thể.',
+    mainScene: I18N.lang === 'en' ? 'Main scene' : 'Không gian chính',
+    viewLabel: (n) => I18N.lang === 'en' ? `View ${n}` : `Góc nhìn ${n}`,
+    sceneDesc: (index, placeName) => I18N.lang === 'en' ? `Scene ${index} of ${placeName}.` : `Scene ${index} của ${placeName}.`,
+    openNewTab: I18N.lang === 'en' ? 'Open in new tab' : 'Mở tab mới',
+    profileBtn: I18N.t('virtual360.profileBtn', 'Hồ sơ điểm'),
+    viewingNow: I18N.lang === 'en' ? 'Now viewing' : 'Đang xem',
+    chooseThisPoint: I18N.lang === 'en' ? 'Choose this point' : 'Chọn điểm này',
+    viewThisScene: I18N.lang === 'en' ? 'View this scene' : 'Xem scene này',
+    loadingMeta: I18N.lang === 'en' ? 'Loading 360 data...' : 'Đang tải dữ liệu 360...',
+    readyMeta: (place, sceneName, count) => I18N.lang === 'en'
+      ? `Viewing ${place} • ${sceneName}. ${count} points currently have 360 scenes.`
+      : `Đang xem 360 tại ${place} • ${sceneName}. Tổng ${count} điểm đã gắn 360.`,
+    loadFail: I18N.lang === 'en' ? 'Could not load 360 data.' : 'Không tải được dữ liệu 360.'
+  };
+
   let pendingEmbedTimer = null;
 
   function pickEmbedUrl() {
@@ -56,16 +80,10 @@
   function updateUrlSelection(placeId, sceneId) {
     try {
       const url = new URL(window.location.href);
-      if (placeId) {
-        url.searchParams.set('id', placeId);
-      } else {
-        url.searchParams.delete('id');
-      }
-      if (sceneId) {
-        url.searchParams.set('scene', sceneId);
-      } else {
-        url.searchParams.delete('scene');
-      }
+      if (placeId) url.searchParams.set('id', placeId);
+      else url.searchParams.delete('id');
+      if (sceneId) url.searchParams.set('scene', sceneId);
+      else url.searchParams.delete('scene');
       window.history.replaceState({}, '', url.toString());
     } catch (_err) {
       // Ignore if URL update is blocked.
@@ -75,7 +93,6 @@
   function createForcedReloadUrl(src) {
     const raw = String(src || '').trim();
     if (!raw) return '';
-
     const parts = raw.split('#');
     const base = parts[0] || '';
     const hash = parts.length > 1 ? `#${parts.slice(1).join('#')}` : '';
@@ -113,21 +130,21 @@
     if (!placeNameEl || !placeSummaryEl || !profileLinkEl || !externalLinkEl || !sceneCountEl) return;
 
     if (!place) {
-      placeNameEl.textContent = 'Chưa chọn điểm';
-      placeSummaryEl.textContent = 'Dữ liệu điểm và scene sẽ hiện tại đây khi bạn chọn.';
+      placeNameEl.textContent = TXT.emptyName;
+      placeSummaryEl.textContent = TXT.emptySummary;
       profileLinkEl.href = 'place.html';
       externalLinkEl.href = '#';
-      sceneCountEl.textContent = '0 scene';
+      sceneCountEl.textContent = I18N.lang === 'en' ? '0 scenes' : '0 scene';
       return;
     }
 
-    placeNameEl.textContent = place.name || place.id || 'Điểm chưa đặt tên';
+    placeNameEl.textContent = place.name || place.id || TXT.emptyName;
     placeSummaryEl.textContent = place.summary
-      ? `${place.summary}${scene && scene.name ? ' • Đang xem: ' + scene.name : ''}`
-      : (scene && scene.name ? `Đang xem: ${scene.name}` : 'Đang cập nhật thông tin điểm.');
+      ? `${place.summary}${scene && scene.name ? ' • ' + (I18N.lang === 'en' ? 'Viewing: ' : 'Đang xem: ') + scene.name : ''}`
+      : (scene && scene.name ? (I18N.lang === 'en' ? `Viewing: ${scene.name}` : `Đang xem: ${scene.name}`) : TXT.emptySummary);
     profileLinkEl.href = `place.html?id=${encodeURIComponent(place.id || '')}`;
     externalLinkEl.href = scene && scene.url ? scene.url : (place.pano360_url || '#');
-    sceneCountEl.textContent = `${scenesCount || 0} scene`;
+    sceneCountEl.textContent = I18N.lang === 'en' ? `${scenesCount || 0} scenes` : `${scenesCount || 0} scene`;
   }
 
   function renderPlaceList(places, selectedPlaceId, onSelectPlace) {
@@ -135,7 +152,7 @@
     if (!wrap) return;
 
     if (!places.length) {
-      wrap.innerHTML = '<div class="search-empty">Chưa có điểm nào được gắn 360.</div>';
+      wrap.innerHTML = `<div class="search-empty">${TXT.noPlaceWith360}</div>`;
       return;
     }
 
@@ -145,9 +162,9 @@
         const isActive = String(place.id) === String(selectedPlaceId) ? ' is-active' : '';
         return [
           `<article class="virtual-place-card${isActive}">`,
-          `  <h4>${esc(place.name || place.id || 'Điểm chưa đặt tên')}</h4>`,
-          `  <p>${scenes.length} scene 360${place.summary ? ' • ' + esc(place.summary) : ''}</p>`,
-          `  <button class="btn small${isActive ? ' primary' : ''}" type="button" data-place-select="${esc(place.id || '')}">${isActive ? 'Đang xem' : 'Chọn điểm này'}</button>`,
+          `  <h4>${esc(place.name || place.id || TXT.emptyName)}</h4>`,
+          `  <p>${scenes.length} ${I18N.lang === 'en' ? '360 scenes' : 'scene 360'}${place.summary ? ' • ' + esc(place.summary) : ''}</p>`,
+          `  <button class="btn small${isActive ? ' primary' : ''}" type="button" data-place-select="${esc(place.id || '')}">${isActive ? TXT.viewingNow : TXT.chooseThisPoint}</button>`,
           '</article>'
         ].join('');
       })
@@ -167,16 +184,16 @@
     if (!wrap || !selectedPlaceMeta) return;
 
     if (!place) {
-      selectedPlaceMeta.textContent = 'Chưa chọn điểm để xem scene.';
-      wrap.innerHTML = '<div class="search-empty">Hãy chọn một điểm có 360 ở phía trên.</div>';
+      selectedPlaceMeta.textContent = TXT.choosePointFirst;
+      wrap.innerHTML = `<div class="search-empty">${TXT.promptPickPoint}</div>`;
       return;
     }
 
     const scenes = getScenes(place);
-    selectedPlaceMeta.textContent = `${place.name} • ${scenes.length} scene khả dụng`;
+    selectedPlaceMeta.textContent = TXT.availableScenes(place.name, scenes.length);
 
     if (!scenes.length) {
-      wrap.innerHTML = '<div class="search-empty">Điểm này chưa có scene 360 cụ thể.</div>';
+      wrap.innerHTML = `<div class="search-empty">${TXT.noSpecificScene}</div>`;
       return;
     }
 
@@ -184,16 +201,16 @@
       .map((scene, index) => {
         const sceneId = String(scene.id || `scene-${index + 1}`);
         const active = sceneId === String(selectedSceneId) ? ' is-active' : '';
-        const sceneName = esc(scene.name || `Góc nhìn ${index + 1}`);
-        const sceneDescription = esc(scene.description || `Scene ${index + 1} của ${place.name}.`);
+        const sceneName = esc(scene.name || (index === 0 ? TXT.mainScene : TXT.viewLabel(index + 1)));
+        const sceneDescription = esc(scene.description || TXT.sceneDesc(index + 1, place.name));
         return [
           `<article class="virtual-scene-card${active}">`,
           `  <h4>${sceneName}</h4>`,
           `  <p>${sceneDescription}</p>`,
           '  <div class="virtual-scene-actions">',
-          `    <button class="btn small${active ? ' primary' : ''}" type="button" data-scene-select="${esc(sceneId)}">${active ? 'Đang xem' : 'Xem scene này'}</button>`,
-          `    <a class="btn small" href="${esc(scene.url)}" target="_blank" rel="noopener">Mở tab mới</a>`,
-          `    <a class="btn small" href="place.html?id=${encodeURIComponent(place.id || '')}">Hồ sơ điểm</a>`,
+          `    <button class="btn small${active ? ' primary' : ''}" type="button" data-scene-select="${esc(sceneId)}">${active ? TXT.viewingNow : TXT.viewThisScene}</button>`,
+          `    <a class="btn small" href="${esc(scene.url)}" target="_blank" rel="noopener">${TXT.openNewTab}</a>`,
+          `    <a class="btn small" href="place.html?id=${encodeURIComponent(place.id || '')}">${TXT.profileBtn}</a>`,
           '  </div>',
           '</article>'
         ].join('');
@@ -229,7 +246,7 @@
         renderPlaceList([], '', function () {});
         renderSceneList(null, '', function () {});
         updateCurrentPlaceCard(null, null, 0);
-        if (meta) meta.textContent = 'Hiện chưa có điểm nào gắn scene 360.';
+        if (meta) meta.textContent = TXT.noPlaceWith360;
         return;
       }
 
@@ -248,9 +265,9 @@
         selectedSceneId = scene ? String(scene.id || '') : '';
 
         if (scene) {
-          setEmbedSource(scene.url, `Không gian 360 - ${place.name} - ${scene.name || selectedSceneId}`);
+          setEmbedSource(scene.url, `360 - ${place.name} - ${scene.name || selectedSceneId}`);
         } else if (fallbackEmbedUrl) {
-          setEmbedSource(fallbackEmbedUrl, `Không gian 360 - ${place.name}`);
+          setEmbedSource(fallbackEmbedUrl, `360 - ${place.name}`);
         }
 
         updateUrlSelection(place.id, selectedSceneId);
@@ -259,8 +276,8 @@
         updateCurrentPlaceCard(place, scene, scenes.length);
 
         if (meta) {
-          const sceneName = scene && scene.name ? scene.name : 'Không gian chính';
-          meta.textContent = `Đang xem 360 tại ${place.name} • ${sceneName}. Tổng ${placeOptions.length} điểm đã gắn 360.`;
+          const sceneName = scene && scene.name ? scene.name : TXT.mainScene;
+          meta.textContent = TXT.readyMeta(place.name, sceneName, placeOptions.length);
         }
       }
 
@@ -269,7 +286,7 @@
       renderPlaceList([], '', function () {});
       renderSceneList(null, '', function () {});
       updateCurrentPlaceCard(null, null, 0);
-      if (meta) meta.textContent = 'Không tải được dữ liệu 360.';
+      if (meta) meta.textContent = TXT.loadFail;
     }
   }
 

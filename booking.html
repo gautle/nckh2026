@@ -13,7 +13,7 @@
         <div class="logo"></div>
         <div>
           <b>Đặt trải nghiệm</b>
-          <span>MVP form cho demo</span>
+          <span>Biểu mẫu đặt trải nghiệm</span>
         </div>
       </a>
       <nav class="nav">
@@ -22,6 +22,7 @@
         <a href="du-lich-ao-360.html">Du lịch ảo 360</a>
         <a href="huong-dan.html">Các bài viết</a>
         <a class="active" href="booking.html">Đặt trải nghiệm</a>
+        <a href="san-pham.html">Gian sản phẩm</a>
         <a href="admin-bookings.html">Quản lý tài khoản</a>
       </nav>
     </div>
@@ -53,13 +54,36 @@
             <select class="input" id="bookingPoint" name="point"></select>
           </label>
           <label>Gói trải nghiệm
-            <select class="input" name="package">
-              <option>Gói 1 - Làm thử 1 công đoạn (60')</option>
-              <option>Gói 2 - Từ nguyên liệu đến hoạ tiết (120')</option>
-              <option>Gói 3 - Combo nghề + ẩm thực + kể chuyện (nửa ngày)</option>
+            <select class="input" id="bookingPackage" name="package">
+              <option value="goi-1">Gói 1 - Làm thử 1 công đoạn (60')</option>
+              <option value="goi-2">Gói 2 - Từ nguyên liệu đến hoạ tiết (120')</option>
+              <option value="goi-3">Gói 3 - Combo nghề + ẩm thực + kể chuyện (nửa ngày)</option>
             </select>
           </label>
         </div>
+
+        <section id="bookingPreview" class="booking-preview" aria-live="polite">
+          <div class="booking-preview-head">
+            <span class="booking-preview-kicker">Gợi ý theo lựa chọn</span>
+            <h3 id="bookingPreviewTitle">Bạn đang chọn trải nghiệm tại điểm này</h3>
+            <p id="bookingPreviewIntro">Nội dung sẽ đổi theo địa điểm và gói bạn đang chọn để người xem hiểu rõ trước khi gửi đăng ký.</p>
+          </div>
+          <div class="booking-preview-grid">
+            <article class="booking-preview-card">
+              <span class="booking-summary-label">Điểm nổi bật</span>
+              <b id="bookingPreviewHighlights">-</b>
+              <p id="bookingPreviewSummary">-</p>
+            </article>
+            <article class="booking-preview-card">
+              <span class="booking-summary-label">Bạn sẽ nhận được</span>
+              <ul id="bookingPreviewIncludes" class="booking-preview-list"></ul>
+            </article>
+            <article class="booking-preview-card">
+              <span class="booking-summary-label">Lời khuyên trước khi đi</span>
+              <ul id="bookingPreviewAdvice" class="booking-preview-list"></ul>
+            </article>
+          </div>
+        </section>
 
         <label>Ghi chú
           <textarea class="input" name="note" placeholder="Nhu cầu đặc biệt, nhóm có trẻ em/người cao tuổi..."></textarea>
@@ -100,6 +124,7 @@
   <script src="js/supabase-config.js"></script>
   <script src="js/config.js"></script>
   <script src="js/demo-data.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
   <script src="js/booking.js"></script>
   <script src="js/chatbot.js"></script>
