@@ -5,12 +5,14 @@
       locale: 'vi-VN',
       nav: {
         home: 'Trang chủ',
+        explore: 'Khám phá',
         map: 'Bản đồ',
         virtual360: 'Du lịch ảo 360',
         articles: 'Các bài viết',
         booking: 'Đặt trải nghiệm',
         products: 'Gian sản phẩm',
-        account: 'Quản lý tài khoản'
+        place: 'Hồ sơ điểm',
+        account: 'Tài khoản'
       },
       common: {
         viewMap: 'Xem bản đồ',
@@ -423,12 +425,14 @@
       locale: 'en-US',
       nav: {
         home: 'Home',
+        explore: 'Explore',
         map: 'Map',
         virtual360: 'Virtual 360',
         articles: 'Articles',
         booking: 'Book Experience',
         products: 'Craft Shop',
-        account: 'Dashboard'
+        place: 'Place profile',
+        account: 'Account'
       },
       common: {
         viewMap: 'View map',
@@ -885,6 +889,7 @@
       'index.html': t('nav.home'),
       'map.html': t('nav.map'),
       'du-lich-ao-360.html': t('nav.virtual360'),
+      'place.html': t('nav.place'),
       'huong-dan.html': t('nav.articles'),
       'booking.html': t('nav.booking'),
       'san-pham.html': t('nav.products'),
@@ -893,6 +898,9 @@
     document.querySelectorAll('.nav a[href]').forEach((link) => {
       const href = link.getAttribute('href') || '';
       if (navMap[href]) link.textContent = navMap[href];
+    });
+    document.querySelectorAll('.nav-dropdown-trigger-label').forEach((label) => {
+      label.textContent = t('nav.explore');
     });
   }
 

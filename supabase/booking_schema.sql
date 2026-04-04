@@ -13,11 +13,34 @@ create table if not exists public.bookings (
   status text not null default 'new' check (status in ('new','contacted','confirmed','cancelled'))
 );
 
+create table if not exists public.admin_users (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  email text,
+  created_at timestamptz not null default now()
+);
+
 alter table public.bookings enable row level security;
+alter table public.admin_users enable row level security;
+
+create or replace function public.is_admin_user()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (
+    select 1
+    from public.admin_users
+    where user_id = auth.uid()
+  );
+$$;
+
+grant execute on function public.is_admin_user() to anon, authenticated;
 
 -- Secure policies:
 -- 1) Public can submit bookings
--- 2) Only authenticated users can read/update/delete bookings (for admin dashboard)
+-- 2) Only allowlisted admin users can read/update/delete bookings
 
 drop policy if exists "public_insert_bookings" on public.bookings;
 create policy "public_insert_bookings"
@@ -27,15 +50,15 @@ with check (true);
 drop policy if exists "admin_read_bookings" on public.bookings;
 create policy "admin_read_bookings"
 on public.bookings for select
-using (auth.role() = 'authenticated');
+using (public.is_admin_user());
 
 drop policy if exists "admin_update_bookings" on public.bookings;
 create policy "admin_update_bookings"
 on public.bookings for update
-using (auth.role() = 'authenticated')
-with check (auth.role() = 'authenticated');
+using (public.is_admin_user())
+with check (public.is_admin_user());
 
 drop policy if exists "admin_delete_bookings" on public.bookings;
 create policy "admin_delete_bookings"
 on public.bookings for delete
-using (auth.role() = 'authenticated');
+using (public.is_admin_user());

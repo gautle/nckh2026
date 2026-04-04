@@ -3,6 +3,10 @@
 // false -> use real data source and Supabase booking
 window.DEMO_MODE = true;
 
+// Public booking lookup should stay off in secure mode unless you add
+// a dedicated protected lookup flow on Supabase/backend.
+window.PUBLIC_BOOKING_LOOKUP_ENABLED = false;
+
 // Chatbot AI mode:
 // false -> chatbot uses built-in keyword replies
 // true  -> chatbot calls secure backend endpoint

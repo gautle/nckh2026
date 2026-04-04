@@ -7,6 +7,7 @@ async function initBooking() {
   };
   const LANG = I18N.lang === 'en' ? 'en' : 'vi';
   const DEMO_MODE = A.isDemoMode();
+  const PUBLIC_LOOKUP_ENABLED = Boolean(window.PUBLIC_BOOKING_LOOKUP_ENABLED);
   const LAST_BOOKING_PHONE_KEY = 'last_booking_phone';
   const LAST_BOOKING_CODE_KEY = 'last_booking_code';
   const params = new URLSearchParams(window.location.search);
@@ -15,6 +16,7 @@ async function initBooking() {
   const byId = new Map(places.map(p => [p.id, p]));
 
   const pointIdInput = document.getElementById('bookingPoint');
+  const formEl = document.getElementById('bookingForm');
   const successEl = document.getElementById('bookingSuccess');
   const errorEl = document.getElementById('bookingError');
   const nextStepsEl = document.getElementById('bookingNextSteps');
@@ -24,6 +26,7 @@ async function initBooking() {
   const nameInput = document.querySelector('input[name="name"]');
   const phoneInput = document.querySelector('input[name="phone"]');
   const packageInput = document.getElementById('bookingPackage');
+  const submitBtn = formEl ? formEl.querySelector('button[type="submit"]') : null;
   const previewTitleEl = document.getElementById('bookingPreviewTitle');
   const previewIntroEl = document.getElementById('bookingPreviewIntro');
   const previewHighlightsEl = document.getElementById('bookingPreviewHighlights');
@@ -58,10 +61,24 @@ async function initBooking() {
     latestGeneric: LANG === 'en'
       ? 'You can use this code to quickly check the current booking status.'
       : 'Bạn có thể dùng mã này để tra cứu nhanh trạng thái đơn.',
+    latestBoundManual: (placeName) => LANG === 'en'
+      ? `Your latest booking is linked to ${placeName}. Public lookup is disabled in secure mode, so please keep this code for the administrator.`
+      : `Đơn gần nhất của bạn đang gắn với ${placeName}. Chế độ bảo mật hiện tắt tra cứu công khai, vui lòng lưu lại mã này để quản trị viên hỗ trợ khi cần.`,
+    latestGenericManual: LANG === 'en'
+      ? 'Public lookup is disabled in secure mode. Please keep this code and phone number for the administrator.'
+      : 'Chế độ bảo mật hiện tắt tra cứu công khai. Vui lòng lưu lại mã này cùng số điện thoại để quản trị viên hỗ trợ.',
     demoAccepted: LANG === 'en' ? 'Demo booking received.' : 'Đã nhận đăng ký (demo).',
     accepted: LANG === 'en' ? 'Booking submitted successfully.' : 'Đã nhận đăng ký thành công.',
     trackingCode: LANG === 'en' ? 'Tracking code' : 'Mã tra cứu',
     viewStatus: LANG === 'en' ? 'View booking status' : 'Xem trạng thái đơn',
+    secureLookupNotice: LANG === 'en'
+      ? 'Public lookup is currently disabled in secure mode. Please keep this code and your phone number so the administrator can support you.'
+      : 'Tra cứu công khai hiện đang tắt ở chế độ bảo mật. Vui lòng lưu lại mã này cùng số điện thoại để quản trị viên hỗ trợ khi cần.',
+    invalidPhone: LANG === 'en' ? 'Please enter a valid phone number.' : 'Vui lòng nhập số điện thoại hợp lệ.',
+    invalidPeople: LANG === 'en' ? 'Please enter a valid group size.' : 'Vui lòng nhập số lượng người hợp lệ.',
+    missingDate: LANG === 'en' ? 'Please select a travel date.' : 'Vui lòng chọn ngày đi.',
+    missingPlace: LANG === 'en' ? 'Please choose a valid experience point.' : 'Vui lòng chọn điểm trải nghiệm hợp lệ.',
+    submitting: LANG === 'en' ? 'Submitting...' : 'Đang gửi...',
     submitError: (message) => LANG === 'en' ? `Booking failed: ${message}` : `Lỗi gửi đăng ký: ${message}`,
     initError: (message) => LANG === 'en' ? `Initialization error: ${message}` : `Lỗi khởi tạo: ${message}`
   };
@@ -309,38 +326,87 @@ async function initBooking() {
     });
   }
 
-  const lastPhone = localStorage.getItem(LAST_BOOKING_PHONE_KEY) || '';
+  function safeStorageGet(key) {
+    try {
+      return localStorage.getItem(key) || '';
+    } catch (_err) {
+      return '';
+    }
+  }
+
+  function safeStorageSet(key, value) {
+    try {
+      localStorage.setItem(key, value);
+      return true;
+    } catch (_err) {
+      return false;
+    }
+  }
+
+  function readDemoBookingRows() {
+    try {
+      const raw = safeStorageGet('demo_bookings');
+      const rows = JSON.parse(raw || '[]');
+      return Array.isArray(rows) ? rows : [];
+    } catch (_err) {
+      return [];
+    }
+  }
+
+  const defaultSubmitLabel = submitBtn ? submitBtn.textContent : '';
+  const lastPhone = safeStorageGet(LAST_BOOKING_PHONE_KEY);
   if (phoneInput && lastPhone) {
     phoneInput.value = lastPhone;
   }
 
-  function updateNextSteps(phone, code, placeName) {
+  function normalizePhone(v) {
+    return String(v || '').replace(/[^\d+]/g, '').trim();
+  }
+
+  function updateNextSteps(phone, code, placeName, canTrackPublicly) {
     if (!nextStepsEl || !latestCodeEl || !latestNoteEl || !trackNowEl) return;
     latestCodeEl.textContent = code || '-';
-    latestNoteEl.textContent = placeName
-      ? TXT.latestBound(placeName)
-      : TXT.latestGeneric;
+    latestNoteEl.textContent = canTrackPublicly
+      ? (placeName ? TXT.latestBound(placeName) : TXT.latestGeneric)
+      : (placeName ? TXT.latestBoundManual(placeName) : TXT.latestGenericManual);
     const trackUrl = `tra-cuu-don.html?phone=${encodeURIComponent(phone || '')}&code=${encodeURIComponent(code || '')}`;
     trackNowEl.href = trackUrl;
+    trackNowEl.hidden = !canTrackPublicly;
     nextStepsEl.hidden = false;
   }
 
-  document.getElementById('bookingForm').addEventListener('submit', async e => {
+  function setSubmitting(isSubmitting) {
+    if (!submitBtn) return;
+    submitBtn.disabled = isSubmitting;
+    submitBtn.textContent = isSubmitting ? TXT.submitting : defaultSubmitLabel;
+  }
+
+  if (!formEl) return;
+
+  formEl.addEventListener('submit', async e => {
     e.preventDefault();
     successEl.style.display = 'none';
     errorEl.style.display = 'none';
+    setSubmitting(true);
 
     try {
       const form = new FormData(e.currentTarget);
-      const placeId = form.get('point');
+      const placeId = String(form.get('point') || '').trim();
       const place = byId.get(placeId);
+      if (!placeId || !place) throw new Error(TXT.missingPlace);
       const packageKey = String(form.get('package') || 'goi-1');
       const packageDetail = PACKAGE_DETAILS[packageKey] || PACKAGE_DETAILS['goi-1'];
+      const normalizedPhone = normalizePhone(form.get('phone'));
+      if (!normalizedPhone) throw new Error(TXT.invalidPhone);
+      const peopleCount = Number(form.get('people') || 1);
+      if (!Number.isFinite(peopleCount) || peopleCount < 1 || peopleCount > 30) throw new Error(TXT.invalidPeople);
+      const travelDate = String(form.get('date') || '').trim();
+      if (!travelDate) throw new Error(TXT.missingDate);
       const payload = {
         customer_name: String(form.get('name') || '').trim(),
-        customer_phone: String(form.get('phone') || '').trim(),
-        people_count: Number(form.get('people') || 1),
-        travel_date: String(form.get('date') || ''),
+        customer_phone: normalizedPhone,
+        people_count: peopleCount,
+        travel_date: travelDate,
         package_name: packageDetail.label,
         note: String(form.get('note') || '').trim(),
         place_id: placeId,
@@ -349,24 +415,23 @@ async function initBooking() {
         created_at: new Date().toISOString()
       };
 
-      function normalizePhone(v) {
-        return String(v || '').replace(/[^\d+]/g, '').trim();
-      }
-
       function newLocalBookingId() {
         return 'lb_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
       }
 
       let lookupCode = '';
-      const phoneForLookup = normalizePhone(payload.customer_phone);
+      const phoneForLookup = payload.customer_phone;
       const customerName = payload.customer_name;
+      const canTrackPublicly = DEMO_MODE || PUBLIC_LOOKUP_ENABLED;
 
       if (DEMO_MODE) {
         const key = 'demo_bookings';
-        const oldRows = JSON.parse(localStorage.getItem(key) || '[]');
+        const oldRows = readDemoBookingRows();
         payload._local_id = newLocalBookingId();
         oldRows.unshift(payload);
-        localStorage.setItem(key, JSON.stringify(oldRows));
+        if (!safeStorageSet(key, JSON.stringify(oldRows))) {
+          throw new Error(LANG === 'en' ? 'Could not save the demo booking on this browser.' : 'Không lưu được đơn demo trên trình duyệt này.');
+        }
         lookupCode = 'DEMO-' + payload._local_id;
       } else {
         const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
@@ -387,10 +452,10 @@ async function initBooking() {
       }
 
       if (phoneForLookup) {
-        localStorage.setItem(LAST_BOOKING_PHONE_KEY, phoneForLookup);
+        safeStorageSet(LAST_BOOKING_PHONE_KEY, phoneForLookup);
       }
       if (lookupCode) {
-        localStorage.setItem(LAST_BOOKING_CODE_KEY, lookupCode);
+        safeStorageSet(LAST_BOOKING_CODE_KEY, lookupCode);
       }
 
       e.currentTarget.reset();
@@ -407,15 +472,24 @@ async function initBooking() {
       setBookingHint(selectedPlace);
       updateBookingPreview(selectedPlace, packageInput ? packageInput.value : 'goi-1');
       const lookupUrl = `tra-cuu-don.html?phone=${encodeURIComponent(phoneForLookup)}&code=${encodeURIComponent(lookupCode)}`;
+      const safeLookupCode = A.escapeHtml(lookupCode);
       const baseMessage = DEMO_MODE ? TXT.demoAccepted : TXT.accepted;
-      successEl.innerHTML = lookupCode
-        ? `${baseMessage} ${TXT.trackingCode}: <b>${lookupCode}</b>. <a href="${lookupUrl}">${TXT.viewStatus}</a>.`
-        : `${baseMessage} <a href="tra-cuu-don.html">${I18N.t('common.trackOrder', 'Tra cứu đơn')}</a>.`;
+      if (canTrackPublicly) {
+        successEl.innerHTML = lookupCode
+          ? `${baseMessage} ${TXT.trackingCode}: <b>${safeLookupCode}</b>. <a href="${lookupUrl}">${TXT.viewStatus}</a>.`
+          : `${baseMessage} <a href="tra-cuu-don.html">${I18N.t('common.trackOrder', 'Tra cứu đơn')}</a>.`;
+      } else {
+        successEl.innerHTML = lookupCode
+          ? `${baseMessage} ${TXT.trackingCode}: <b>${safeLookupCode}</b>. ${TXT.secureLookupNotice}`
+          : `${baseMessage} ${TXT.secureLookupNotice}`;
+      }
       successEl.style.display = 'block';
-      updateNextSteps(phoneForLookup, lookupCode, payload.place_name);
+      updateNextSteps(phoneForLookup, lookupCode, payload.place_name, canTrackPublicly);
     } catch (err) {
-      errorEl.textContent = TXT.submitError(err.message);
+      errorEl.textContent = TXT.submitError(err && err.message ? err.message : String(err));
       errorEl.style.display = 'block';
+    } finally {
+      setSubmitting(false);
     }
   });
 }

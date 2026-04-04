@@ -18,12 +18,18 @@
       </a>
       <nav class="nav">
         <a href="index.html">Trang chủ</a>
-        <a href="map.html">Bản đồ</a>
-        <a href="du-lich-ao-360.html">Du lịch ảo 360</a>
-        <a href="huong-dan.html">Các bài viết</a>
+        <details class="nav-dropdown">
+          <summary class="nav-dropdown-trigger"><span class="nav-dropdown-trigger-label">Khám phá</span><span class="nav-dropdown-chevron" aria-hidden="true">▾</span></summary>
+          <div class="nav-dropdown-menu">
+            <a href="map.html">Bản đồ</a>
+            <a href="du-lich-ao-360.html">Du lịch ảo 360</a>
+            <a href="place.html">Hồ sơ điểm</a>
+            <a href="huong-dan.html">Các bài viết</a>
+            <a href="san-pham.html">Gian sản phẩm</a>
+          </div>
+        </details>
         <a href="booking.html">Đặt trải nghiệm</a>
-        <a href="san-pham.html">Gian sản phẩm</a>
-        <a class="active" href="admin-bookings.html">Quản lý tài khoản</a>
+        <a class="active nav-account-link" href="admin-bookings.html">Tài khoản</a>
       </nav>
     </div>
   </header>
@@ -32,7 +38,7 @@
     <section id="loginCard" class="card form" style="max-width:560px">
       <h2 style="margin:0">Đăng nhập quản trị</h2>
       <p class="lead">Chỉ tài khoản admin mới xem và cập nhật đơn.</p>
-      <form id="loginForm" class="form" method="dialog" action="javascript:void(0)" novalidate onsubmit="event.preventDefault(); window.__forceLoginSubmit(event); return false;">
+      <form id="loginForm" class="form" novalidate>
         <label>Email admin
           <input class="input" type="email" name="email" required />
         </label>
@@ -40,7 +46,7 @@
           <input class="input" type="password" name="password" required />
         </label>
       <div class="row" style="justify-content:flex-start">
-        <button id="btnLogin" class="btn primary" type="submit" onclick="event.preventDefault(); window.__forceLoginSubmit(event); return false;">Đăng nhập</button>
+        <button id="btnLogin" class="btn primary" type="submit">Đăng nhập</button>
         <button id="btnDemoAdmin" class="btn" type="button">Vào dashboard demo</button>
       </div>
       </form>
@@ -112,16 +118,16 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <script src="js/supabase-config.js"></script>
   <script src="js/config.js"></script>
   <script src="js/metrics.js"></script>
   <script src="js/i18n.js"></script>
   <script>
     (function () {
-      const SUPABASE_URL = 'https://ojqcwegtxzhoqdkmgzsa.supabase.co';
-      const SUPABASE_ANON_KEY = 'sb_publishable_a2vFhGf6JVqIMokJ4LnvXw_oVY89uOx';
       const DEMO_BOOKINGS_KEY = 'demo_bookings';
       const HIDDEN_REMOTE_IDS_KEY = 'admin_hidden_remote_booking_ids_v1';
       const IS_DEMO_MODE = Boolean(window.DEMO_MODE);
+      const DEMO_DASHBOARD_ENABLED = IS_DEMO_MODE;
       const I18N = window.SiteI18n || { lang: 'vi', locale: 'vi-VN', t: (_key, fallback) => fallback };
       const LANG = I18N.lang === 'en' ? 'en' : 'vi';
       const LOCALE = I18N.locale || (LANG === 'en' ? 'en-US' : 'vi-VN');
@@ -157,7 +163,9 @@
           ? `deleted ${remoteCount} Supabase booking(s)${demoCount ? ` and ${demoCount} demo booking(s)` : ''}.`
           : `đã xoá ${remoteCount} đơn trên Supabase${demoCount ? (' + ' + demoCount + ' đơn demo') : ''}.`,
         loadListError: (message) => LANG === 'en' ? `Could not load booking list: ${message}` : `Tải danh sách lỗi: ${message}`,
-        fallbackDemoWarn: LANG === 'en' ? 'Supabase is unavailable, showing local demo data instead.' : 'Không tải được Supabase, đang hiển thị dữ liệu demo local.',
+        fallbackDemoWarn: LANG === 'en'
+          ? 'Supabase is unavailable or the admin session is missing, showing local demo data instead.'
+          : 'Supabase chưa sẵn sàng hoặc chưa có session admin, đang hiển thị dữ liệu demo local.',
         missingCredentials: LANG === 'en' ? 'Please enter both email and password.' : 'Vui lòng nhập đủ email và mật khẩu.',
         sendingLogin: LANG === 'en' ? 'sending sign-in request...' : 'đang gửi yêu cầu đăng nhập...',
         loggingIn: LANG === 'en' ? 'Signing in...' : 'Đang đăng nhập...',
@@ -170,10 +178,19 @@
         dashboardReady: LANG === 'en' ? 'dashboard is ready.' : 'đã tải xong dashboard.',
         missingSupabaseJs: LANG === 'en' ? 'Could not load the Supabase JS library.' : 'Không tải được thư viện Supabase JS.',
         missingSupabaseState: LANG === 'en' ? 'missing Supabase library.' : 'thiếu thư viện Supabase.',
+        missingSupabaseConfig: LANG === 'en' ? 'Missing Supabase client configuration.' : 'Thiếu cấu hình Supabase client.',
         signedOut: LANG === 'en' ? 'signed out.' : 'đã đăng xuất.',
+        logoutError: (message) => LANG === 'en' ? `Sign-out failed: ${message}` : `Đăng xuất lỗi: ${message}`,
         adminSessionReady: LANG === 'en' ? 'admin session detected.' : 'đã có session admin.',
         waitLoginOrDemo: LANG === 'en' ? 'waiting for sign-in or demo dashboard.' : 'chờ đăng nhập hoặc mở dashboard demo.',
         waitLogin: LANG === 'en' ? 'waiting for sign-in.' : 'chờ đăng nhập.',
+        demoDisabled: LANG === 'en'
+          ? 'The demo dashboard is only available when DEMO_MODE is enabled.'
+          : 'Dashboard demo chỉ khả dụng khi website đang chạy ở DEMO_MODE.',
+        sessionExpired: LANG === 'en'
+          ? 'Admin session is missing or has expired. Please sign in again.'
+          : 'Session admin đã hết hạn hoặc chưa tồn tại. Vui lòng đăng nhập lại.',
+        sessionExpiredState: LANG === 'en' ? 'admin session expired.' : 'session admin đã hết hạn.',
         initError: (message) => LANG === 'en' ? `Initialization error: ${message}` : `Khởi tạo lỗi: ${message}`,
         initStateError: LANG === 'en' ? 'initialization failed.' : 'khởi tạo lỗi.'
       };
@@ -188,6 +205,15 @@
         media_consent_no: 0,
         last_updated: null
       };
+
+      function escapeHtml(value) {
+        return String(value == null ? '' : value)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#39;');
+      }
 
       function readArraySafe(key) {
         try {
@@ -282,16 +308,45 @@
         if (isLoggedIn) setAdminTab('orders');
       }
 
+      function setWaitingState() {
+        setState(DEMO_DASHBOARD_ENABLED ? TXT.waitLoginOrDemo : TXT.waitLogin);
+      }
+
+      function isLikelyAuthError(error) {
+        const message = String(
+          (error && (error.message || error.error_description || error.details || error.code)) || ''
+        ).toLowerCase();
+        return (
+          message.includes('jwt') ||
+          message.includes('session') ||
+          message.includes('not authenticated') ||
+          message.includes('permission denied') ||
+          message.includes('row-level security') ||
+          message.includes('pgrst')
+        );
+      }
+
+      function resetDashboardData() {
+        allRows = [];
+        selectedBookingIds = new Set();
+        renderRows();
+      }
+
       async function openDemoDashboard() {
         clearErrors();
-        setAuthUI(true);
-        setState(TXT.openingDemo);
-        try {
-          await loadBookings();
-          setState(TXT.openedDemo);
-        } catch (err) {
-          showError(TXT.demoOpenFail(err && err.message ? err.message : String(err)), 'dashboardError');
+        if (!DEMO_DASHBOARD_ENABLED) {
+          showError(TXT.demoDisabled, 'loginError');
+          setWaitingState();
+          return;
         }
+        setState(TXT.openingDemo);
+        const loaded = await loadBookings({ errorTarget: 'loginError' });
+        if (!loaded) {
+          setAuthUI(false);
+          return;
+        }
+        setAuthUI(true);
+        setState(TXT.openedDemo);
       }
 
       function statusOptions(selected) {
@@ -394,22 +449,22 @@
         const tbody = document.getElementById('bookingRows');
         tbody.innerHTML = rows.map(r => (
           '<tr>' +
-            '<td><input type="checkbox" data-row-select-id="' + r.id + '"' + (selectedBookingIds.has(String(r.id)) ? ' checked' : '') + ' /></td>' +
-            '<td>' + formatDate(r.created_at) + '</td>' +
-            '<td>' + (r.customer_name || '') + '</td>' +
-            '<td>' + (r.customer_phone || '') + '</td>' +
-            '<td>' + (r.place_name || r.place_id || '') + '</td>' +
-            '<td>' + (r.travel_date || '') + '</td>' +
-            '<td>' + (r.people_count || '') + '</td>' +
-            '<td>' + (r.package_name || '') + '</td>' +
-            '<td>' + (r.note || '') + '</td>' +
-            '<td><select class="status-select" data-status-id="' + r.id + '">' + statusOptions(r.status) + '</select></td>' +
-            '<td><button class="btn small" data-delete-id="' + r.id + '">' + TXT.deleteBtn + '</button></td>' +
+            '<td><input type="checkbox" data-row-select-id="' + escapeHtml(r.id) + '"' + (selectedBookingIds.has(String(r.id)) ? ' checked' : '') + ' /></td>' +
+            '<td>' + escapeHtml(formatDate(r.created_at)) + '</td>' +
+            '<td>' + escapeHtml(r.customer_name || '') + '</td>' +
+            '<td>' + escapeHtml(r.customer_phone || '') + '</td>' +
+            '<td>' + escapeHtml(r.place_name || r.place_id || '') + '</td>' +
+            '<td>' + escapeHtml(r.travel_date || '') + '</td>' +
+            '<td>' + escapeHtml(r.people_count || '') + '</td>' +
+            '<td>' + escapeHtml(r.package_name || '') + '</td>' +
+            '<td>' + escapeHtml(r.note || '') + '</td>' +
+            '<td><select class="status-select" data-status-id="' + escapeHtml(r.id) + '">' + statusOptions(r.status) + '</select></td>' +
+            '<td><button class="btn small" type="button" data-delete-id="' + escapeHtml(r.id) + '">' + escapeHtml(TXT.deleteBtn) + '</button></td>' +
           '</tr>'
         )).join('');
 
         if (!rows.length) {
-          tbody.innerHTML = '<tr><td colspan="11" style="color:rgba(255,255,255,.72)">' + TXT.emptyRows + '</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="11" style="color:rgba(255,255,255,.72)">' + escapeHtml(TXT.emptyRows) + '</td></tr>';
         }
 
         tbody.querySelectorAll('[data-status-id]').forEach(sel => {
@@ -426,8 +481,27 @@
               return;
             }
 
-            const res = await supabase.from('bookings').update({ status: status }).eq('id', id);
+            if (!supabase) {
+              sel.value = hit.status || 'new';
+              showError(TXT.sessionExpired, 'dashboardError');
+              setState(TXT.sessionExpiredState);
+              return;
+            }
+
+            const previousStatus = hit.status || 'new';
+            sel.disabled = true;
+            let res;
+            try {
+              res = await supabase.from('bookings').update({ status: status }).eq('id', id);
+            } catch (err) {
+              sel.disabled = false;
+              sel.value = previousStatus;
+              showError(TXT.statusUpdateFail(err && err.message ? err.message : String(err)), 'dashboardError');
+              return;
+            }
+            sel.disabled = false;
             if (res.error) {
+              sel.value = previousStatus;
               showError(TXT.statusUpdateFail(res.error.message), 'dashboardError');
               return;
             }
@@ -486,7 +560,19 @@
           return;
         }
 
-        const res = await supabase.from('bookings').delete().in('id', remoteIds).select('id');
+        if (!supabase) {
+          showError(TXT.sessionExpired, 'dashboardError');
+          setState(TXT.sessionExpiredState);
+          return;
+        }
+
+        let res;
+        try {
+          res = await supabase.from('bookings').delete().in('id', remoteIds).select('id');
+        } catch (err) {
+          showError(TXT.loadListError(err && err.message ? err.message : String(err)), 'dashboardError');
+          return;
+        }
         if (res.error) {
           const hiddenIds = readHiddenRemoteIds();
           remoteIds.forEach(id => hiddenIds.add(String(id)));
@@ -517,23 +603,53 @@
         await loadBookings();
       }
 
-      async function loadBookings() {
+      async function loadBookings(options) {
         clearErrors();
+        const errorTarget = options && options.errorTarget ? options.errorTarget : 'dashboardError';
         const hiddenIds = readHiddenRemoteIds();
         const demoRows = IS_DEMO_MODE ? readDemoBookings() : [];
         let remoteRows = [];
 
-        const res = await supabase.from('bookings').select('*').order('created_at', { ascending: false });
-        if (res.error) {
-          if (!demoRows.length) {
-            showError(TXT.loadListError(res.error.message), 'dashboardError');
-            return;
+        if (supabase && typeof supabase.from === 'function') {
+          let res;
+          try {
+            res = await supabase.from('bookings').select('*').order('created_at', { ascending: false });
+          } catch (err) {
+            if (IS_DEMO_MODE) {
+              showError(TXT.fallbackDemoWarn, errorTarget);
+            } else {
+              showError(TXT.loadListError(err && err.message ? err.message : String(err)), errorTarget);
+              return false;
+            }
           }
-          showError(TXT.fallbackDemoWarn, 'dashboardError');
-        } else {
-          remoteRows = (res.data || [])
-            .filter(row => !hiddenIds.has(String(row.id)))
-            .map(row => Object.assign({}, row, { __source: 'supabase' }));
+          if (!res) {
+            remoteRows = [];
+          } else if (res.error) {
+            if (IS_DEMO_MODE) {
+              showError(TXT.fallbackDemoWarn, errorTarget);
+            } else {
+              if (isLikelyAuthError(res.error)) {
+                setAuthUI(false);
+                resetDashboardData();
+                showError(TXT.sessionExpired, errorTarget);
+                setState(TXT.sessionExpiredState);
+                return false;
+              }
+              showError(TXT.loadListError(res.error.message), errorTarget);
+              return false;
+            }
+          } else {
+            remoteRows = (res.data || [])
+              .filter(row => !hiddenIds.has(String(row.id)))
+              .map(row => Object.assign({}, row, { __source: 'supabase' }));
+          }
+        } else if (!IS_DEMO_MODE) {
+          const missingMessage = window.supabase ? TXT.missingSupabaseConfig : TXT.missingSupabaseJs;
+          setAuthUI(false);
+          resetDashboardData();
+          showError(missingMessage, errorTarget);
+          setState(TXT.missingSupabaseState);
+          return false;
         }
 
         allRows = demoRows.concat(remoteRows).sort((a, b) => {
@@ -543,11 +659,17 @@
         });
         syncSelectionByData();
         renderRows();
+        return true;
       }
 
       async function doLogin(event) {
         if (event) event.preventDefault();
         clearErrors();
+        if (!supabase) {
+          showError(window.supabase ? TXT.missingSupabaseConfig : TXT.missingSupabaseJs, 'loginError');
+          setState(TXT.missingSupabaseState);
+          return false;
+        }
         const form = document.getElementById('loginForm');
         const data = new FormData(form);
         const email = String(data.get('email') || '').trim();
@@ -559,10 +681,27 @@
           return false;
         }
         setState(TXT.sendingLogin);
-        if (btn) btn.textContent = TXT.loggingIn;
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = TXT.loggingIn;
+        }
 
-        const res = await supabase.auth.signInWithPassword({ email, password });
-        if (btn) btn.textContent = TXT.loginButton;
+        let res;
+        try {
+          res = await supabase.auth.signInWithPassword({ email, password });
+        } catch (err) {
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = TXT.loginButton;
+          }
+          showError(TXT.loginError(err && err.message ? err.message : String(err)), 'loginError');
+          setState(LANG === 'en' ? 'sign-in failed.' : 'đăng nhập thất bại.');
+          return false;
+        }
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = TXT.loginButton;
+        }
 
         if (res.error) {
           showError(TXT.loginError(res.error.message), 'loginError');
@@ -577,25 +716,17 @@
 
         setAuthUI(true);
         setState(TXT.loginSuccessLoading);
-        await loadBookings();
+        const loaded = await loadBookings();
+        if (!loaded) return false;
         setState(TXT.dashboardReady);
         return false;
       }
 
-      window.__forceLoginSubmit = doLogin;
-
       async function init() {
-        if (!window.supabase) {
-          showError(TXT.missingSupabaseJs, 'loginError');
-          setState(TXT.missingSupabaseState);
-          return;
-        }
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
         document.getElementById('loginForm').addEventListener('submit', doLogin);
-        document.getElementById('btnLogin').addEventListener('click', doLogin);
         document.getElementById('btnDemoAdmin').addEventListener('click', openDemoDashboard);
         document.getElementById('btnReload').addEventListener('click', loadBookings);
+        document.getElementById('btnDemoAdmin').hidden = !DEMO_DASHBOARD_ENABLED;
         document.getElementById('btnReloadMetrics').addEventListener('click', renderMetrics);
         document.getElementById('btnDeleteSelected').addEventListener('click', async () => {
           const visibleIds = new Set(getVisibleRows().map(r => String(r.id)));
@@ -613,8 +744,16 @@
           renderRows();
         });
         document.getElementById('btnLogout').addEventListener('click', async () => {
-          await supabase.auth.signOut();
+          clearErrors();
+          if (supabase && supabase.auth) {
+            const res = await supabase.auth.signOut();
+            if (res && res.error) {
+              showError(TXT.logoutError(res.error.message), 'dashboardError');
+              return;
+            }
+          }
           setAuthUI(false);
+          resetDashboardData();
           setState(TXT.signedOut);
         });
         document.querySelectorAll('[data-status-filter]').forEach(c => c.addEventListener('change', function () {
@@ -625,13 +764,36 @@
             setAdminTab(btn.getAttribute('data-admin-tab'));
           });
         });
+        renderMetrics();
+
+        if (!window.supabase) {
+          setState(DEMO_DASHBOARD_ENABLED ? TXT.waitLoginOrDemo : TXT.missingSupabaseState);
+          if (!DEMO_DASHBOARD_ENABLED) {
+            showError(TXT.missingSupabaseJs, 'loginError');
+          }
+          return;
+        }
+        supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
+        if (!supabase) {
+          setState(DEMO_DASHBOARD_ENABLED ? TXT.waitLoginOrDemo : TXT.missingSupabaseState);
+          if (!DEMO_DASHBOARD_ENABLED) {
+            showError(TXT.missingSupabaseConfig, 'loginError');
+          }
+          return;
+        }
+
+        supabase.auth.onAuthStateChange(function (_event, session) {
+          if (session) return;
+          setAuthUI(false);
+          resetDashboardData();
+          setWaitingState();
+        });
 
         const s = await supabase.auth.getSession();
         const loggedIn = !!(s.data && s.data.session);
         setAuthUI(loggedIn);
-        setState(loggedIn ? TXT.adminSessionReady : (IS_DEMO_MODE ? TXT.waitLoginOrDemo : TXT.waitLogin));
+        setState(loggedIn ? TXT.adminSessionReady : (DEMO_DASHBOARD_ENABLED ? TXT.waitLoginOrDemo : TXT.waitLogin));
         if (loggedIn) await loadBookings();
-        renderMetrics();
       }
 
       window.addEventListener('DOMContentLoaded', function () {
@@ -643,5 +805,6 @@
     })();
   </script>
   <script src="js/chatbot.js"></script>
+  <script src="js/nav-dropdown.js"></script>
 </body>
 </html>

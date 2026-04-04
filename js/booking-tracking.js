@@ -5,6 +5,7 @@
   const DEMO_BOOKINGS_KEY = 'demo_bookings';
   const LAST_BOOKING_PHONE_KEY = 'last_booking_phone';
   const LAST_BOOKING_CODE_KEY = 'last_booking_code';
+  const PUBLIC_LOOKUP_ENABLED = Boolean(window.PUBLIC_BOOKING_LOOKUP_ENABLED);
 
   const STATUS_LABELS = {
     new: LANG === 'en' ? 'New' : 'Mới',
@@ -27,11 +28,27 @@
     found: (n) => LANG === 'en' ? `found ${n} booking(s).` : `tìm thấy ${n} đơn.`,
     none: LANG === 'en' ? 'no matching booking found.' : 'không tìm thấy đơn phù hợp.',
     lookupError: LANG === 'en'
-      ? 'Public lookup is not enabled on Supabase yet. You can use DEMO_MODE or ask the administrator to check for you. Details: '
-      : 'Hiện chưa bật quyền tra cứu công khai trên Supabase. Bạn có thể dùng DEMO_MODE hoặc nhờ quản trị kiểm tra giúp. Chi tiết: ',
+      ? 'Could not look up bookings right now. Please try again later or ask the administrator for support.'
+      : 'Chưa thể tra cứu đơn ở thời điểm này. Vui lòng thử lại sau hoặc nhờ quản trị viên hỗ trợ.',
+    publicLookupDisabled: LANG === 'en'
+      ? 'Public lookup is disabled in secure mode. Please keep your phone number and tracking code, then contact the administrator if you need support.'
+      : 'Tra cứu công khai đang tắt trong chế độ bảo mật. Vui lòng lưu lại số điện thoại và mã tra cứu, sau đó liên hệ quản trị viên nếu cần hỗ trợ.',
+    publicLookupDisabledHint: LANG === 'en'
+      ? 'Secure mode is enabled, so this page only works in DEMO_MODE or when a dedicated public lookup flow is configured.'
+      : 'Website đang chạy ở chế độ bảo mật, nên trang này chỉ hoạt động trong DEMO_MODE hoặc khi đã cấu hình riêng luồng tra cứu công khai.',
+    publicLookupDisabledState: LANG === 'en' ? 'public lookup is disabled in secure mode.' : 'tra cứu công khai đang bị tắt trong chế độ bảo mật.',
     accessErrorState: LANG === 'en' ? 'lookup failed due to access permissions.' : 'tra cứu lỗi quyền truy cập.',
     refreshState: LANG === 'en' ? 'lookup form reset.' : 'đã làm mới biểu mẫu tra cứu.'
   };
+
+  function escapeHtml(value) {
+    return String(value == null ? '' : value)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#39;');
+  }
 
   function normalizePhone(v) {
     return String(v || '').replace(/[^\d+]/g, '').trim();
@@ -64,6 +81,14 @@
     }
   }
 
+  function safeStorageGet(key) {
+    try {
+      return localStorage.getItem(key) || '';
+    } catch (_err) {
+      return '';
+    }
+  }
+
   function setState(message) {
     const el = document.getElementById('lookupState');
     if (el) el.textContent = (LANG === 'en' ? 'Status: ' : 'Trạng thái: ') + message;
@@ -91,7 +116,7 @@
 
   function statusBadge(status) {
     const key = String(status || 'new');
-    return '<span class="tag">' + (STATUS_LABELS[key] || key) + '</span>';
+    return '<span class="tag">' + escapeHtml(STATUS_LABELS[key] || key) + '</span>';
   }
 
   function renderRows(rows) {
@@ -99,7 +124,7 @@
     if (!tbody) return;
 
     if (!rows.length) {
-      tbody.innerHTML = `<tr><td colspan="8" style="color:var(--muted)">${TXT.noMatch}</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="8" style="color:var(--muted)">${escapeHtml(TXT.noMatch)}</td></tr>`;
       setCount(0);
       return;
     }
@@ -107,14 +132,14 @@
     tbody.innerHTML = rows.map((row) => {
       return (
         '<tr>' +
-          '<td>' + String(row.tracking_code || row.id || '-') + '</td>' +
-          '<td>' + formatDate(row.created_at) + '</td>' +
-          '<td>' + String(row.place_name || row.place_id || '-') + '</td>' +
-          '<td>' + String(row.travel_date || '-') + '</td>' +
-          '<td>' + String(row.people_count || '-') + '</td>' +
-          '<td>' + String(row.package_name || '-') + '</td>' +
+          '<td>' + escapeHtml(String(row.tracking_code || row.id || '-')) + '</td>' +
+          '<td>' + escapeHtml(formatDate(row.created_at)) + '</td>' +
+          '<td>' + escapeHtml(String(row.place_name || row.place_id || '-')) + '</td>' +
+          '<td>' + escapeHtml(String(row.travel_date || '-')) + '</td>' +
+          '<td>' + escapeHtml(String(row.people_count || '-')) + '</td>' +
+          '<td>' + escapeHtml(String(row.package_name || '-')) + '</td>' +
           '<td>' + statusBadge(row.status) + '</td>' +
-          '<td>' + String(row.note || '-') + '</td>' +
+          '<td>' + escapeHtml(String(row.note || '-')) + '</td>' +
         '</tr>'
       );
     }).join('');
@@ -147,6 +172,18 @@
     }
   }
 
+  function showLookupDisabled(phone) {
+    const normalizedPhone = normalizePhone(phone);
+    renderRows([]);
+    updateSummary(normalizedPhone, []);
+    const hintEl = document.getElementById('lookupSummaryHint');
+    const statusEl = document.getElementById('lookupSummaryStatus');
+    if (hintEl) hintEl.textContent = TXT.publicLookupDisabledHint;
+    if (statusEl) statusEl.textContent = TXT.summaryNone;
+    showError(TXT.publicLookupDisabled);
+    setState(TXT.publicLookupDisabledState);
+  }
+
   function filterDemoRows(phone, code) {
     const rows = readDemoBookings();
     const phoneNorm = normalizePhone(phone);
@@ -166,7 +203,11 @@
     const supabase = window.getSupabaseClient ? window.getSupabaseClient() : null;
     if (!supabase) throw new Error(LANG === 'en' ? 'Missing Supabase client configuration.' : 'Thiếu cấu hình Supabase client.');
 
-    let query = supabase.from('bookings').select('*').eq('customer_phone', phone).order('created_at', { ascending: false });
+    let query = supabase
+      .from('bookings')
+      .select('*')
+      .eq('customer_phone', normalizePhone(phone))
+      .order('created_at', { ascending: false });
     if (code && /^\d+$/.test(code)) {
       query = query.eq('id', Number(code));
     }
@@ -178,29 +219,36 @@
 
   async function runLookup(phone, code) {
     clearError();
-    if (!phone) {
+    const phoneNormalized = normalizePhone(phone);
+    if (!phoneNormalized) {
       showError(TXT.missingPhone);
       setState(TXT.waiting);
       return;
     }
 
     if (window.DEMO_MODE) {
-      const rows = filterDemoRows(phone, code);
+      const rows = filterDemoRows(phoneNormalized, code);
       renderRows(rows);
-      updateSummary(phone, rows);
+      updateSummary(phoneNormalized, rows);
       setState(rows.length ? TXT.demoFound(rows.length) : TXT.demoNone);
       return;
     }
 
+    if (!PUBLIC_LOOKUP_ENABLED) {
+      showLookupDisabled(phoneNormalized);
+      return;
+    }
+
     try {
-      const rows = await filterSupabaseRows(phone, code);
+      const rows = await filterSupabaseRows(phoneNormalized, code);
       renderRows(rows);
-      updateSummary(phone, rows);
+      updateSummary(phoneNormalized, rows);
       setState(rows.length ? TXT.found(rows.length) : TXT.none);
     } catch (err) {
       renderRows([]);
-      updateSummary(phone, []);
-      showError(TXT.lookupError + (err && err.message ? err.message : String(err)));
+      updateSummary(phoneNormalized, []);
+      console.error('Booking lookup failed:', err);
+      showError(TXT.lookupError);
       setState(TXT.accessErrorState);
     }
   }
@@ -223,6 +271,12 @@
       clearError();
       renderRows([]);
       updateSummary('', []);
+      if (!window.DEMO_MODE && !PUBLIC_LOOKUP_ENABLED) {
+        const hintEl = document.getElementById('lookupSummaryHint');
+        if (hintEl) hintEl.textContent = TXT.publicLookupDisabledHint;
+        setState(TXT.publicLookupDisabledState);
+        return;
+      }
       setState(TXT.refreshState);
     });
   }
@@ -241,14 +295,22 @@
   window.addEventListener('DOMContentLoaded', async () => {
     bindForm();
     const pre = prefillFromUrl();
-    const fallbackPhone = localStorage.getItem(LAST_BOOKING_PHONE_KEY) || '';
-    const fallbackCode = localStorage.getItem(LAST_BOOKING_CODE_KEY) || '';
+    const fallbackPhone = safeStorageGet(LAST_BOOKING_PHONE_KEY);
+    const fallbackCode = safeStorageGet(LAST_BOOKING_CODE_KEY);
     const phone = pre.phone || fallbackPhone;
     const code = pre.code || fallbackCode;
     const phoneInput = document.getElementById('lookupPhone');
     const codeInput = document.getElementById('lookupCode');
     if (phoneInput && phone && !phoneInput.value) phoneInput.value = phone;
     if (codeInput && code && !codeInput.value) codeInput.value = code;
+    if (!window.DEMO_MODE && !PUBLIC_LOOKUP_ENABLED && !phone) {
+      renderRows([]);
+      updateSummary('', []);
+      const hintEl = document.getElementById('lookupSummaryHint');
+      if (hintEl) hintEl.textContent = TXT.publicLookupDisabledHint;
+      setState(TXT.publicLookupDisabledState);
+      return;
+    }
     if (phone) {
       await runLookup(phone, code);
     } else {
