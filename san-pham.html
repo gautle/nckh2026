@@ -18,8 +18,8 @@
       </a>
       <nav class="nav">
         <a href="index.html">Trang chủ</a>
-        <details class="nav-dropdown is-active">
-          <summary class="nav-dropdown-trigger"><span class="nav-dropdown-trigger-label">Khám phá</span><span class="nav-dropdown-chevron" aria-hidden="true">▾</span></summary>
+        <div class="nav-dropdown is-active">
+          <button class="nav-dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false"><span class="nav-dropdown-trigger-label">Khám phá</span><span class="nav-dropdown-chevron" aria-hidden="true">▾</span></button>
           <div class="nav-dropdown-menu">
             <a href="map.html">Bản đồ</a>
             <a href="du-lich-ao-360.html">Du lịch ảo 360</a>
@@ -27,7 +27,7 @@
             <a href="huong-dan.html">Các bài viết</a>
             <a class="active" href="san-pham.html">Gian sản phẩm</a>
           </div>
-        </details>
+        </div>
         <a href="booking.html">Đặt trải nghiệm</a>
         <a href="admin-bookings.html" class="nav-account-link">Tài khoản</a>
       </nav>
@@ -35,32 +35,6 @@
   </header>
 
   <main class="container main product-page">
-    <section class="card product-hero">
-      <div class="product-hero-copy">
-        <span id="productsKicker" class="article-kicker">GIAN SẢN PHẨM</span>
-        <h1 id="productsHeroTitle">Trang phục, phụ kiện và chất liệu thủ công để người xem hình dung rõ hơn giá trị của nghề</h1>
-        <p id="productsHeroLead" class="lead">Trang này hoạt động như một gian trưng bày mềm: bạn có thể xem nhóm sản phẩm, giá tham khảo và gửi nhu cầu đặt hàng hoặc hỏi thêm thông tin về chất liệu, size và cách sử dụng.</p>
-        <div class="article-meta-chips product-meta-chips">
-          <span id="productsChip1" class="article-chip">Trang phục và phụ kiện</span>
-          <span id="productsChip2" class="article-chip">Giá tham khảo</span>
-          <span id="productsChip3" class="article-chip">Có thể đặt may / đặt theo nhu cầu</span>
-        </div>
-        <div class="home-copy-actions product-hero-actions">
-          <a id="productsPrimaryBtn" class="btn primary" href="#productGrid">Xem sản phẩm</a>
-          <a id="productsSecondaryBtn" class="btn" href="booking.html">Gửi nhu cầu đặt hàng</a>
-        </div>
-      </div>
-      <aside class="card product-usage-card">
-        <span id="productsUsageKicker" class="home-section-kicker">Cách sử dụng</span>
-        <h2 id="productsUsageTitle">Dùng gian này như một catalog gọn để giới thiệu và chốt nhu cầu</h2>
-        <ul class="product-usage-list">
-          <li id="productsUsage1">Xem nhanh loại sản phẩm, ảnh và giá tham khảo trước khi liên hệ.</li>
-          <li id="productsUsage2">So sánh giữa đồ mặc, phụ kiện và chất liệu để chọn đúng nhu cầu.</li>
-          <li id="productsUsage3">Nếu muốn may theo size hoặc đặt số lượng, dùng nút gửi nhu cầu ở từng thẻ.</li>
-        </ul>
-      </aside>
-    </section>
-
     <section class="section product-filter-section">
       <div class="product-filter-head">
         <div>
@@ -214,15 +188,41 @@
     </section>
 
     <section class="section">
-      <article class="card product-note-card">
-        <h2 id="productsNoteTitle">Lưu ý khi dùng gian sản phẩm</h2>
-        <ul class="checklist">
-          <li id="productsNote1">Giá trên trang là giá tham khảo để người xem dễ hình dung trước khi liên hệ.</li>
-          <li id="productsNote2">Sản phẩm thủ công có thể thay đổi theo chất liệu, mức độ thêu tay và số lượng đặt.</li>
-          <li id="productsNote3">Với các mẫu đặt riêng, nên trao đổi trước về size, thời gian và mục đích sử dụng.</li>
-        </ul>
-        <p id="productsNoteMeta" class="note">Trang này hiệu quả nhất khi dùng như một catalog giới thiệu và ghi nhận nhu cầu trước khi chốt đơn trực tiếp với cộng đồng.</p>
-      </article>
+      <div class="product-bottom-grid">
+        <article class="card product-top-note">
+          <div class="product-top-note-copy">
+            <span id="productsKicker" class="article-kicker">GIAN SẢN PHẨM</span>
+            <h1 id="productsHeroTitle">Trang phục, phụ kiện và chất liệu thủ công</h1>
+            <p id="productsHeroLead" class="lead">Xem nhanh sản phẩm, giá tham khảo và gửi nhu cầu đặt hàng trực tiếp từ từng thẻ sản phẩm bên dưới.</p>
+          </div>
+          <div class="article-meta-chips product-meta-chips">
+            <span id="productsChip1" class="article-chip">Trang phục và phụ kiện</span>
+            <span id="productsChip2" class="article-chip">Giá tham khảo</span>
+            <span id="productsChip3" class="article-chip">Có thể đặt may / đặt theo nhu cầu</span>
+          </div>
+        </article>
+        <article class="card product-usage-card">
+          <span id="productsUsageKicker" class="home-section-kicker">Cách sử dụng</span>
+          <h2 id="productsUsageTitle">Dùng gian này như một catalog gọn để giới thiệu và chốt nhu cầu</h2>
+          <ul class="product-usage-list">
+            <li id="productsUsage1">Xem nhanh loại sản phẩm, ảnh và giá tham khảo trước khi liên hệ.</li>
+            <li id="productsUsage2">So sánh giữa đồ mặc, phụ kiện và chất liệu để chọn đúng nhu cầu.</li>
+            <li id="productsUsage3">Nếu muốn may theo size hoặc đặt số lượng, dùng nút gửi nhu cầu ở từng thẻ.</li>
+          </ul>
+          <div class="product-hero-actions">
+            <a id="productsSecondaryBtn" class="btn primary" href="booking.html">Gửi nhu cầu đặt hàng</a>
+          </div>
+        </article>
+        <article class="card product-note-card">
+          <h2 id="productsNoteTitle">Lưu ý khi dùng gian sản phẩm</h2>
+          <ul class="checklist">
+            <li id="productsNote1">Giá trên trang là giá tham khảo để người xem dễ hình dung trước khi liên hệ.</li>
+            <li id="productsNote2">Sản phẩm thủ công có thể thay đổi theo chất liệu, mức độ thêu tay và số lượng đặt.</li>
+            <li id="productsNote3">Với các mẫu đặt riêng, nên trao đổi trước về size, thời gian và mục đích sử dụng.</li>
+          </ul>
+          <p id="productsNoteMeta" class="note">Trang này hiệu quả nhất khi dùng như một catalog giới thiệu và ghi nhận nhu cầu trước khi chốt đơn trực tiếp với cộng đồng.</p>
+        </article>
+      </div>
     </section>
   </main>
 
