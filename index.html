@@ -6,7 +6,7 @@
   <title>Chạm vào Di sản Hmông - Trang chủ</title>
   <link rel="stylesheet" href="assets/style.css" />
 </head>
-<body>
+<body class="page-home">
   <header class="topbar">
     <div class="container top-inner">
       <a class="brand" href="index.html">
@@ -26,12 +26,11 @@
           <div id="homeSearchResults" class="search-results" style="display:none"></div>
         </div>
         <a class="active" href="index.html">Trang chủ</a>
-        <div class="nav-dropdown">
+        <div class="nav-dropdown" data-nav-dropdown>
           <button class="nav-dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false"><span class="nav-dropdown-trigger-label">Khám phá</span><span class="nav-dropdown-chevron" aria-hidden="true">▾</span></button>
           <div class="nav-dropdown-menu">
             <a href="map.html">Bản đồ</a>
             <a href="du-lich-ao-360.html">Du lịch ảo 360</a>
-            <a href="place.html">Hồ sơ điểm</a>
             <a href="huong-dan.html">Các bài viết</a>
             <a href="san-pham.html">Gian sản phẩm</a>
           </div>
@@ -56,164 +55,21 @@
       <div class="home-hero360-overlay"></div>
       <div class="container home-hero360-content">
         <span class="home-kicker">Di sản sống • Bản đồ số • Trải nghiệm cộng đồng</span>
-        <h1>Chạm vào Di sản Hmông qua không gian 360, bản đồ và hành trình trải nghiệm</h1>
-        <p class="home-hero-lead">Khám phá Hang Kia - Pà Cò và Mai Châu bằng tư liệu số, hình ảnh 360, hồ sơ điểm đến và các trải nghiệm gắn với cộng đồng địa phương.</p>
+        <h1>Chạm vào Di sản Hmông qua không gian 360 và đặt trải nghiệm cùng cộng đồng</h1>
+        <p class="home-hero-lead">Khám phá Hang Kia - Pà Cò và Mai Châu bằng tư liệu số, hình ảnh 360 và bước sang đặt trải nghiệm thực tế theo nhu cầu của người xem.</p>
         <div class="home-hero-actions">
           <a class="btn primary" href="du-lich-ao-360.html">Khám phá 360</a>
-          <a class="btn" href="#homeMapSection">Xem bản đồ</a>
+          <a class="btn" href="booking.html">Đặt trải nghiệm</a>
         </div>
-      </div>
-    </section>
-
-    <section id="homeMapSection" class="container section">
-      <article class="card home-copy-card home-card-narrow">
-        <span class="home-section-kicker">Bản đồ khám phá</span>
-        <h2>Bản đồ số giúp khách nắm toàn cảnh điểm đến chỉ trong một lần nhìn</h2>
-        <p>Bản đồ là nơi người xem nhìn toàn cảnh hệ thống điểm đến: nơi lưu trú, không gian văn hoá, điểm trải nghiệm và các vị trí cần lưu ý về quyền ghi hình hoặc mức độ nhạy cảm.</p>
-        <ul class="home-feature-list">
-          <li>Lọc nhanh theo nhóm điểm và mức độ nhạy cảm.</li>
-          <li>Mở hồ sơ chi tiết của từng điểm từ bản đồ.</li>
-          <li>Chuyển tiếp trực tiếp sang trải nghiệm 360 khi cần xem sâu hơn.</li>
-        </ul>
-        <div class="home-copy-actions">
-          <a class="btn primary" href="map.html">Khám phá bản đồ chi tiết</a>
-          <a class="btn" href="place.html?id=MS">Xem hồ sơ mẫu</a>
-        </div>
-      </article>
-    </section>
-
-    <section id="home360Section" class="container section">
-      <div class="home-split home-split-reverse">
-        <article class="card home-preview-card home-immersive-card">
-          <div class="home-preview-badge">Không gian 360</div>
-          <iframe
-            src="https://23000908-cell.github.io/3Dvistar_premium/#scene=MS_3"
-            title="Trải nghiệm 360 nổi bật"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            allowfullscreen
-          ></iframe>
-        </article>
-        <article class="card home-copy-card">
-          <span class="home-section-kicker">Không gian 360 và thuyết minh</span>
-          <h2>Xem trước không gian thực, rồi đi tiếp sang phần nghe và đọc diễn giải</h2>
-          <p>Trải nghiệm 360 là bước để khách có cảm giác về điểm đến trước khi mở hồ sơ chi tiết hoặc đi sang phần đặt lịch.</p>
-          <div class="home-audio-panel">
-            <div>
-              <strong>Audio thuyết minh</strong>
-              <p>Khu vực này sẵn sàng để gắn audio Vbee hoặc file mp3 theo từng điểm.</p>
-            </div>
-            <a class="btn small" href="place.html?id=MS">Mở hồ sơ điểm để nghe thuyết minh</a>
-          </div>
-          <div class="home-copy-actions">
-            <a class="btn primary" href="du-lich-ao-360.html">Mở trang 360 đầy đủ</a>
-            <a class="btn" href="place.html?id=ML">Xem điểm 360 khác</a>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <section id="homeArticleSection" class="container section">
-      <article class="card home-article-summary home-article-summary-wide home-card-narrow">
-        <span class="home-section-kicker">Các bài viết</span>
-        <h3>Ba nhóm nội dung chính</h3>
-        <div class="home-preview-tags">
-          <span class="tag">Pà Cò và bối cảnh điểm đến</span>
-          <span class="tag">Thổ cẩm và nghề thủ công</span>
-          <span class="tag">Dân tộc Hmông và văn hoá</span>
-        </div>
-        <p>Trang chủ chỉ giữ phần tóm tắt ngắn. Nếu muốn đi sâu hơn, người xem có thể mở thư viện tổng hợp để đọc theo từng chủ đề.</p>
-        <div class="home-copy-actions">
-          <a class="btn primary" href="huong-dan.html">Mở toàn bộ thư viện bài viết</a>
-        </div>
-      </article>
-    </section>
-
-    <section id="homeRouteSection" class="container section">
-      <div class="home-split">
-        <article class="card home-copy-card">
-          <span class="home-section-kicker">Đặt trải nghiệm</span>
-          <h2>Khi đã xem đủ thông tin, khách có thể đi tiếp sang đặt trải nghiệm hoặc lọc lộ trình phù hợp</h2>
-          <p>Trang đặt trải nghiệm giúp người xem chuyển nhanh từ bước khám phá sang bước lên kế hoạch thực tế: chọn địa điểm, xem gói phù hợp và lưu lại thông tin tra cứu đơn.</p>
-          <div class="home-copy-actions">
-            <a class="btn primary" href="booking.html">Đặt trải nghiệm ngay</a>
-            <a class="btn" href="tra-cuu-don.html">Tra cứu đơn đã đặt</a>
-          </div>
-        </article>
-        <article class="card panel-card home-route-card">
-          <span class="home-section-kicker">Lộ trình gợi ý</span>
-          <form id="routePlannerForm" class="route-planner-form" autocomplete="off">
-            <div class="route-planner-grid">
-              <label>
-                Số lượng người
-                <input id="routePeople" class="input" type="number" min="1" max="60" value="4" />
-              </label>
-              <label>
-                Thời gian chuyến đi
-                <select id="routeDuration" class="input">
-                  <option value="all">Linh hoạt</option>
-                  <option value="half_day">Nửa ngày</option>
-                  <option value="one_day">1 ngày</option>
-                  <option value="two_days">2N1Đ</option>
-                  <option value="three_days">3N2Đ</option>
-                </select>
-              </label>
-              <label>
-                Chi phí dự kiến (VNĐ/người)
-                <select id="routeBudget" class="input">
-                  <option value="all">Linh hoạt</option>
-                  <option value="under_500">Dưới 500.000</option>
-                  <option value="500_900">500.000 - 900.000</option>
-                  <option value="900_1500">900.000 - 1.500.000</option>
-                  <option value="1500_plus">Trên 1.500.000</option>
-                </select>
-              </label>
-              <label>
-                Di chuyển
-                <select id="routeTransport" class="input">
-                  <option value="all">Linh hoạt</option>
-                  <option value="self_drive">Tự đi xe</option>
-                  <option value="limousine">Xe dịch vụ limousine</option>
-                  <option value="coach">Xe khách</option>
-                </select>
-              </label>
-            </div>
-            <div class="route-planner-actions">
-              <button class="btn primary" type="submit">Lọc lộ trình</button>
-              <button id="routeResetBtn" class="btn" type="button">Đặt lại</button>
-            </div>
-          </form>
-          <div id="routeResultMeta" class="note">Đang chuẩn bị gợi ý lộ trình...</div>
-          <div id="routeResults" class="route-results">
-            <div class="search-empty">Đang tải dữ liệu lộ trình...</div>
-          </div>
-        </article>
       </div>
     </section>
   </main>
 
-  <footer id="footer" class="footer">
-    <div class="container footer-grid">
-      <div>
-        <h4>Liên hệ nhóm nghiên cứu</h4>
-        <p>Email: research@example.org</p>
-      </div>
-      <div>
-        <h4>Liên hệ cộng đồng</h4>
-        <p>Hotline/Zalo: 09xx xxx xxx</p>
-      </div>
-      <div>
-        <h4>Nguồn dữ liệu</h4>
-        <p>Khảo sát thực địa + tư liệu cộng đồng.</p>
-      </div>
-    </div>
-  </footer>
   <script src="js/config.js"></script>
   <script src="js/demo-data.js"></script>
   <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
   <script src="js/home-search.js"></script>
-  <script src="js/home-route.js"></script>
   <script src="js/chatbot.js"></script>
   <script src="js/nav-dropdown.js"></script>
 </body>

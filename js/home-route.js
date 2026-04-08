@@ -21,14 +21,14 @@
     flexible: LANG === 'en' ? 'Flexible' : 'Linh hoạt',
     perPerson: LANG === 'en' ? 'VND/person' : '/người',
     viewMap: I18N.t ? I18N.t('common.viewMap', 'Xem bản đồ') : 'Xem bản đồ',
-    bookRoute: LANG === 'en' ? 'Book this route' : 'Đặt theo lộ trình',
+    bookRoute: LANG === 'en' ? 'Book this experience' : 'Đặt trải nghiệm này',
     found: (n) => LANG === 'en'
-      ? `Found ${n} route${n > 1 ? 's' : ''} matching your current preferences.`
-      : `Tìm thấy ${n} lộ trình phù hợp với nhu cầu hiện tại.`,
+      ? `Found ${n} experience suggestion${n > 1 ? 's' : ''} matching your current preferences.`
+      : `Tìm thấy ${n} gợi ý trải nghiệm phù hợp với nhu cầu hiện tại.`,
     nearest: LANG === 'en'
-      ? 'No exact route matches yet. Here are the closest suggestions:'
-      : 'Chưa có lộ trình khớp 100%. Gợi ý gần nhất để bạn tham khảo:',
-    noData: LANG === 'en' ? 'No route data yet.' : 'Chưa có dữ liệu lộ trình.'
+      ? 'No exact experience match yet. Here are the closest suggestions:'
+      : 'Chưa có gợi ý khớp 100%. Đây là các trải nghiệm gần nhất để bạn tham khảo:',
+    noData: LANG === 'en' ? 'No experience data yet.' : 'Chưa có dữ liệu trải nghiệm.'
   };
 
   function escapeHtml(v) {

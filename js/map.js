@@ -87,7 +87,15 @@ function loadArcGISEmbed() {
     embedReady = true;
   };
 
+  const onError = () => {
+    const loadingEl = document.getElementById('mapLoading');
+    if (loadingEl) loadingEl.innerHTML = `<div class="map-loading-card"><b>${TXT.noArcgisTitle}</b><span>${TXT.slowHint}</span></div>`;
+    hintEl.textContent = TXT.slowHint;
+    embedReady = false;
+  };
+
   iframe.addEventListener('load', onReady, { once: true });
+  iframe.addEventListener('error', onError, { once: true });
 
   requestAnimationFrame(() => {
     mapEl.appendChild(iframe);
@@ -183,12 +191,17 @@ async function setup() {
 
   el.search.addEventListener('input', applyFilters);
 
+  const debugEl = document.getElementById('mapHint');
   if (!allPlaces.length) {
     visiblePlaces = [];
     el.count.textContent = TXT.count(0);
     el.list.innerHTML = `<div class="point-item">${TXT.noPointData}</div>`;
+    if (debugEl) debugEl.textContent = `${TXT.noPointData}`;
   } else {
     applyFilters();
+    if (debugEl && !embedReady) {
+      debugEl.textContent = `${TXT.count(allPlaces.length)} • ${TXT.slowHint}`;
+    }
   }
 
   const p = new URLSearchParams(window.location.search);
