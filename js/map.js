@@ -3,27 +3,27 @@ let visiblePlaces = [];
 let embedReady = false;
 
 const el = {};
-const I18N = window.SiteI18n || { lang: 'vi', t: (_key, fallback) => fallback };
+const MAP_I18N = window.SiteI18n || { lang: 'vi', t: (_key, fallback) => fallback };
 const TXT = {
-  noArcgisTitle: I18N.lang === 'en' ? 'ArcGIS link is missing.' : 'Chưa có link ArcGIS.',
-  noArcgisBody: I18N.lang === 'en' ? 'Open map.html and paste the Embed link from ArcGIS Online.' : 'Mở map.html và dán link Embed từ ArcGIS Online.',
-  noArcgisHint: I18N.lang === 'en' ? 'You have not configured the ArcGIS embed link yet.' : 'Bạn chưa cấu hình link ArcGIS embed.',
-  loadingTitle: I18N.lang === 'en' ? 'Loading ArcGIS map...' : 'Đang tải bản đồ ArcGIS...',
-  loadingBody: I18N.lang === 'en' ? 'The map is quite heavy, so it may take a few seconds. Point filters still work while you wait.' : 'Bản đồ nặng nên có thể mất vài giây. Bộ lọc điểm vẫn dùng được trong lúc chờ.',
-  liveHint: I18N.lang === 'en' ? 'The ArcGIS embed is active. You can drag and zoom directly in the frame.' : 'Nhúng ArcGIS đang hoạt động. Bạn có thể kéo/zoom trực tiếp trong khung.',
-  slowHint: I18N.lang === 'en' ? 'ArcGIS is loading a bit slowly. You can still filter points or open the full map if needed.' : 'ArcGIS đang tải hơi chậm. Bạn có thể tiếp tục lọc điểm và mở bản đồ full nếu cần.',
-  viewOnMap: I18N.lang === 'en' ? 'View on ArcGIS' : 'Xem trên ArcGIS',
-  view360: I18N.t('common.explore360', 'Xem 360'),
-  openProfile: I18N.t('common.openProfile', 'Mở hồ sơ'),
-  noPointsMatch: I18N.lang === 'en' ? 'No points match the current filters.' : 'Không có điểm phù hợp bộ lọc hiện tại.',
-  noPointData: I18N.lang === 'en' ? 'No point data yet. Please check data/places.json or js/demo-data.js.' : 'Chưa có dữ liệu điểm. Hãy kiểm tra data/places.json hoặc js/demo-data.js.',
+  noArcgisTitle: MAP_I18N.lang === 'en' ? 'ArcGIS link is missing.' : 'Chưa có link ArcGIS.',
+  noArcgisBody: MAP_I18N.lang === 'en' ? 'Open map.html and paste the Embed link from ArcGIS Online.' : 'Mở map.html và dán link Embed từ ArcGIS Online.',
+  noArcgisHint: MAP_I18N.lang === 'en' ? 'You have not configured the ArcGIS embed link yet.' : 'Bạn chưa cấu hình link ArcGIS embed.',
+  loadingTitle: MAP_I18N.lang === 'en' ? 'Loading ArcGIS map...' : 'Đang tải bản đồ ArcGIS...',
+  loadingBody: MAP_I18N.lang === 'en' ? 'The map is quite heavy, so it may take a few seconds. Point filters still work while you wait.' : 'Bản đồ nặng nên có thể mất vài giây. Bộ lọc điểm vẫn dùng được trong lúc chờ.',
+  liveHint: MAP_I18N.lang === 'en' ? 'The ArcGIS embed is active. You can drag and zoom directly in the frame.' : 'Nhúng ArcGIS đang hoạt động. Bạn có thể kéo/zoom trực tiếp trong khung.',
+  slowHint: MAP_I18N.lang === 'en' ? 'ArcGIS is loading a bit slowly. You can still filter points or open the full map if needed.' : 'ArcGIS đang tải hơi chậm. Bạn có thể tiếp tục lọc điểm và mở bản đồ full nếu cần.',
+  viewOnMap: MAP_I18N.lang === 'en' ? 'View on ArcGIS' : 'Xem trên ArcGIS',
+  view360: MAP_I18N.t('common.explore360', 'Xem 360'),
+  openProfile: MAP_I18N.t('common.openProfile', 'Mở hồ sơ'),
+  noPointsMatch: MAP_I18N.lang === 'en' ? 'No points match the current filters.' : 'Không có điểm phù hợp bộ lọc hiện tại.',
+  noPointData: MAP_I18N.lang === 'en' ? 'No point data yet. Please check data/places.json or js/demo-data.js.' : 'Chưa có dữ liệu điểm. Hãy kiểm tra data/places.json hoặc js/demo-data.js.',
   focusHint: (place) => embedReady
-    ? (I18N.lang === 'en'
+    ? (MAP_I18N.lang === 'en'
       ? `Selected: ${place.name} (${place.lat.toFixed(5)}, ${place.lng.toFixed(5)}). Locate it in the ArcGIS frame on the right.`
       : `Đã chọn: ${place.name} (${place.lat.toFixed(5)}, ${place.lng.toFixed(5)}). Hãy định vị điểm trên ArcGIS ở khung bên phải.`)
-    : (I18N.lang === 'en' ? `Selected: ${place.name}.` : `Đã chọn: ${place.name}.`),
-  count: (n) => I18N.lang === 'en' ? `${n} points` : `${n} điểm`,
-  loadFail: I18N.lang === 'en' ? 'Could not load map data. Waiting for demo data.' : 'Không tải được dữ liệu bản đồ. Đang chờ dữ liệu demo.'
+    : (MAP_I18N.lang === 'en' ? `Selected: ${place.name}.` : `Đã chọn: ${place.name}.`),
+  count: (n) => MAP_I18N.lang === 'en' ? `${n} points` : `${n} điểm`,
+  loadFail: MAP_I18N.lang === 'en' ? 'Could not load map data. Waiting for demo data.' : 'Không tải được dữ liệu bản đồ. Đang chờ dữ liệu demo.'
 };
 
 function trackMetric(eventName, payload) {
