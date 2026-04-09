@@ -11,6 +11,7 @@
         articles: 'Các bài viết',
         booking: 'Đặt trải nghiệm',
         products: 'Gian sản phẩm',
+        digitalLibrary: 'Thư viện số',
         account: 'Tài khoản'
       },
       common: {
@@ -338,6 +339,24 @@
         ],
         noteMeta: 'Trang này hiệu quả nhất khi dùng như một catalog giới thiệu và ghi nhận nhu cầu trước khi chốt đơn trực tiếp với cộng đồng.'
       },
+      library: {
+        title: 'Thư viện số',
+        brandTitle: 'Thư viện số',
+        brandSub: 'Ký hiệu, hoa văn và biểu tượng Hmông',
+        kicker: 'THƯ VIỆN SỐ',
+        heroTitle: 'Kho ký hiệu và hoa văn Hmông ở dạng trực quan, dễ tra cứu',
+        heroLead: 'Trang này dùng ảnh tổng hợp hoa văn làm bản gốc tham chiếu, sau đó tách thành từng mục nhỏ để người xem dễ ghi nhớ, đối chiếu và bổ sung ý nghĩa về sau.',
+        plateTitle: 'Bảng tổng hợp hoa văn',
+        plateLead: 'Ảnh gốc được giữ nguyên để người xem nhìn toàn cảnh trước khi đi vào từng mô-típ cụ thể.',
+        indexTitle: 'Danh mục ký hiệu',
+        indexLead: 'Mỗi thẻ là một mô-típ được lấy từ ảnh tổng hợp, kèm tên gọi tiếng Anh và cách viết Hmông có trong tư liệu gốc.',
+        meaningLabel: 'Ý nghĩa / ghi chú',
+        useLabel: 'Ứng dụng thường thấy',
+        sourceTitle: 'Hướng bổ sung dữ liệu',
+        source1: 'Có thể bổ sung ý nghĩa chi tiết cho từng hoa văn khi có tài liệu cộng đồng hoặc thuyết minh nghiên cứu.',
+        source2: 'Có thể nối từng ký hiệu sang Gian sản phẩm để chỉ ra hoa văn xuất hiện trên trang phục hoặc phụ kiện nào.',
+        source3: 'Nếu sau này có ảnh tách riêng từng hoa văn, mình có thể nâng cấp thành thư viện chi tiết hơn.'
+      },
       admin: {
         brandTitle: 'Các bài viết',
         brandSub: 'Tổng hợp tư liệu về Pà Cò và văn hoá Hmông',
@@ -430,7 +449,8 @@
         articles: 'Articles',
         booking: 'Book Experience',
         products: 'Craft Shop',
-          account: 'Account'
+        digitalLibrary: 'Digital Library',
+        account: 'Account'
       },
       common: {
         viewMap: 'View map',
@@ -757,6 +777,24 @@
         ],
         noteMeta: 'This page works best as a presentation catalog and a way to capture interest before confirming an order directly with the community.'
       },
+      library: {
+        title: 'Digital Library',
+        brandTitle: 'Digital Library',
+        brandSub: 'Hmong motifs, symbols, and reference notes',
+        kicker: 'DIGITAL LIBRARY',
+        heroTitle: 'A visual archive of Hmong motifs that is easy to browse and expand',
+        heroLead: 'This page keeps the original motif plate at the top, then breaks it into smaller entries so visitors can compare, remember, and later attach fuller cultural meanings.',
+        plateTitle: 'Master motif plate',
+        plateLead: 'The source image stays visible so visitors can first understand the overall motif system before focusing on individual forms.',
+        indexTitle: 'Motif index',
+        indexLead: 'Each card below comes from the same reference image and keeps both the English name and the Hmong label shown in the original plate.',
+        meaningLabel: 'Meaning / note',
+        useLabel: 'Common use',
+        sourceTitle: 'How this library can grow',
+        source1: 'Detailed meanings can be added later when you have community notes or research-based explanations.',
+        source2: 'Each motif can later be linked to the craft shop to show where it appears on garments or accessories.',
+        source3: 'If you later have separate motif images, this page can be upgraded into a richer visual archive.'
+      },
       admin: {
         brandTitle: 'Articles',
         brandSub: 'Collected resources on Pà Cò and Hmong culture',
@@ -891,6 +929,7 @@
       'huong-dan.html': t('nav.articles'),
       'booking.html': t('nav.booking'),
       'san-pham.html': t('nav.products'),
+      'thu-vien-so.html': t('nav.digitalLibrary'),
       'admin-bookings.html': t('nav.account')
     };
     document.querySelectorAll('.nav a[href]').forEach((link) => {
@@ -1430,6 +1469,28 @@
     setText('#productsNoteMeta', t('products.noteMeta'));
   }
 
+  function applyLibrary() {
+    document.title = t('library.title');
+    const brand = document.querySelector('.brand');
+    if (brand) {
+      setText('b', t('library.brandTitle'), brand);
+      setText('span', t('library.brandSub'), brand);
+    }
+    setText('#libraryKicker', t('library.kicker'));
+    setText('#libraryHeroTitle', t('library.heroTitle'));
+    setText('#libraryHeroLead', t('library.heroLead'));
+    setText('#libraryPlateTitle', t('library.plateTitle'));
+    setText('#libraryPlateLead', t('library.plateLead'));
+    setText('#libraryIndexTitle', t('library.indexTitle'));
+    setText('#libraryIndexLead', t('library.indexLead'));
+    document.querySelectorAll('.motif-meaning-label').forEach((el) => { el.textContent = t('library.meaningLabel'); });
+    document.querySelectorAll('.motif-use-label').forEach((el) => { el.textContent = t('library.useLabel'); });
+    setText('#librarySourceTitle', t('library.sourceTitle'));
+    setText('#librarySource1', t('library.source1'));
+    setText('#librarySource2', t('library.source2'));
+    setText('#librarySource3', t('library.source3'));
+  }
+
   function applyAdmin() {
     document.title = t('admin.title');
     const brand = document.querySelector('.brand');
@@ -1499,6 +1560,7 @@
     else if (page === 'tra-cuu-don.html') applyTracking();
     else if (page === 'huong-dan.html') applyArticles();
     else if (page === 'san-pham.html') applyProducts();
+    else if (page === 'thu-vien-so.html') applyLibrary();
     else if (page === 'admin-bookings.html') applyAdmin();
   }
 
