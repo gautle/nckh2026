@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chi tiết tư liệu</title>
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body class="page-content page-library-detail">
+  <header class="topbar">
+    <div class="container top-inner">
+      <a class="brand" href="thu-vien-so.html">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <b>Thư viện số</b>
+          <span>Ký hiệu, hoa văn và biểu tượng Hmông</span>
+        </div>
+      </a>
+      <nav class="nav">
+        <a href="index.html">Trang chủ</a>
+        <div class="nav-dropdown is-active" data-nav-dropdown>
+          <button class="nav-dropdown-trigger" type="button" aria-haspopup="true" aria-expanded="false"><span class="nav-dropdown-trigger-label">Khám phá</span><span class="nav-dropdown-chevron" aria-hidden="true">▾</span></button>
+          <div class="nav-dropdown-menu">
+            <a href="map.html">Bản đồ</a>
+            <a href="du-lich-ao-360.html">Du lịch ảo 360</a>
+            <a href="huong-dan.html">Các bài viết</a>
+            <a href="san-pham.html">Gian sản phẩm</a>
+            <a class="active" href="thu-vien-so.html">Thư viện số</a>
+          </div>
+        </div>
+        <a href="booking.html">Đặt trải nghiệm</a>
+        <a href="admin-bookings.html" class="nav-account-link">Tài khoản</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container main library-detail-main">
+    <a class="library-back-link" href="thu-vien-so.html">← Quay lại Thư viện số</a>
+
+    <section class="section card library-detail-hero">
+      <div class="library-detail-media" id="libraryDetailMedia"></div>
+      <div class="library-detail-copy">
+        <span id="libraryDetailKicker" class="article-kicker">BIỂU GHI TƯ LIỆU</span>
+        <h1 id="libraryDetailTitle">Đang tải biểu ghi...</h1>
+        <p id="libraryDetailLead" class="lead">Trang chi tiết hiển thị metadata, mô tả và mối liên hệ của một tư liệu số trong thư viện.</p>
+        <div id="libraryDetailMeta" class="library-detail-meta"></div>
+      </div>
+    </section>
+
+    <section class="section library-detail-layout">
+      <article class="card library-detail-body">
+        <div class="archive-section-head">
+          <div>
+            <span id="libraryDetailDescKicker" class="home-section-kicker">Mô tả biểu ghi</span>
+            <h2 id="libraryDetailDescTitle">Mô tả và bối cảnh sử dụng</h2>
+          </div>
+        </div>
+        <p id="libraryDetailDescription"></p>
+        <div class="library-detail-note-grid">
+          <div class="detail-note-card">
+            <h3 id="libraryDetailUsageTitle">Ứng dụng / giá trị tra cứu</h3>
+            <p id="libraryDetailUsage"></p>
+          </div>
+          <div class="detail-note-card">
+            <h3 id="libraryDetailNoteTitle">Ghi chú dữ liệu</h3>
+            <p id="libraryDetailNote"></p>
+          </div>
+        </div>
+      </article>
+
+      <aside class="library-detail-side">
+        <section class="card library-detail-aside-card">
+          <span id="libraryDetailInfoKicker" class="home-section-kicker">Metadata</span>
+          <dl id="libraryDetailMetadataList" class="library-detail-dl"></dl>
+        </section>
+        <section class="card library-detail-aside-card">
+          <span id="libraryDetailTagsKicker" class="home-section-kicker">Từ khóa</span>
+          <div id="libraryDetailTags" class="record-tags"></div>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/demo-data.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/chatbot.js"></script>
+  <script src="js/nav-dropdown.js"></script>
+  <script src="js/library-detail.js"></script>
+</body>
+</html>

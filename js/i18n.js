@@ -343,19 +343,87 @@
         title: 'Thư viện số',
         brandTitle: 'Thư viện số',
         brandSub: 'Ký hiệu, hoa văn và biểu tượng Hmông',
+        statsCollections: 'Bộ sưu tập',
+        statsRecords: 'Biểu ghi',
+        statsDigitized: 'Đã số hóa',
+        statsGrowing: 'Đang bổ sung',
+        statsRecordsUnit: 'biểu ghi',
+        filterAll: 'Tất cả hồ sơ',
+        recordTypeMotif: 'Hoa văn / ký hiệu',
+        recordTypeImage: 'Ảnh tư liệu',
+        recordTypeVideo: 'Video quy trình',
+        recordTypeAudio: 'Âm thanh / lời kể',
+        recordTypeDocument: 'Tài liệu nghiên cứu',
+        statusPending: 'Đang cập nhật',
         kicker: 'THƯ VIỆN SỐ',
-        heroTitle: 'Kho ký hiệu và hoa văn Hmông ở dạng trực quan, dễ tra cứu',
-        heroLead: 'Trang này dùng ảnh tổng hợp hoa văn làm bản gốc tham chiếu, sau đó tách thành từng mục nhỏ để người xem dễ ghi nhớ, đối chiếu và bổ sung ý nghĩa về sau.',
-        plateTitle: 'Bảng tổng hợp hoa văn',
-        plateLead: 'Ảnh gốc được giữ nguyên để người xem nhìn toàn cảnh trước khi đi vào từng mô-típ cụ thể.',
-        indexTitle: 'Danh mục ký hiệu',
-        indexLead: 'Mỗi thẻ là một mô-típ được lấy từ ảnh tổng hợp, kèm tên gọi tiếng Anh và cách viết Hmông có trong tư liệu gốc.',
-        meaningLabel: 'Ý nghĩa / ghi chú',
-        useLabel: 'Ứng dụng thường thấy',
-        sourceTitle: 'Hướng bổ sung dữ liệu',
-        source1: 'Có thể bổ sung ý nghĩa chi tiết cho từng hoa văn khi có tài liệu cộng đồng hoặc thuyết minh nghiên cứu.',
-        source2: 'Có thể nối từng ký hiệu sang Gian sản phẩm để chỉ ra hoa văn xuất hiện trên trang phục hoặc phụ kiện nào.',
-        source3: 'Nếu sau này có ảnh tách riêng từng hoa văn, mình có thể nâng cấp thành thư viện chi tiết hơn.'
+        heroTitle: 'Kho tư liệu số về hoa văn, quy trình và tư liệu văn hóa Hmông',
+        heroLead: 'Thư viện số này được tổ chức như một kho lưu trữ có thể mở rộng theo thời gian: mỗi biểu ghi đều có loại tư liệu, nguồn, ngày số hóa, từ khóa và tình trạng dữ liệu để người xem không chỉ nhìn thấy hình ảnh mà còn hiểu cách tư liệu đang được mô tả và bảo tồn.',
+        browseKicker: 'Tra cứu kho số',
+        browseTitle: 'Tìm theo loại tư liệu, chủ đề hoặc từ khóa lưu trữ',
+        browseLead: 'Khối tra cứu này giúp người xem chuyển từ cách xem trực quan sang cách tra cứu theo hồ sơ tư liệu: tìm video quy trình, ảnh hiện vật, âm thanh lời kể hoặc tài liệu nghiên cứu mà không cần đọc toàn bộ trang.',
+        searchPlaceholder: 'Tìm theo tên tư liệu, từ khóa hoặc nguồn...',
+        collectionsKicker: 'Bộ sưu tập',
+        collectionsTitle: 'Các nhóm tư liệu đang được lưu trữ',
+        collectionsLead: 'Mỗi nhóm tư liệu có trạng thái khác nhau: có nhóm đã có biểu ghi cụ thể, có nhóm mới là khung dữ liệu mẫu để chờ bổ sung file thật.',
+        recordsKicker: 'Hồ sơ tư liệu',
+        recordsTitle: 'Biểu ghi số hóa tiêu biểu',
+        recordsLead: 'Đây là các hồ sơ tư liệu cấp biểu ghi. Mỗi hồ sơ đều có metadata để người xem hiểu nguồn gốc, loại tư liệu và mức độ hoàn thiện của dữ liệu hiện có.',
+        resultsLoading: 'Đang tải dữ liệu thư viện...',
+        resultsAll: 'hồ sơ tư liệu',
+        resultsMotifs: 'Bộ sưu tập ký hiệu và hoa văn được hiển thị ở phần nổi bật bên dưới.',
+        clearFilters: 'Xóa lọc',
+        emptyTitle: 'Chưa có hồ sơ phù hợp',
+        emptyLead: 'Bạn có thể đổi từ khóa tìm kiếm hoặc chuyển sang nhóm tư liệu khác để tiếp tục tra cứu.',
+        emptyMotifTitle: 'Mở bộ sưu tập hoa văn ở phía dưới',
+        emptyMotifLead: 'Hoa văn được trình bày như một collection nổi bật bên trong thư viện, nên toàn bộ biểu ghi được đặt ở phần bên dưới.',
+        motifKicker: 'Bộ sưu tập nổi bật',
+        motifTitle: 'Bộ sưu tập ký hiệu và hoa văn',
+        motifLead: 'Hoa văn hiện là nhóm tư liệu được mô tả dày nhất, nên được trình bày như một collection riêng bên trong thư viện số thay vì đại diện cho toàn bộ kho dữ liệu.',
+        plateKicker: 'Ảnh tham chiếu gốc',
+        plateTitle: 'Bảng tổng hợp hoa văn Hmông',
+        plateLead: 'Ảnh gốc được giữ lại như một tư liệu tham chiếu tổng quan. Từ ảnh này, các mô-típ được tách thành biểu ghi nhỏ hơn để đọc, tra cứu và bổ sung diễn giải sau này.',
+        masterTypeLabel: 'Loại tư liệu',
+        masterTypeValue: 'Ảnh tham chiếu / bảng tổng hợp',
+        masterSourceLabel: 'Nguồn',
+        masterSourceValue: 'Bộ tổng hợp hoa văn “Hmong Motifs”',
+        masterDateLabel: 'Ngày số hóa',
+        masterDateValue: '09/04/2026',
+        sourceKicker: 'Nguyên tắc biểu ghi',
+        sourceTitle: 'Cách dữ liệu này được mô tả',
+        source1: 'Mỗi hoa văn được xem như một biểu ghi riêng: có tên, cách gọi Hmông, nguồn, ngày số hóa và ghi chú ứng dụng.',
+        source2: 'Khi có dữ liệu thật hơn, từng biểu ghi có thể nối sang Gian sản phẩm, bài viết hoặc audio giải thích.',
+        source3: 'Nếu sau này có ảnh chụp riêng từng hoa văn hoặc lời kể cộng đồng, collection này có thể nâng cấp thành thư viện chi tiết hơn.',
+        sidebar1Kicker: 'Mục đích lưu trữ',
+        sidebar1Title: 'Thư viện số này dùng để bảo tồn qua mô tả, không chỉ qua hiển thị',
+        sidebar1Lead: 'Điểm khác của trang này so với gallery ảnh là mỗi tư liệu đều được đặt trong một hồ sơ có metadata, nhờ đó có thể tìm, đối chiếu, thay thế file gốc hoặc mở rộng bằng dữ liệu mới mà không mất cấu trúc.',
+        sidebar2Kicker: 'Tình trạng dữ liệu',
+        statusActive: 'Đã có biểu ghi và có thể truy cập như một hồ sơ tham chiếu.',
+        statusDraft: 'Đã có cấu trúc lưu trữ nhưng còn chờ file thật, chú giải hoặc phê duyệt quyền truy cập.',
+        sidebar3Kicker: 'Hướng mở rộng',
+        openCollection: 'Mở bộ sưu tập',
+        viewRecord: 'Xem biểu ghi',
+        collectionLabel: 'Bộ sưu tập',
+        typeLabel: 'Loại tư liệu',
+        stateLabel: 'Trạng thái',
+        topicLabel: 'Chủ đề',
+        sourceLabel: 'Nguồn',
+        digitizedLabel: 'Ngày số hóa',
+        accessLabel: 'Quyền truy cập',
+        detailBack: '← Quay lại Thư viện số',
+        detailKicker: 'BIỂU GHI TƯ LIỆU',
+        detailLead: 'Trang chi tiết hiển thị metadata, mô tả và mối liên hệ của một tư liệu số trong thư viện.',
+        detailDescKicker: 'Mô tả biểu ghi',
+        detailDescTitle: 'Mô tả và bối cảnh sử dụng',
+        detailUsageTitle: 'Ứng dụng / giá trị tra cứu',
+        detailNoteTitle: 'Ghi chú dữ liệu',
+        detailInfoKicker: 'Metadata',
+        detailTagsKicker: 'Từ khóa',
+        detailLoadErrorTitle: 'Không tải được biểu ghi',
+        detailLoadErrorLead: 'Vui lòng quay lại Thư viện số và thử lại.',
+        detailNotFoundTitle: 'Không tìm thấy biểu ghi',
+        detailNotFoundLead: 'Biểu ghi bạn chọn không còn tồn tại hoặc chưa được công bố trong kho số.',
+        loadErrorTitle: 'Không tải được dữ liệu thư viện',
+        loadErrorLead: 'Kiểm tra lại các file dữ liệu JSON rồi tải lại trang.'
       },
       admin: {
         brandTitle: 'Các bài viết',
@@ -780,20 +848,88 @@
       library: {
         title: 'Digital Library',
         brandTitle: 'Digital Library',
-        brandSub: 'Hmong motifs, symbols, and reference notes',
+        brandSub: 'Hmong motifs, symbols, and digital archive records',
+        statsCollections: 'Collections',
+        statsRecords: 'Records',
+        statsDigitized: 'Digitized now',
+        statsGrowing: 'Growing / pending',
+        statsRecordsUnit: 'records',
+        filterAll: 'All records',
+        recordTypeMotif: 'Motif / symbol',
+        recordTypeImage: 'Photographic record',
+        recordTypeVideo: 'Process video',
+        recordTypeAudio: 'Audio / oral narrative',
+        recordTypeDocument: 'Research document',
+        statusPending: 'Pending',
         kicker: 'DIGITAL LIBRARY',
-        heroTitle: 'A visual archive of Hmong motifs that is easy to browse and expand',
-        heroLead: 'This page keeps the original motif plate at the top, then breaks it into smaller entries so visitors can compare, remember, and later attach fuller cultural meanings.',
-        plateTitle: 'Master motif plate',
-        plateLead: 'The source image stays visible so visitors can first understand the overall motif system before focusing on individual forms.',
-        indexTitle: 'Motif index',
-        indexLead: 'Each card below comes from the same reference image and keeps both the English name and the Hmong label shown in the original plate.',
-        meaningLabel: 'Meaning / note',
-        useLabel: 'Common use',
-        sourceTitle: 'How this library can grow',
-        source1: 'Detailed meanings can be added later when you have community notes or research-based explanations.',
-        source2: 'Each motif can later be linked to the craft shop to show where it appears on garments or accessories.',
-        source3: 'If you later have separate motif images, this page can be upgraded into a richer visual archive.'
+        heroTitle: 'A growing archive of Hmong motifs, process records, and digitized cultural materials',
+        heroLead: 'This digital library is organized as an expandable archive: each record carries a material type, source, digitization date, keywords, and record status so visitors can understand how cultural materials are being described, stored, and preserved.',
+        browseKicker: 'Archive browsing',
+        browseTitle: 'Search by material type, topic, or archival keyword',
+        browseLead: 'Use this area to move from visual browsing to archival lookup: process videos, object photographs, oral narratives, or research documents can all sit inside the same repository without losing structure.',
+        searchPlaceholder: 'Search by record title, keyword, or source...',
+        collectionsKicker: 'Collections',
+        collectionsTitle: 'Curated collections within the archive',
+        collectionsLead: 'Each collection has a different level of completeness: some already contain records, while others are scaffolds waiting for future files and community-approved descriptions.',
+        recordsKicker: 'Archive records',
+        recordsTitle: 'Sample digitized records',
+        recordsLead: 'These are item-level archive records. Each one carries metadata so visitors understand the source, material type, and current completeness of the archived record.',
+        resultsLoading: 'Loading archive data...',
+        resultsAll: 'archive records',
+        resultsMotifs: 'The motif collection is displayed as the featured collection below.',
+        clearFilters: 'Clear filters',
+        emptyTitle: 'No matching records yet',
+        emptyLead: 'Try another keyword or switch to another material type to continue browsing.',
+        emptyMotifTitle: 'Open the motif collection below',
+        emptyMotifLead: 'Motifs are presented as a featured collection inside the broader archive, so their full record set appears in the lower section.',
+        motifKicker: 'Featured collection',
+        motifTitle: 'Motif and symbol collection',
+        motifLead: 'Motifs are currently the densest documented collection, so they are framed as one highlighted collection inside the digital library rather than standing in for the whole archive.',
+        plateKicker: 'Master reference image',
+        plateTitle: 'Hmong motif reference sheet',
+        plateLead: 'The master plate remains visible as a reference document. Individual motifs are then separated into smaller archive records for lookup, comparison, and future interpretation.',
+        masterTypeLabel: 'Material type',
+        masterTypeValue: 'Reference image / compiled sheet',
+        masterSourceLabel: 'Source',
+        masterSourceValue: 'Compiled “Hmong Motifs” reference plate',
+        masterDateLabel: 'Digitized on',
+        masterDateValue: '09/04/2026',
+        sourceKicker: 'Record logic',
+        sourceTitle: 'How this archive describes data',
+        source1: 'Each motif is treated as an individual archive record with a title, Hmong label, source, digitization date, and use note.',
+        source2: 'As more data becomes available, each record can later connect to products, articles, or explanatory audio.',
+        source3: 'If separate photos or community narratives are collected in the future, this collection can expand into a fuller digital archive.',
+        sidebar1Kicker: 'Preservation logic',
+        sidebar1Title: 'This archive preserves through description, not only through display',
+        sidebar1Lead: 'Unlike a simple image gallery, each item here sits inside a record structure with metadata. That makes the repository searchable, replaceable, and expandable without losing context.',
+        sidebar2Kicker: 'Record status',
+        statusActive: 'A usable archive record already exists and can be browsed as a reference item.',
+        statusDraft: 'The archival structure is ready, but the file, annotation, or access approval is still pending.',
+        sidebar3Kicker: 'Growth path',
+        openCollection: 'Open collection',
+        viewRecord: 'View archive record',
+        collectionLabel: 'Collection',
+        typeLabel: 'Material type',
+        stateLabel: 'Status',
+        topicLabel: 'Topic',
+        sourceLabel: 'Source',
+        digitizedLabel: 'Digitized on',
+        accessLabel: 'Access',
+        detailBack: '← Back to Digital Library',
+        detailKicker: 'ARCHIVE RECORD',
+        detailLead: 'The detail page presents metadata, description, and contextual use for one item in the digital archive.',
+        detailDescKicker: 'Record description',
+        detailDescTitle: 'Description and contextual use',
+        detailUsageTitle: 'Use / archival value',
+        detailNoteTitle: 'Record note',
+        detailInfoKicker: 'Metadata',
+        detailTagsKicker: 'Keywords',
+        detailLoadErrorTitle: 'Could not load record',
+        detailLoadErrorLead: 'Please return to the digital library and try again.',
+        detailNotFoundTitle: 'Record not found',
+        detailNotFoundLead: 'The selected archive record is not available or has not been published yet.',
+        loadErrorTitle: 'Could not load archive data',
+        loadErrorLead: 'Please check the JSON data files and refresh the page.'
       },
       admin: {
         brandTitle: 'Articles',
@@ -1479,16 +1615,53 @@
     setText('#libraryKicker', t('library.kicker'));
     setText('#libraryHeroTitle', t('library.heroTitle'));
     setText('#libraryHeroLead', t('library.heroLead'));
+    setText('#libraryBrowseKicker', t('library.browseKicker'));
+    setText('#libraryBrowseTitle', t('library.browseTitle'));
+    setText('#libraryBrowseLead', t('library.browseLead'));
+    setPlaceholder('#librarySearchInput', t('library.searchPlaceholder'));
+    setText('#libraryCollectionsKicker', t('library.collectionsKicker'));
+    setText('#libraryCollectionsTitle', t('library.collectionsTitle'));
+    setText('#libraryCollectionsLead', t('library.collectionsLead'));
+    setText('#libraryRecordsKicker', t('library.recordsKicker'));
+    setText('#libraryRecordsTitle', t('library.recordsTitle'));
+    setText('#libraryRecordsLead', t('library.recordsLead'));
+    setText('#libraryResultsMeta', t('library.resultsLoading'));
+    setText('#libraryClearFilters', t('library.clearFilters'));
+    setText('#libraryEmptyTitle', t('library.emptyTitle'));
+    setText('#libraryEmptyLead', t('library.emptyLead'));
+    setText('#libraryMotifKicker', t('library.motifKicker'));
+    setText('#libraryMotifTitle', t('library.motifTitle'));
+    setText('#libraryMotifLead', t('library.motifLead'));
+    setText('#libraryPlateKicker', t('library.plateKicker'));
     setText('#libraryPlateTitle', t('library.plateTitle'));
     setText('#libraryPlateLead', t('library.plateLead'));
-    setText('#libraryIndexTitle', t('library.indexTitle'));
-    setText('#libraryIndexLead', t('library.indexLead'));
-    document.querySelectorAll('.motif-meaning-label').forEach((el) => { el.textContent = t('library.meaningLabel'); });
-    document.querySelectorAll('.motif-use-label').forEach((el) => { el.textContent = t('library.useLabel'); });
+    setText('#libraryMasterTypeLabel', t('library.masterTypeLabel'));
+    setText('#libraryMasterTypeValue', t('library.masterTypeValue'));
+    setText('#libraryMasterSourceLabel', t('library.masterSourceLabel'));
+    setText('#libraryMasterSourceValue', t('library.masterSourceValue'));
+    setText('#libraryMasterDateLabel', t('library.masterDateLabel'));
+    setText('#libraryMasterDateValue', t('library.masterDateValue'));
+    setText('#librarySourceKicker', t('library.sourceKicker'));
     setText('#librarySourceTitle', t('library.sourceTitle'));
     setText('#librarySource1', t('library.source1'));
     setText('#librarySource2', t('library.source2'));
     setText('#librarySource3', t('library.source3'));
+    setText('#librarySidebar1Kicker', t('library.sidebar1Kicker'));
+    setText('#librarySidebar1Title', t('library.sidebar1Title'));
+    setText('#librarySidebar1Lead', t('library.sidebar1Lead'));
+    setText('#librarySidebar2Kicker', t('library.sidebar2Kicker'));
+    setText('#libraryStatusActive', t('library.statusActive'));
+    setText('#libraryStatusDraft', t('library.statusDraft'));
+    setText('#librarySidebar3Kicker', t('library.sidebar3Kicker'));
+    setText('.library-back-link', t('library.detailBack'));
+    setText('#libraryDetailKicker', t('library.detailKicker'));
+    setText('#libraryDetailLead', t('library.detailLead'));
+    setText('#libraryDetailDescKicker', t('library.detailDescKicker'));
+    setText('#libraryDetailDescTitle', t('library.detailDescTitle'));
+    setText('#libraryDetailUsageTitle', t('library.detailUsageTitle'));
+    setText('#libraryDetailNoteTitle', t('library.detailNoteTitle'));
+    setText('#libraryDetailInfoKicker', t('library.detailInfoKicker'));
+    setText('#libraryDetailTagsKicker', t('library.detailTagsKicker'));
   }
 
   function applyAdmin() {
@@ -1560,7 +1733,7 @@
     else if (page === 'tra-cuu-don.html') applyTracking();
     else if (page === 'huong-dan.html') applyArticles();
     else if (page === 'san-pham.html') applyProducts();
-    else if (page === 'thu-vien-so.html') applyLibrary();
+    else if (page === 'thu-vien-so.html' || page === 'thu-vien-so-chi-tiet.html') applyLibrary();
     else if (page === 'admin-bookings.html') applyAdmin();
   }
 
