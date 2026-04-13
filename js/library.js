@@ -7,7 +7,7 @@
   const t = (key, fallback) => (window.SiteI18n?.t ? window.SiteI18n.t(key, fallback) : (fallback || key));
 
   function getLang() {
-    return window.SiteI18n && window.SiteI18n.lang === 'en' ? 'en' : 'vi';
+    return window.SiteI18n?.lang === 'en' ? 'en' : 'vi';
   }
 
   function field(record, key) {
@@ -15,24 +15,19 @@
     return record?.[`${key}_${lang}`] ?? record?.[`${key}_vi`] ?? '';
   }
 
-  function textForRecordType(type) {
-    const map = {
-      motif: t('library.recordTypeMotif', 'Hoa văn / ký hiệu'),
-      image: t('library.recordTypeImage', 'Ảnh tư liệu'),
-      video: t('library.recordTypeVideo', 'Video quy trình'),
-      audio: t('library.recordTypeAudio', 'Âm thanh / lời kể'),
-      document: t('library.recordTypeDocument', 'Tài liệu nghiên cứu')
-    };
-    return map[type] || type;
-  }
-
-  function toneLabel(record) {
-    return field(record, 'status') || t('library.statusPending', 'Đang cập nhật');
-  }
-
   function parseDate(value) {
     const ts = Date.parse(value || '');
     return Number.isFinite(ts) ? ts : 0;
+  }
+
+  function preferredCollectionOrder(collectionId) {
+    const order = ['process-videos', 'photo-archive', 'audio-archive', 'research-docs', 'motifs'];
+    const index = order.indexOf(collectionId);
+    return index === -1 ? 999 : index;
+  }
+
+  function orderedCollections(collections) {
+    return collections.slice().sort((a, b) => preferredCollectionOrder(a.id) - preferredCollectionOrder(b.id));
   }
 
   function collectionMap(collections) {
@@ -53,6 +48,17 @@
 
   function collectionStatus(collection) {
     return field(collection, 'status');
+  }
+
+  function textForRecordType(type) {
+    const map = {
+      motif: t('library.recordTypeMotif', 'Hoa văn / ký hiệu'),
+      image: t('library.recordTypeImage', 'Ảnh tư liệu'),
+      video: t('library.recordTypeVideo', 'Video quy trình'),
+      audio: t('library.recordTypeAudio', 'Âm thanh / lời kể'),
+      document: t('library.recordTypeDocument', 'Tài liệu nghiên cứu')
+    };
+    return map[type] || type;
   }
 
   function recordKeywords(record) {
@@ -78,8 +84,22 @@
       .slice(-1)[0] || '—';
   }
 
-  function statCard(label, value) {
-    return `<article class="archive-stat-card"><span>${label}</span><strong>${value}</strong></article>`;
+  function toneLabel(record) {
+    return field(record, 'status') || t('library.statusPending', 'Đang cập nhật');
+  }
+
+  function recordLink(record) {
+    return `thu-vien-so-chi-tiet.html?id=${encodeURIComponent(record.id)}`;
+  }
+
+  function buildThumb(record, className = 'archive-record-thumb') {
+    const title = field(record, 'title');
+    const poster = record.media_poster || record.thumbnail;
+    const thumbClass = `${className}${record.record_type === 'video' ? ' is-video' : ''}`;
+    if (poster) {
+      return `<a class="${thumbClass}" href="${recordLink(record)}"><img src="${poster}" alt="${title}" loading="lazy" /></a>`;
+    }
+    return `<a class="${thumbClass}" href="${recordLink(record)}"><div class="archive-record-icon">${recordIcon(record.record_type)}</div></a>`;
   }
 
   function recordIcon(type) {
@@ -87,40 +107,70 @@
     return map[type] || '•';
   }
 
-  function buildThumb(record, className = 'archive-record-thumb') {
-    const title = field(record, 'title');
-    if (record.thumbnail) {
-      return `<a class="${className}" href="thu-vien-so-chi-tiet.html?id=${encodeURIComponent(record.id)}"><img src="${record.thumbnail}" alt="${title}" loading="lazy" /></a>`;
+  function statCard(label, value) {
+    return `<article class="archive-stat-card"><span>${label}</span><strong>${value}</strong></article>`;
+  }
+
+  function formatToneClass(tone) {
+    return tone || 'draft';
+  }
+
+  function buildMetaPairs(pairs, className = 'archive-mini-meta') {
+    const rows = pairs
+      .filter(([, value]) => value && value !== '—')
+      .map(([term, value]) => `<div><dt>${term}</dt><dd>${value}</dd></div>`)
+      .join('');
+    return rows ? `<dl class="${className}">${rows}</dl>` : '';
+  }
+
+  function buildTagList(tags) {
+    if (!tags.length) return '';
+    return `<div class="record-tags">${tags.map((tag) => `<span>${tag}</span>`).join('')}</div>`;
+  }
+
+  function buildVideoBadge(record) {
+    const parts = [
+      record.duration,
+      field(record, 'technique') || field(record, 'topic'),
+      field(record, 'location')
+    ].filter(Boolean).slice(0, 3);
+    return buildTagList(parts);
+  }
+
+  function recordExtraMeta(record) {
+    if (record.record_type === 'video') {
+      return [
+        [t('library.techniqueLabel', 'Kỹ thuật'), field(record, 'technique') || field(record, 'topic') || '—'],
+        [t('library.durationLabel', 'Thời lượng'), record.duration || '—'],
+        [t('library.formatLabel', 'Định dạng media'), record.media_format || '—'],
+        [t('library.rightsLabel', 'Quyền sử dụng'), field(record, 'usage_rights') || '—']
+      ];
     }
-    return `<a class="${className}" href="thu-vien-so-chi-tiet.html?id=${encodeURIComponent(record.id)}"><div class="archive-record-icon">${recordIcon(record.record_type)}</div></a>`;
-  }
-
-  function renderStats(collections, items) {
-    const target = $('#archiveStats');
-    if (!target) return;
-    const digitized = items.filter((item) => item.status_tone === 'active').length;
-    const draft = items.filter((item) => item.status_tone !== 'active').length;
-    target.innerHTML = [
-      statCard(t('library.statsCollections', 'Bộ sưu tập'), collections.length),
-      statCard(t('library.statsRecords', 'Biểu ghi'), items.length),
-      statCard(t('library.statsDigitized', 'Đã số hóa'), digitized),
-      statCard(t('library.statsGrowing', 'Đang bổ sung'), draft)
-    ].join('');
-  }
-
-  function renderCollectionFilters(collections, counts) {
-    const target = $('#libraryTypeFilters');
-    if (!target) return;
-    const buttons = [`<button class="archive-chip is-active" type="button" data-filter="all">${t('library.filterAll', 'Tất cả hồ sơ')}</button>`];
-    collections.forEach((collection) => {
-      buttons.push(`<button class="archive-chip" type="button" data-filter="${collection.id}">${collectionType(collection)} · ${counts[collection.id] || 0}</button>`);
-    });
-    target.innerHTML = buttons.join('');
+    if (record.record_type === 'audio') {
+      return [
+        [t('library.durationLabel', 'Thời lượng'), record.duration || '—'],
+        [t('library.contributorLabel', 'Người cung cấp / ghi nhận'), field(record, 'contributor') || field(record, 'source') || '—'],
+        [t('library.locationLabel', 'Địa điểm'), field(record, 'location') || '—']
+      ];
+    }
+    if (record.record_type === 'document') {
+      return [
+        [t('library.contributorLabel', 'Người cung cấp / ghi nhận'), field(record, 'contributor') || field(record, 'source') || '—'],
+        [t('library.formatLabel', 'Định dạng media'), record.media_format || 'PDF / record sheet'],
+        [t('library.rightsLabel', 'Quyền sử dụng'), field(record, 'usage_rights') || '—']
+      ];
+    }
+    return [
+      [t('library.topicLabel', 'Chủ đề'), field(record, 'topic') || '—'],
+      [t('library.locationLabel', 'Địa điểm'), field(record, 'location') || '—'],
+      [t('library.contributorLabel', 'Người cung cấp / ghi nhận'), field(record, 'contributor') || field(record, 'source') || '—']
+    ];
   }
 
   function buildCollectionCard(collection, items, counts) {
     const count = counts[collection.id] || 0;
     const newest = latestForCollection(items, collection.id);
+    const sampleTypes = [...new Set(itemsForCollection(items, collection.id).map((item) => field(item, 'material_type') || textForRecordType(item.record_type)).filter(Boolean))].slice(0, 3);
     return `
       <article class="archive-collection-card">
         <div class="archive-collection-head">
@@ -129,26 +179,25 @@
         </div>
         <h3>${collectionTitle(collection)}</h3>
         <p>${collectionSummary(collection)}</p>
-        <dl class="archive-collection-meta">
-          <div><dt>${t('library.typeLabel', 'Loại tư liệu')}</dt><dd>${collectionType(collection)}</dd></div>
-          <div><dt>${t('library.digitizedLabel', 'Ngày số hóa')}</dt><dd>${newest}</dd></div>
-          <div><dt>${t('library.stateLabel', 'Trạng thái')}</dt><dd>${collectionStatus(collection)}</dd></div>
-        </dl>
-        <a class="text-link" href="${collection.id === 'motifs' ? '#motifCollection' : '#archiveRecordsSection'}" data-collection-link="${collection.id}">${t('library.openCollection', 'Mở bộ sưu tập')}</a>
+        ${buildMetaPairs([
+          [t('library.typeLabel', 'Loại tư liệu'), collectionType(collection)],
+          [t('library.digitizedLabel', 'Ngày số hóa'), newest],
+          [t('library.stateLabel', 'Tình trạng dữ liệu'), collectionStatus(collection)]
+        ], 'archive-collection-meta')}
+        ${buildTagList(sampleTypes)}
+        <a class="text-link" href="${collection.id === 'motifs' ? '#motifCollection' : '#archiveRecordsSection'}" data-collection-link="${collection.id}">${t('library.openCollection', 'Mở collection')}</a>
       </article>`;
   }
 
-  function renderCollections(collections, items, counts) {
-    const target = $('#libraryCollectionsGrid');
-    if (!target) return;
-    target.innerHTML = collections.map((collection) => buildCollectionCard(collection, items, counts)).join('');
-  }
-
   function buildPathwayCard(collection, items, counts) {
-    const list = itemsForCollection(items, collection.id)
+    const collectionItems = itemsForCollection(items, collection.id)
       .sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || parseDate(b.digitized_at) - parseDate(a.digitized_at));
-    const sample = list[0];
-    const materialTypes = [...new Set(list.map((record) => field(record, 'material_type') || textForRecordType(record.record_type)).filter(Boolean))].slice(0, 2);
+    const sample = collectionItems[0];
+    const pathwayTags = [
+      collectionType(collection),
+      sample?.duration,
+      sample ? (field(sample, 'technique') || field(sample, 'topic')) : ''
+    ].filter(Boolean).slice(0, 3);
     return `
       <article class="archive-pathway-card">
         <div class="archive-pathway-head">
@@ -157,29 +206,137 @@
         </div>
         <h3>${collectionTitle(collection)}</h3>
         <p>${collectionSummary(collection)}</p>
-        <dl class="archive-mini-meta archive-pathway-meta">
-          <div><dt>${t('library.statsRecords', 'Biểu ghi')}</dt><dd>${counts[collection.id] || 0}</dd></div>
-          <div><dt>${t('library.pathwayLatestLabel', 'Mới số hóa')}</dt><dd>${latestForCollection(items, collection.id)}</dd></div>
-        </dl>
-        <div class="record-tags">${materialTypes.map((tag) => `<span>${tag}</span>`).join('')}</div>
+        ${buildMetaPairs([
+          [t('library.statsRecords', 'Biểu ghi'), counts[collection.id] || 0],
+          [t('library.pathwayLatestLabel', 'Mới số hóa'), latestForCollection(items, collection.id)]
+        ], 'archive-mini-meta archive-pathway-meta')}
+        ${buildTagList(pathwayTags)}
         <a class="text-link" href="${collection.id === 'motifs' ? '#motifCollection' : '#archiveRecordsSection'}" data-collection-link="${collection.id}">${sample ? t('library.pathwayAction', 'Duyệt nhóm tư liệu') : t('library.pathwayComingSoon', 'Xem trạng thái collection')}</a>
       </article>`;
   }
 
-  function renderPathways(collections, items, counts) {
-    const target = $('#libraryPathwaysGrid');
-    if (!target) return;
-    target.innerHTML = collections.map((collection) => buildPathwayCard(collection, items, counts)).join('');
+  function buildHighlightCard(record, collectionsById) {
+    const collection = collectionsById.get(record.collection);
+    return `
+      <article class="archive-highlight-card">
+        ${buildThumb(record, 'archive-highlight-thumb')}
+        <div class="archive-highlight-copy">
+          <div class="archive-record-topline">
+            <span class="archive-type-pill">${field(record, 'material_type') || textForRecordType(record.record_type)}</span>
+            <span class="status-pill tone-${formatToneClass(record.status_tone)}">${toneLabel(record)}</span>
+          </div>
+          <h3><a href="${recordLink(record)}">${field(record, 'title')}</a></h3>
+          <p class="archive-record-summary">${field(record, 'summary')}</p>
+          ${buildMetaPairs([
+            [t('library.collectionLabel', 'Collection'), collection ? collectionTitle(collection) : '—'],
+            [record.record_type === 'video' ? t('library.durationLabel', 'Thời lượng') : t('library.digitizedLabel', 'Ngày số hóa'), record.record_type === 'video' ? (record.duration || '—') : (record.digitized_at || '—')]
+          ], 'archive-mini-meta archive-highlight-meta')}
+          ${record.record_type === 'video' ? buildVideoBadge(record) : buildTagList(recordKeywords(record).slice(0, 3))}
+          <a class="text-link" href="${recordLink(record)}">${t('library.viewRecord', 'Xem biểu ghi')}</a>
+        </div>
+      </article>`;
+  }
+
+  function buildVideoFeature(record) {
+    return `
+      <article class="archive-video-card archive-video-card-featured">
+        ${buildThumb(record, 'archive-video-thumb')}
+        <div class="archive-video-copy">
+          <div class="archive-record-topline">
+            <span class="archive-type-pill">${field(record, 'material_type') || textForRecordType(record.record_type)}</span>
+            <span class="status-pill tone-${formatToneClass(record.status_tone)}">${toneLabel(record)}</span>
+          </div>
+          <h3><a href="${recordLink(record)}">${field(record, 'title')}</a></h3>
+          <p class="archive-record-subtitle">${field(record, 'subtitle')}</p>
+          <p class="archive-record-summary">${field(record, 'summary')}</p>
+          ${buildMetaPairs([
+            [t('library.techniqueLabel', 'Kỹ thuật'), field(record, 'technique') || field(record, 'topic') || '—'],
+            [t('library.durationLabel', 'Thời lượng'), record.duration || '—'],
+            [t('library.locationLabel', 'Địa điểm'), field(record, 'location') || '—'],
+            [t('library.contributorLabel', 'Người cung cấp / ghi nhận'), field(record, 'contributor') || field(record, 'source') || '—']
+          ], 'archive-mini-meta archive-video-meta')}
+          ${buildVideoBadge(record)}
+          <a class="text-link" href="${recordLink(record)}">${t('library.viewRecord', 'Xem biểu ghi')}</a>
+        </div>
+      </article>`;
+  }
+
+  function buildVideoCard(record) {
+    return `
+      <article class="archive-video-card">
+        ${buildThumb(record, 'archive-video-thumb')}
+        <div class="archive-video-copy">
+          <div class="archive-record-topline">
+            <span class="archive-type-pill">${field(record, 'material_type') || textForRecordType(record.record_type)}</span>
+            <span class="status-pill tone-${formatToneClass(record.status_tone)}">${toneLabel(record)}</span>
+          </div>
+          <h3><a href="${recordLink(record)}">${field(record, 'title')}</a></h3>
+          <p class="archive-record-summary">${field(record, 'summary')}</p>
+          ${buildMetaPairs([
+            [t('library.durationLabel', 'Thời lượng'), record.duration || '—'],
+            [t('library.formatLabel', 'Định dạng media'), record.media_format || '—']
+          ], 'archive-mini-meta archive-video-meta compact')}
+          ${buildVideoBadge(record)}
+          <a class="text-link" href="${recordLink(record)}">${t('library.viewRecord', 'Xem biểu ghi')}</a>
+        </div>
+      </article>`;
+  }
+
+  function buildRecordCard(record, collectionsById) {
+    const collection = collectionsById.get(record.collection);
+    const primaryTopic = record.record_type === 'video'
+      ? (field(record, 'technique') || field(record, 'topic') || '—')
+      : (field(record, 'topic') || '—');
+    return `
+      <article class="archive-record-card" data-collection="${record.collection}" data-type="${record.record_type}">
+        ${buildThumb(record)}
+        <div class="archive-record-copy">
+          <div class="archive-record-topline">
+            <span class="archive-type-pill">${field(record, 'material_type') || textForRecordType(record.record_type)}</span>
+            <span class="status-pill tone-${formatToneClass(record.status_tone)}">${toneLabel(record)}</span>
+          </div>
+          <h3><a href="${recordLink(record)}">${field(record, 'title')}</a></h3>
+          <p class="archive-record-subtitle">${field(record, 'subtitle')}</p>
+          <p class="archive-record-summary">${field(record, 'summary')}</p>
+          ${buildMetaPairs([
+            [t('library.collectionLabel', 'Collection'), collection ? collectionTitle(collection) : '—'],
+            [record.record_type === 'video' ? t('library.techniqueLabel', 'Kỹ thuật') : t('library.topicLabel', 'Chủ đề'), primaryTopic],
+            [t('library.sourceLabel', 'Nguồn'), field(record, 'source') || '—'],
+            [t('library.digitizedLabel', 'Ngày số hóa'), record.digitized_at || '—']
+          ], 'archive-record-meta')}
+          ${buildMetaPairs(recordExtraMeta(record), 'archive-mini-meta archive-record-extra')}
+          ${record.record_type === 'video' ? buildVideoBadge(record) : buildTagList(recordKeywords(record).slice(0, 3))}
+          <a class="text-link" href="${recordLink(record)}">${t('library.viewRecord', 'Xem biểu ghi')}</a>
+        </div>
+      </article>`;
+  }
+
+  function buildMotifCard(record) {
+    return `
+      <article class="archive-motif-card" data-motif-id="${record.id}">
+        <a class="archive-motif-thumb" href="${recordLink(record)}"><img src="${record.thumbnail}" alt="${field(record, 'title')}" loading="lazy" /></a>
+        <div class="archive-motif-copy">
+          <span class="motif-no">${record.id.replace('motif-', '').padStart(2, '0')}</span>
+          <h3><a href="${recordLink(record)}">${field(record, 'title')}</a></h3>
+          <p class="motif-hmong">${field(record, 'subtitle')}</p>
+          ${buildMetaPairs([
+            [t('library.sourceLabel', 'Nguồn'), field(record, 'source') || '—'],
+            [t('library.digitizedLabel', 'Ngày số hóa'), record.digitized_at || '—']
+          ], 'archive-mini-meta')}
+          ${buildTagList(recordKeywords(record).slice(0, 2))}
+          <a class="text-link" href="${recordLink(record)}">${t('library.viewRecord', 'Xem biểu ghi')}</a>
+        </div>
+      </article>`;
   }
 
   function pickHighlights(items) {
-    const preferred = ['photo-archive', 'process-videos', 'audio-archive', 'research-docs', 'motifs'];
+    const preferred = ['process-videos', 'photo-archive', 'audio-archive', 'research-docs', 'motifs'];
     const picks = [];
     preferred.forEach((collectionId) => {
-      const item = items
-        .filter((record) => record.collection === collectionId)
+      const record = items
+        .filter((item) => item.collection === collectionId)
         .sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || parseDate(b.digitized_at) - parseDate(a.digitized_at))[0];
-      if (item && !picks.some((picked) => picked.id === item.id)) picks.push(item);
+      if (record && !picks.some((picked) => picked.id === record.id)) picks.push(record);
     });
     const extras = items
       .filter((record) => !picks.some((picked) => picked.id === record.id))
@@ -187,79 +344,62 @@
     return picks.concat(extras).slice(0, 6);
   }
 
-  function buildHighlightCard(record, collectionsById) {
-    const collection = collectionsById.get(record.collection);
-    const link = `thu-vien-so-chi-tiet.html?id=${encodeURIComponent(record.id)}`;
-    return `
-      <article class="archive-highlight-card">
-        ${buildThumb(record, 'archive-highlight-thumb')}
-        <div class="archive-highlight-copy">
-          <div class="archive-record-topline">
-            <span class="archive-type-pill">${field(record, 'material_type') || textForRecordType(record.record_type)}</span>
-            <span class="status-pill tone-${record.status_tone || 'draft'}">${toneLabel(record)}</span>
-          </div>
-          <h3><a href="${link}">${field(record, 'title')}</a></h3>
-          <p class="archive-record-summary">${field(record, 'summary')}</p>
-          <dl class="archive-mini-meta archive-highlight-meta">
-            <div><dt>${t('library.collectionLabel', 'Bộ sưu tập')}</dt><dd>${collection ? collectionTitle(collection) : '—'}</dd></div>
-            <div><dt>${t('library.digitizedLabel', 'Ngày số hóa')}</dt><dd>${record.digitized_at || '—'}</dd></div>
-          </dl>
-          <div class="record-tags">${recordKeywords(record).slice(0, 2).map((tag) => `<span>${tag}</span>`).join('')}</div>
-          <a class="text-link" href="${link}">${t('library.viewRecord', 'Xem biểu ghi')}</a>
-        </div>
-      </article>`;
+  function renderStats(collections, items) {
+    const target = $('#archiveStats');
+    if (!target) return;
+    const processVideos = items.filter((item) => item.record_type === 'video').length;
+    const digitized = items.filter((item) => item.status_tone === 'active').length;
+    target.innerHTML = [
+      statCard(t('library.statsCollections', 'Bộ sưu tập'), collections.length),
+      statCard(t('library.statsRecords', 'Biểu ghi'), items.length),
+      statCard(t('library.statsVideos', 'Video quy trình'), processVideos),
+      statCard(t('library.statsDigitized', 'Đã số hóa'), digitized)
+    ].join('');
+  }
+
+  function renderCollectionFilters(collections, counts) {
+    const target = $('#libraryTypeFilters');
+    if (!target) return;
+    const buttons = [`<button class="archive-chip is-active" type="button" data-filter="all">${t('library.filterAll', 'Tất cả hồ sơ')}</button>`];
+    orderedCollections(collections).forEach((collection) => {
+      buttons.push(`<button class="archive-chip" type="button" data-filter="${collection.id}">${collectionType(collection)} · ${counts[collection.id] || 0}</button>`);
+    });
+    target.innerHTML = buttons.join('');
+  }
+
+  function renderCollections(collections, items, counts) {
+    const target = $('#libraryCollectionsGrid');
+    if (!target) return;
+    target.innerHTML = orderedCollections(collections).map((collection) => buildCollectionCard(collection, items, counts)).join('');
+  }
+
+  function renderPathways(collections, items, counts) {
+    const target = $('#libraryPathwaysGrid');
+    if (!target) return;
+    target.innerHTML = orderedCollections(collections).map((collection) => buildPathwayCard(collection, items, counts)).join('');
   }
 
   function renderHighlights(items, collectionsById) {
     const target = $('#libraryHighlightsGrid');
     if (!target) return;
-    const records = pickHighlights(items);
-    target.innerHTML = records.map((record) => buildHighlightCard(record, collectionsById)).join('');
+    target.innerHTML = pickHighlights(items).map((record) => buildHighlightCard(record, collectionsById)).join('');
   }
 
-  function buildRecordCard(record, collectionsById) {
-    const collection = collectionsById.get(record.collection);
-    const link = `thu-vien-so-chi-tiet.html?id=${encodeURIComponent(record.id)}`;
-    return `
-      <article class="archive-record-card" data-collection="${record.collection}" data-type="${record.record_type}">
-        ${buildThumb(record)}
-        <div class="archive-record-copy">
-          <div class="archive-record-topline">
-            <span class="archive-type-pill">${field(record, 'material_type') || textForRecordType(record.record_type)}</span>
-            <span class="status-pill tone-${record.status_tone || 'draft'}">${toneLabel(record)}</span>
-          </div>
-          <h3><a href="${link}">${field(record, 'title')}</a></h3>
-          <p class="archive-record-subtitle">${field(record, 'subtitle')}</p>
-          <p class="archive-record-summary">${field(record, 'summary')}</p>
-          <dl class="archive-record-meta">
-            <div><dt>${t('library.collectionLabel', 'Bộ sưu tập')}</dt><dd>${collection ? collectionTitle(collection) : '—'}</dd></div>
-            <div><dt>${t('library.topicLabel', 'Chủ đề')}</dt><dd>${field(record, 'topic')}</dd></div>
-            <div><dt>${t('library.sourceLabel', 'Nguồn')}</dt><dd>${field(record, 'source')}</dd></div>
-            <div><dt>${t('library.digitizedLabel', 'Ngày số hóa')}</dt><dd>${record.digitized_at || '—'}</dd></div>
-          </dl>
-          <div class="record-tags">${recordKeywords(record).slice(0, 3).map((tag) => `<span>${tag}</span>`).join('')}</div>
-          <a class="text-link" href="${link}">${t('library.viewRecord', 'Xem biểu ghi')}</a>
-        </div>
-      </article>`;
-  }
-
-  function buildMotifCard(record) {
-    const link = `thu-vien-so-chi-tiet.html?id=${encodeURIComponent(record.id)}`;
-    return `
-      <article class="archive-motif-card" data-motif-id="${record.id}">
-        <a class="archive-motif-thumb" href="${link}"><img src="${record.thumbnail}" alt="${field(record, 'title')}" loading="lazy" /></a>
-        <div class="archive-motif-copy">
-          <span class="motif-no">${record.id.replace('motif-', '').padStart(2, '0')}</span>
-          <h3><a href="${link}">${field(record, 'title')}</a></h3>
-          <p class="motif-hmong">${field(record, 'subtitle')}</p>
-          <dl class="archive-mini-meta">
-            <div><dt>${t('library.sourceLabel', 'Nguồn')}</dt><dd>${field(record, 'source')}</dd></div>
-            <div><dt>${t('library.digitizedLabel', 'Ngày số hóa')}</dt><dd>${record.digitized_at || '—'}</dd></div>
-          </dl>
-          <div class="record-tags">${recordKeywords(record).slice(0, 2).map((tag) => `<span>${tag}</span>`).join('')}</div>
-          <a class="text-link" href="${link}">${t('library.viewRecord', 'Xem biểu ghi')}</a>
-        </div>
-      </article>`;
+  function renderVideoSection(items) {
+    const featureTarget = $('#libraryVideoFeatured');
+    const gridTarget = $('#libraryVideoGrid');
+    if (!featureTarget || !gridTarget) return;
+    const videos = items
+      .filter((item) => item.collection === 'process-videos')
+      .sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || parseDate(b.digitized_at) - parseDate(a.digitized_at));
+    const featured = videos[0];
+    const rest = videos.slice(1, 5);
+    featureTarget.innerHTML = featured
+      ? buildVideoFeature(featured)
+      : `<div class="archive-empty-state is-visible"><h3>${t('library.videoEmptyTitle', 'Chưa có video quy trình công khai')}</h3><p>${t('library.videoEmptyLead', 'Khung lưu trữ và metadata cho video đã sẵn sàng; chỉ cần nạp file thật để mở tuyến tư liệu này.')}</p></div>`;
+    gridTarget.innerHTML = rest.length
+      ? rest.map(buildVideoCard).join('')
+      : `<div class="archive-video-coming-soon"><h3>${t('library.videoComingSoonTitle', 'Đang mở rộng tư liệu quy trình')}</h3><p>${t('library.videoComingSoonLead', 'Các hồ sơ về nhuộm chàm, dệt, thêu và may mặc thủ công sẽ tiếp tục được nạp vào collection này khi có file gốc và xác nhận quyền sử dụng.')}</p></div>`;
   }
 
   function renderSidebarCollections(collections, counts) {
@@ -269,21 +409,19 @@
       <button class="archive-sidebar-link" type="button" data-sidebar-link="${collection.id}">
         <span>${collectionTitle(collection)}</span>
         <small>${counts[collection.id] || 0} ${t('library.statsRecordsUnit', 'biểu ghi')}</small>
-      </button>
-    `).join('');
+      </button>`).join('');
   }
 
-  function loadData() {
-    return Promise.all([
+  async function loadData() {
+    const [collectionsRes, itemsRes] = await Promise.all([
       fetch('data/library-collections.json', { cache: 'no-store' }),
       fetch('data/library-items.json', { cache: 'no-store' })
-    ]).then(async ([collectionsRes, itemsRes]) => {
-      if (!collectionsRes.ok || !itemsRes.ok) throw new Error('library-data-failed');
-      return {
-        collections: await collectionsRes.json(),
-        items: await itemsRes.json()
-      };
-    });
+    ]);
+    if (!collectionsRes.ok || !itemsRes.ok) throw new Error('library-data-failed');
+    return {
+      collections: await collectionsRes.json(),
+      items: await itemsRes.json()
+    };
   }
 
   function installInteractions(state) {
@@ -309,12 +447,12 @@
       const target = $('#libraryResultsMeta');
       if (!target) return;
       if (activeCollectionId === 'motifs') {
-        target.textContent = t('library.resultsMotifs', 'Collection ký hiệu và hoa văn được hiển thị ở phần chuyên đề bên dưới.');
+        target.textContent = t('library.resultsMotifs', 'Collection ký hiệu và hoa văn được tách xuống phần chuyên đề phía dưới để không lấn át toàn bộ landing page.');
         return;
       }
       const activeCollection = activeCollectionId !== 'all' ? collectionsById.get(activeCollectionId) : null;
       const tail = activeCollection ? ` · ${collectionTitle(activeCollection)}` : '';
-      target.textContent = `${records.length} ${t('library.resultsAll', 'hồ sơ tư liệu')}${tail}`;
+      target.textContent = `${records.length} ${t('library.resultsAll', 'biểu ghi tư liệu')}${tail}`;
     }
 
     function renderMotifs() {
@@ -323,7 +461,7 @@
       motifGrid.innerHTML = visible.map(buildMotifCard).join('');
       if (motifMeta) {
         motifMeta.textContent = motifExpanded
-          ? t('library.motifExpandedMeta', 'Hiển thị toàn bộ collection ký hiệu và hoa văn.')
+          ? t('library.motifExpandedMeta', 'Đang hiển thị toàn bộ collection ký hiệu và hoa văn.')
           : t('library.motifCollapsedMeta', 'Landing page chỉ hiển thị một phần collection hoa văn để giữ trọng tâm cho toàn bộ kho tư liệu số.');
       }
       if (motifToggle) {
@@ -345,27 +483,38 @@
           field(record, 'title'),
           field(record, 'subtitle'),
           field(record, 'summary'),
+          field(record, 'description'),
           field(record, 'source'),
           field(record, 'topic'),
+          field(record, 'technique'),
+          field(record, 'location'),
+          field(record, 'contributor'),
+          field(record, 'usage_rights'),
+          record.duration || '',
+          record.media_format || '',
           ...recordKeywords(record)
         ].join(' ').toLowerCase().includes(q));
       }
+
       setResultsMeta(list);
+
       if (activeCollectionId === 'motifs') {
         recordGrid.innerHTML = '';
         emptyState.hidden = false;
         $('#libraryEmptyTitle').textContent = t('library.emptyMotifTitle', 'Collection chuyên đề nằm ở phía dưới');
-        $('#libraryEmptyLead').textContent = t('library.emptyMotifLead', 'Hoa văn được tổ chức như một collection chuyên đề. Bạn có thể kéo xuống dưới để duyệt toàn bộ các biểu ghi ký hiệu.');
+        $('#libraryEmptyLead').textContent = t('library.emptyMotifLead', 'Hoa văn được tổ chức như một collection chuyên đề. Kéo xuống để duyệt toàn bộ biểu ghi ký hiệu và hoa văn.');
         motifSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         return;
       }
+
       if (!list.length) {
         recordGrid.innerHTML = '';
         emptyState.hidden = false;
-        $('#libraryEmptyTitle').textContent = t('library.emptyTitle', 'Chưa có hồ sơ phù hợp');
+        $('#libraryEmptyTitle').textContent = t('library.emptyTitle', 'Chưa có biểu ghi phù hợp');
         $('#libraryEmptyLead').textContent = t('library.emptyLead', 'Bạn có thể đổi từ khóa tìm kiếm hoặc chuyển sang nhóm tư liệu khác để tiếp tục tra cứu.');
         return;
       }
+
       emptyState.hidden = true;
       recordGrid.innerHTML = list
         .sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || parseDate(b.digitized_at) - parseDate(a.digitized_at))
@@ -374,6 +523,7 @@
     }
 
     renderPathways(state.collections, state.items, counts);
+    renderVideoSection(state.items);
     renderHighlights(state.items, collectionsById);
     renderMotifs();
     renderRecords();
@@ -429,7 +579,7 @@
       renderStats(state.collections, state.items);
       renderCollectionFilters(state.collections, counts);
       renderCollections(state.collections, state.items, counts);
-      renderSidebarCollections(state.collections, counts);
+      renderSidebarCollections(orderedCollections(state.collections), counts);
       installInteractions(state);
     } catch (error) {
       const target = $('#libraryRecordGrid');

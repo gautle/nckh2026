@@ -17,16 +17,16 @@
   {
     "id": "process-videos",
     "slug": "video-quy-trinh",
-    "title_vi": "Video quy trình",
-    "title_en": "Process videos",
-    "summary_vi": "Video ngắn về may, ghép mảnh, thêu và hoàn thiện sản phẩm để người xem hiểu quy trình tạo tác.",
-    "summary_en": "Short videos showing sewing, embroidery, assembly, and finishing processes.",
-    "type_vi": "Video quy trình",
-    "type_en": "Process videos",
-    "status_vi": "Đang bổ sung",
-    "status_en": "Coming soon",
-    "status_tone": "draft",
-    "count": 2,
+    "title_vi": "Tư liệu quy trình và kỹ thuật thủ công",
+    "title_en": "Process documentation and craft techniques",
+    "summary_vi": "Biểu ghi video và multimedia về nhuộm chàm, thêu, dệt, may mặc thủ công và các thao tác nghề liên quan. Nhóm này được chuẩn bị như một tuyến tra cứu cốt lõi của kho số.",
+    "summary_en": "Video and multimedia records documenting indigo dyeing, embroidery, weaving, hand sewing, and related craft actions. This collection is treated as a core discovery pathway in the archive.",
+    "type_vi": "Video quy trình / tư liệu nghề",
+    "type_en": "Process videos / craft documentation",
+    "status_vi": "Ưu tiên bổ sung",
+    "status_en": "Priority expansion",
+    "status_tone": "active",
+    "count": 4,
     "featured": true
   },
   {
@@ -56,7 +56,7 @@
     "status_vi": "Mẫu thử",
     "status_en": "Pilot set",
     "status_tone": "draft",
-    "count": 1,
+    "count": 2,
     "featured": false
   },
   {

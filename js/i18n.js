@@ -426,10 +426,34 @@
         detailNoteTitle: 'Ghi chú dữ liệu',
         detailInfoKicker: 'Metadata',
         detailTagsKicker: 'Từ khóa',
+        statsVideos: 'Video quy trình',
+        videoKicker: 'Tư liệu quy trình',
+        videoTitle: 'Video nghề là một tuyến tra cứu cốt lõi của kho tư liệu',
+        videoLead: 'Kho số này không chỉ lưu ảnh tĩnh. Phần video quy trình được tổ chức như một collection cốt lõi để ghi nhận các công đoạn như nhuộm chàm, thêu, dệt, may mặc thủ công và các thao tác nghề liên quan, với metadata đủ rõ để tra cứu và mở rộng lâu dài.',
+        videoEmptyTitle: 'Chưa có video quy trình công khai',
+        videoEmptyLead: 'Khung lưu trữ và metadata cho video đã sẵn sàng; chỉ cần nạp file thật để mở tuyến tư liệu này.',
+        videoComingSoonTitle: 'Đang mở rộng tư liệu quy trình',
+        videoComingSoonLead: 'Các hồ sơ về nhuộm chàm, dệt, thêu và may mặc thủ công sẽ tiếp tục được nạp vào collection này khi có file gốc và xác nhận quyền sử dụng.',
+        techniqueLabel: 'Kỹ thuật',
+        durationLabel: 'Thời lượng',
+        locationLabel: 'Địa điểm',
+        contributorLabel: 'Người cung cấp / ghi nhận',
+        formatLabel: 'Định dạng media',
+        rightsLabel: 'Quyền sử dụng',
+        detailRelatedKicker: 'Biểu ghi liên quan',
+        detailRelatedTitle: 'Tư liệu cùng tuyến tra cứu',
+        detailRelatedLead: 'Các biểu ghi liên quan giúp nối hồ sơ hiện tại với quy trình, hiện vật, lời kể hoặc tài liệu nghiên cứu ở cùng một tuyến lưu trữ.',
+        detailContextTitle: 'Bối cảnh kỹ thuật / văn hóa',
         detailLoadErrorTitle: 'Không tải được biểu ghi',
         detailLoadErrorLead: 'Vui lòng quay lại Thư viện số và thử lại.',
         detailNotFoundTitle: 'Không tìm thấy biểu ghi',
         detailNotFoundLead: 'Biểu ghi bạn chọn không còn tồn tại hoặc chưa được công bố trong kho số.',
+        videoReadyNote: 'Khi có file thật hoặc link nhúng ổn định, video sẽ phát trực tiếp trong khung này mà không cần đổi cấu trúc trang.',
+        videoPlaceholderNote: 'Biểu ghi video đã có metadata, thumbnail và logic hiển thị. Chỉ cần gắn file hoặc link nhúng thật để phát ngay trên trang này.',
+        audioPlaceholderNote: 'Biểu ghi âm thanh đã có cấu trúc metadata và ảnh đại diện. Có thể gắn file mp3 hoặc lời kể đã số hóa sau này.',
+        openDocument: 'Mở file tài liệu',
+        relatedEmptyTitle: 'Chưa có biểu ghi liên quan',
+        relatedEmptyLead: 'Phần liên kết chéo giữa các biểu ghi đã sẵn sàng. Bạn có thể bổ sung các record liên quan sau khi nạp thêm ảnh, audio, video hoặc tài liệu nghiên cứu.',
         loadErrorTitle: 'Không tải được dữ liệu thư viện',
         loadErrorLead: 'Kiểm tra lại các file dữ liệu JSON rồi tải lại trang.'
       },
@@ -940,10 +964,34 @@
         detailNoteTitle: 'Record note',
         detailInfoKicker: 'Metadata',
         detailTagsKicker: 'Keywords',
+        statsVideos: 'Process videos',
+        videoKicker: 'Process documentation',
+        videoTitle: 'Craft-process video is a core discovery route in the archive',
+        videoLead: 'The repository is not limited to still images. Process video is structured as a core collection for documenting indigo dyeing, embroidery, weaving, hand sewing, and related craft actions with metadata that can scale over time.',
+        videoEmptyTitle: 'No public process videos yet',
+        videoEmptyLead: 'The archive structure and metadata logic for video are already prepared; only the real files need to be added.',
+        videoComingSoonTitle: 'Process documentation is expanding',
+        videoComingSoonLead: 'Records on indigo dyeing, weaving, embroidery, and hand garment-making will continue to be added as source files and usage clearance become available.',
+        techniqueLabel: 'Technique',
+        durationLabel: 'Duration',
+        locationLabel: 'Location',
+        contributorLabel: 'Contributor / recorder',
+        formatLabel: 'Media format',
+        rightsLabel: 'Usage rights',
+        detailRelatedKicker: 'Related records',
+        detailRelatedTitle: 'Records in the same discovery route',
+        detailRelatedLead: 'Related records connect the current item with process documentation, object photography, oral narratives, and research documents within the same archival pathway.',
+        detailContextTitle: 'Technical / cultural context',
         detailLoadErrorTitle: 'Could not load record',
         detailLoadErrorLead: 'Please return to the digital library and try again.',
         detailNotFoundTitle: 'Record not found',
         detailNotFoundLead: 'The selected archive record is not available or has not been published yet.',
+        videoReadyNote: 'Once a stable file or embed link is available, the video can play directly in this frame without changing the page structure.',
+        videoPlaceholderNote: 'This video record already has metadata, a thumbnail, and display logic. Only the final file or embed link needs to be attached.',
+        audioPlaceholderNote: 'This audio record already has metadata and a representative thumbnail. A final mp3 or oral-history file can be attached later.',
+        openDocument: 'Open document file',
+        relatedEmptyTitle: 'No related records yet',
+        relatedEmptyLead: 'Cross-links between records are ready. You can add related images, audio, video, or research documents later.',
         loadErrorTitle: 'Could not load archive data',
         loadErrorLead: 'Please check the JSON data files and refresh the page.'
       },
@@ -1638,6 +1686,9 @@
     setText('#libraryPathwaysKicker', t('library.pathwaysKicker'));
     setText('#libraryPathwaysTitle', t('library.pathwaysTitle'));
     setText('#libraryPathwaysLead', t('library.pathwaysLead'));
+    setText('#libraryVideoKicker', t('library.videoKicker'));
+    setText('#libraryVideoTitle', t('library.videoTitle'));
+    setText('#libraryVideoLead', t('library.videoLead'));
     setText('#libraryHighlightsKicker', t('library.highlightsKicker'));
     setText('#libraryHighlightsTitle', t('library.highlightsTitle'));
     setText('#libraryHighlightsLead', t('library.highlightsLead'));
@@ -1677,8 +1728,12 @@
     setText('#libraryDetailDescTitle', t('library.detailDescTitle'));
     setText('#libraryDetailUsageTitle', t('library.detailUsageTitle'));
     setText('#libraryDetailNoteTitle', t('library.detailNoteTitle'));
+    setText('#libraryDetailContextTitle', t('library.detailContextTitle'));
     setText('#libraryDetailInfoKicker', t('library.detailInfoKicker'));
     setText('#libraryDetailTagsKicker', t('library.detailTagsKicker'));
+    setText('#libraryDetailRelatedKicker', t('library.detailRelatedKicker'));
+    setText('#libraryDetailRelatedTitle', t('library.detailRelatedTitle'));
+    setText('#libraryDetailRelatedLead', t('library.detailRelatedLead'));
   }
 
   function applyAdmin() {
