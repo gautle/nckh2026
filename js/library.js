@@ -137,6 +137,32 @@
     return buildTagList(parts);
   }
 
+  function buildShellCard(lines = 3, className = '') {
+    return `
+      <article class="archive-shell-card ${className}">
+        <span class="archive-shell-pill"></span>
+        <div class="archive-shell-media"></div>
+        <div class="archive-shell-copy">
+          ${Array.from({ length: lines }).map(() => '<span class="archive-shell-line"></span>').join('')}
+        </div>
+      </article>`;
+  }
+
+  function buildHeroPath(collection, items, counts) {
+    const sample = itemsForCollection(items, collection.id)
+      .sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || parseDate(b.digitized_at) - parseDate(a.digitized_at))[0];
+    const meta = [
+      `${counts[collection.id] || 0} ${t('library.statsRecordsUnit', 'biểu ghi')}`,
+      sample?.duration || latestForCollection(items, collection.id)
+    ].filter(Boolean).slice(0, 2).join(' · ');
+    return `
+      <button class="archive-hero-path" type="button" data-sidebar-link="${collection.id}">
+        <span class="archive-hero-path-kicker">${collectionType(collection)}</span>
+        <strong>${collectionTitle(collection)}</strong>
+        <small>${meta}</small>
+      </button>`;
+  }
+
   function recordExtraMeta(record) {
     if (record.record_type === 'video') {
       return [
@@ -357,6 +383,14 @@
     ].join('');
   }
 
+  function renderHeroPaths(collections, items, counts) {
+    const target = $('#archiveHeroPaths');
+    if (!target) return;
+    target.innerHTML = orderedCollections(collections)
+      .map((collection) => buildHeroPath(collection, items, counts))
+      .join('');
+  }
+
   function renderCollectionFilters(collections, counts) {
     const target = $('#libraryTypeFilters');
     if (!target) return;
@@ -410,6 +444,52 @@
         <span>${collectionTitle(collection)}</span>
         <small>${counts[collection.id] || 0} ${t('library.statsRecordsUnit', 'biểu ghi')}</small>
       </button>`).join('');
+  }
+
+  function renderLoadingState() {
+    const stats = $('#archiveStats');
+    const heroPaths = $('#archiveHeroPaths');
+    const pathways = $('#libraryPathwaysGrid');
+    const videoFeatured = $('#libraryVideoFeatured');
+    const videoGrid = $('#libraryVideoGrid');
+    const highlights = $('#libraryHighlightsGrid');
+    const collections = $('#libraryCollectionsGrid');
+    const records = $('#libraryRecordGrid');
+    const sidebar = $('#librarySidebarCollections');
+    const resultMeta = $('#libraryResultsMeta');
+    const motifMeta = $('#libraryMotifMeta');
+    const emptyState = $('#libraryEmptyState');
+
+    if (stats) stats.innerHTML = Array.from({ length: 4 }).map(() => '<article class="archive-stat-card archive-shell-card compact"><span class="archive-shell-line short"></span><strong class="archive-shell-line tall"></strong></article>').join('');
+    if (heroPaths) heroPaths.innerHTML = Array.from({ length: 5 }).map(() => '<div class="archive-hero-path archive-shell-card compact"><span class="archive-shell-line short"></span><strong class="archive-shell-line"></strong><small class="archive-shell-line short"></small></div>').join('');
+    if (pathways) pathways.innerHTML = Array.from({ length: 5 }).map(() => buildShellCard(2, 'compact')).join('');
+    if (videoFeatured) videoFeatured.innerHTML = buildShellCard(4, 'feature');
+    if (videoGrid) videoGrid.innerHTML = Array.from({ length: 3 }).map(() => buildShellCard(2, 'compact')).join('');
+    if (highlights) highlights.innerHTML = Array.from({ length: 4 }).map(() => buildShellCard(3)).join('');
+    if (collections) collections.innerHTML = Array.from({ length: 4 }).map(() => buildShellCard(3, 'compact')).join('');
+    if (records) records.innerHTML = Array.from({ length: 4 }).map(() => buildShellCard(4)).join('');
+    if (sidebar) sidebar.innerHTML = Array.from({ length: 3 }).map(() => '<div class="archive-shell-card compact"><span class="archive-shell-line"></span><span class="archive-shell-line short"></span></div>').join('');
+    if (resultMeta) resultMeta.textContent = t('library.resultsLoading', 'Đang nạp biểu ghi từ kho tư liệu số...');
+    if (motifMeta) motifMeta.textContent = t('library.motifLoading', 'Đang chuẩn bị collection chuyên đề...');
+    if (emptyState) emptyState.hidden = true;
+  }
+
+  function renderLoadError() {
+    const target = $('#libraryRecordGrid');
+    const pathways = $('#libraryPathwaysGrid');
+    const highlights = $('#libraryHighlightsGrid');
+    const videoFeatured = $('#libraryVideoFeatured');
+    const videoGrid = $('#libraryVideoGrid');
+    const collections = $('#libraryCollectionsGrid');
+    const resultMeta = $('#libraryResultsMeta');
+    const message = `<article class="archive-empty-state is-visible"><h3>${t('library.loadErrorTitle', 'Không tải được dữ liệu thư viện')}</h3><p>${t('library.loadErrorLead', 'Kiểm tra lại các file dữ liệu JSON rồi tải lại trang.')}</p></article>`;
+    if (target) target.innerHTML = message;
+    if (pathways) pathways.innerHTML = message;
+    if (highlights) highlights.innerHTML = message;
+    if (videoFeatured) videoFeatured.innerHTML = message;
+    if (videoGrid) videoGrid.innerHTML = '';
+    if (collections) collections.innerHTML = '';
+    if (resultMeta) resultMeta.textContent = t('library.resultsLoadError', 'Kho tư liệu số chưa thể nạp dữ liệu ở thời điểm này.');
   }
 
   async function loadData() {
@@ -510,8 +590,8 @@
       if (!list.length) {
         recordGrid.innerHTML = '';
         emptyState.hidden = false;
-        $('#libraryEmptyTitle').textContent = t('library.emptyTitle', 'Chưa có biểu ghi phù hợp');
-        $('#libraryEmptyLead').textContent = t('library.emptyLead', 'Bạn có thể đổi từ khóa tìm kiếm hoặc chuyển sang nhóm tư liệu khác để tiếp tục tra cứu.');
+        $('#libraryEmptyTitle').textContent = t('library.emptyTitle', 'Không có biểu ghi khớp với bộ lọc hiện tại');
+        $('#libraryEmptyLead').textContent = t('library.emptyLead', 'Thử xoá bộ lọc, đổi từ khóa hoặc chuyển sang một nhóm tư liệu khác để tiếp tục tra cứu.');
         return;
       }
 
@@ -573,19 +653,18 @@
   }
 
   async function init() {
+    renderLoadingState();
     try {
       const state = await loadData();
       const counts = countByCollection(state.items);
       renderStats(state.collections, state.items);
+      renderHeroPaths(state.collections, state.items, counts);
       renderCollectionFilters(state.collections, counts);
       renderCollections(state.collections, state.items, counts);
       renderSidebarCollections(orderedCollections(state.collections), counts);
       installInteractions(state);
     } catch (error) {
-      const target = $('#libraryRecordGrid');
-      if (target) {
-        target.innerHTML = `<article class="archive-empty-state is-visible"><h3>${t('library.loadErrorTitle', 'Không tải được dữ liệu thư viện')}</h3><p>${t('library.loadErrorLead', 'Kiểm tra lại các file dữ liệu JSON rồi tải lại trang.')}</p></article>`;
-      }
+      renderLoadError();
     }
   }
 
