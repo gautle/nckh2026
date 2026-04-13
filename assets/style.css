@@ -3092,6 +3092,8 @@ textarea.input { border-radius: 12px; min-height: 100px; }
 }
 .archive-hero,
 .archive-toolbar,
+.archive-discovery-panel,
+.archive-highlights-panel,
 .archive-collections-panel,
 .archive-records-panel,
 .archive-featured-panel,
@@ -3167,6 +3169,89 @@ textarea.input { border-radius: 12px; min-height: 100px; }
   display: grid;
   gap: 14px;
 }
+.archive-discovery-panel,
+.archive-highlights-panel {
+  display: grid;
+  gap: 18px;
+}
+.archive-pathway-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.archive-pathway-card,
+.archive-highlight-card,
+.archive-collection-brief {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.72);
+}
+.archive-pathway-head,
+.archive-highlight-copy {
+  display: grid;
+  gap: 10px;
+}
+.archive-pathway-head {
+  align-content: start;
+}
+.archive-pathway-card h3,
+.archive-highlight-card h3,
+.archive-collection-brief h3 {
+  margin: 0;
+}
+.archive-pathway-card p,
+.archive-highlight-card p,
+.archive-collection-brief p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.62;
+}
+.archive-pathway-meta,
+.archive-highlight-meta {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.archive-highlight-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.archive-highlight-card {
+  grid-template-columns: minmax(150px, 180px) minmax(0, 1fr);
+  align-items: start;
+}
+.archive-highlight-thumb {
+  aspect-ratio: 4 / 4.2;
+}
+.archive-highlight-copy {
+  align-content: start;
+}
+.archive-collection-brief-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.92fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+.archive-guidance-list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 10px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.archive-motif-toolbar {
+  margin-top: 18px;
+}
+.archive-reference-card {
+  align-content: start;
+}
+.archive-reference-copy {
+  display: grid;
+  gap: 8px;
+}
 .archive-search {
   display: flex;
   align-items: center;
@@ -3219,6 +3304,8 @@ textarea.input { border-radius: 12px; min-height: 100px; }
   display: grid;
   gap: 22px;
 }
+.archive-discovery-panel,
+.archive-highlights-panel,
 .archive-collections-panel,
 .archive-records-panel,
 .archive-featured-panel,
@@ -3598,6 +3685,7 @@ textarea.input { border-radius: 12px; min-height: 100px; }
   .archive-section-head-split {
     grid-template-columns: 1fr;
   }
+  .archive-pathway-grid,
   .archive-record-grid,
   .archive-collections-grid,
   .archive-motif-grid {
@@ -3605,6 +3693,9 @@ textarea.input { border-radius: 12px; min-height: 100px; }
   }
 }
 @media (max-width: 760px) {
+  .archive-pathway-grid,
+  .archive-highlight-grid,
+  .archive-collection-brief-grid,
   .archive-record-grid,
   .archive-collections-grid,
   .archive-motif-grid,
