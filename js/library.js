@@ -128,6 +128,12 @@
     return `<div class="record-tags">${tags.map((tag) => `<span>${tag}</span>`).join('')}</div>`;
   }
 
+  function clampText(value, max = 140) {
+    const text = (value || '').trim();
+    if (!text) return '';
+    return text.length > max ? `${text.slice(0, max).trim()}…` : text;
+  }
+
   function buildVideoBadge(record) {
     const parts = [
       record.duration,
@@ -204,7 +210,7 @@
           <strong>${count}</strong>
         </div>
         <h3>${collectionTitle(collection)}</h3>
-        <p>${collectionSummary(collection)}</p>
+        <p>${clampText(collectionSummary(collection), 120)}</p>
         ${buildMetaPairs([
           [t('library.typeLabel', 'Loại tư liệu'), collectionType(collection)],
           [t('library.digitizedLabel', 'Ngày số hóa'), newest],
@@ -231,7 +237,7 @@
           <span class="status-pill tone-${collection.status_tone || 'draft'}">${collectionStatus(collection)}</span>
         </div>
         <h3>${collectionTitle(collection)}</h3>
-        <p>${collectionSummary(collection)}</p>
+        <p>${clampText(collectionSummary(collection), 110)}</p>
         ${buildMetaPairs([
           [t('library.statsRecords', 'Biểu ghi'), counts[collection.id] || 0],
           [t('library.pathwayLatestLabel', 'Mới số hóa'), latestForCollection(items, collection.id)]
@@ -252,12 +258,12 @@
             <span class="status-pill tone-${formatToneClass(record.status_tone)}">${toneLabel(record)}</span>
           </div>
           <h3><a href="${recordLink(record)}">${field(record, 'title')}</a></h3>
-          <p class="archive-record-summary">${field(record, 'summary')}</p>
+          <p class="archive-record-summary">${clampText(field(record, 'summary'), 110)}</p>
           ${buildMetaPairs([
-            [t('library.collectionLabel', 'Collection'), collection ? collectionTitle(collection) : '—'],
+            [record.record_type === 'video' ? t('library.techniqueLabel', 'Kỹ thuật') : t('library.collectionLabel', 'Collection'), record.record_type === 'video' ? (field(record, 'technique') || field(record, 'topic') || '—') : (collection ? collectionTitle(collection) : '—')],
             [record.record_type === 'video' ? t('library.durationLabel', 'Thời lượng') : t('library.digitizedLabel', 'Ngày số hóa'), record.record_type === 'video' ? (record.duration || '—') : (record.digitized_at || '—')]
           ], 'archive-mini-meta archive-highlight-meta')}
-          ${record.record_type === 'video' ? buildVideoBadge(record) : buildTagList(recordKeywords(record).slice(0, 3))}
+          ${record.record_type === 'video' ? buildTagList([record.duration, field(record, 'location')].filter(Boolean).slice(0, 2)) : buildTagList(recordKeywords(record).slice(0, 2))}
           <a class="text-link" href="${recordLink(record)}">${t('library.viewRecord', 'Xem biểu ghi')}</a>
         </div>
       </article>`;
@@ -274,7 +280,7 @@
           </div>
           <h3><a href="${recordLink(record)}">${field(record, 'title')}</a></h3>
           <p class="archive-record-subtitle">${field(record, 'subtitle')}</p>
-          <p class="archive-record-summary">${field(record, 'summary')}</p>
+          <p class="archive-record-summary">${clampText(field(record, 'summary'), 120)}</p>
           ${buildMetaPairs([
             [t('library.techniqueLabel', 'Kỹ thuật'), field(record, 'technique') || field(record, 'topic') || '—'],
             [t('library.durationLabel', 'Thời lượng'), record.duration || '—'],
@@ -297,7 +303,7 @@
             <span class="status-pill tone-${formatToneClass(record.status_tone)}">${toneLabel(record)}</span>
           </div>
           <h3><a href="${recordLink(record)}">${field(record, 'title')}</a></h3>
-          <p class="archive-record-summary">${field(record, 'summary')}</p>
+          <p class="archive-record-summary">${clampText(field(record, 'summary'), 90)}</p>
           ${buildMetaPairs([
             [t('library.durationLabel', 'Thời lượng'), record.duration || '—'],
             [t('library.formatLabel', 'Định dạng media'), record.media_format || '—']
@@ -323,15 +329,13 @@
           </div>
           <h3><a href="${recordLink(record)}">${field(record, 'title')}</a></h3>
           <p class="archive-record-subtitle">${field(record, 'subtitle')}</p>
-          <p class="archive-record-summary">${field(record, 'summary')}</p>
+          <p class="archive-record-summary">${clampText(field(record, 'summary'), 120)}</p>
           ${buildMetaPairs([
             [t('library.collectionLabel', 'Collection'), collection ? collectionTitle(collection) : '—'],
-            [record.record_type === 'video' ? t('library.techniqueLabel', 'Kỹ thuật') : t('library.topicLabel', 'Chủ đề'), primaryTopic],
-            [t('library.sourceLabel', 'Nguồn'), field(record, 'source') || '—'],
             [t('library.digitizedLabel', 'Ngày số hóa'), record.digitized_at || '—']
           ], 'archive-record-meta')}
-          ${buildMetaPairs(recordExtraMeta(record), 'archive-mini-meta archive-record-extra')}
-          ${record.record_type === 'video' ? buildVideoBadge(record) : buildTagList(recordKeywords(record).slice(0, 3))}
+          ${buildMetaPairs(recordExtraMeta(record).slice(0, 2), 'archive-mini-meta archive-record-extra')}
+          ${record.record_type === 'video' ? buildTagList([record.duration, field(record, 'location')].filter(Boolean).slice(0, 2)) : buildTagList(recordKeywords(record).slice(0, 2))}
           <a class="text-link" href="${recordLink(record)}">${t('library.viewRecord', 'Xem biểu ghi')}</a>
         </div>
       </article>`;

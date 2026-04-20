@@ -3202,11 +3202,12 @@ textarea.input { border-radius: 12px; min-height: 100px; }
 .library-detail-body p {
   margin: 0;
   color: var(--muted);
-  line-height: 1.68;
+  line-height: 1.6;
 }
 .archive-toolbar-copy p,
 .archive-section-head-split > p {
-  max-width: 54ch;
+  max-width: 48ch;
+  font-size: 15px;
 }
 .archive-toolbar-actions {
   display: grid;
@@ -3250,7 +3251,7 @@ textarea.input { border-radius: 12px; min-height: 100px; }
 .archive-collection-brief p {
   margin: 0;
   color: var(--muted);
-  line-height: 1.58;
+  line-height: 1.55;
 }
 .archive-pathway-meta,
 .archive-highlight-meta {
@@ -3258,18 +3259,35 @@ textarea.input { border-radius: 12px; min-height: 100px; }
 }
 .archive-highlight-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
 }
 .archive-highlight-card {
-  grid-template-columns: minmax(150px, 180px) minmax(0, 1fr);
-  align-items: start;
+  gap: 0;
+  overflow: hidden;
+  padding: 0;
+  align-content: start;
 }
 .archive-highlight-thumb {
-  aspect-ratio: 4 / 4.2;
+  aspect-ratio: 16 / 10;
+  border-radius: 0;
+  border: 0;
 }
 .archive-highlight-copy {
   align-content: start;
+  gap: 10px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.96);
+}
+.archive-highlight-copy h3 {
+  font-size: 20px;
+  line-height: 1.2;
+}
+.archive-highlight-copy .archive-record-summary {
+  min-height: 48px;
+}
+.archive-highlight-meta {
+  grid-template-columns: 1fr;
 }
 .archive-collection-brief-grid {
   display: grid;
@@ -3395,7 +3413,7 @@ textarea.input { border-radius: 12px; min-height: 100px; }
 .archive-collection-card p {
   margin: 0;
   color: var(--muted);
-  line-height: 1.62;
+  line-height: 1.56;
 }
 .archive-collection-meta,
 .archive-record-meta,
@@ -3492,7 +3510,7 @@ textarea.input { border-radius: 12px; min-height: 100px; }
 .archive-record-copy,
 .archive-motif-copy {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   align-content: start;
 }
 .archive-record-topline,
@@ -3541,7 +3559,7 @@ textarea.input { border-radius: 12px; min-height: 100px; }
 .motif-hmong {
   margin: -4px 0 0;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -3549,17 +3567,36 @@ textarea.input { border-radius: 12px; min-height: 100px; }
 .archive-motif-copy p {
   margin: 0;
   color: var(--muted);
-  line-height: 1.62;
+  line-height: 1.55;
+}
+.archive-record-summary {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .record-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
 }
 .record-tags span {
   background: rgba(80, 60, 50, 0.08);
   color: var(--muted);
   font-weight: 600;
+}
+.archive-record-meta,
+.archive-mini-meta {
+  gap: 8px;
+}
+.archive-record-meta dt,
+.archive-mini-meta dt {
+  font-size: 11px;
+}
+.archive-record-meta dd,
+.archive-mini-meta dd {
+  font-size: 14px;
+  line-height: 1.45;
 }
 .text-link {
   color: var(--brand);
@@ -3789,6 +3826,9 @@ textarea.input { border-radius: 12px; min-height: 100px; }
   .archive-collections-grid,
   .archive-motif-grid,
   .archive-hero-paths {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .archive-highlight-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
