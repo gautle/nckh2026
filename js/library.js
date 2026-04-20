@@ -128,6 +128,11 @@
     return `<div class="record-tags">${tags.map((tag) => `<span>${tag}</span>`).join('')}</div>`;
   }
 
+  function buildInlineMeta(values, className = 'archive-meta-inline') {
+    const items = values.filter(Boolean).map((value) => `<span>${value}</span>`).join('');
+    return items ? `<div class="${className}">${items}</div>` : '';
+  }
+
   function clampText(value, max = 140) {
     const text = (value || '').trim();
     if (!text) return '';
@@ -201,7 +206,6 @@
   function buildCollectionCard(collection, items, counts) {
     const count = counts[collection.id] || 0;
     const newest = latestForCollection(items, collection.id);
-    const sampleTypes = [...new Set(itemsForCollection(items, collection.id).map((item) => field(item, 'material_type') || textForRecordType(item.record_type)).filter(Boolean))].slice(0, 3);
     return `
       <article class="archive-collection-card">
         <div class="archive-collection-head">
@@ -209,14 +213,13 @@
           <strong>${count}</strong>
         </div>
         <h3>${collectionTitle(collection)}</h3>
-        <p>${clampText(collectionSummary(collection), 120)}</p>
-        ${buildMetaPairs([
-          [t('library.typeLabel', 'Loại tư liệu'), collectionType(collection)],
-          [t('library.digitizedLabel', 'Ngày số hóa'), newest],
-          [t('library.stateLabel', 'Tình trạng dữ liệu'), collectionStatus(collection)]
-        ], 'archive-collection-meta')}
-        ${buildTagList(sampleTypes)}
-        <a class="text-link" href="${collection.id === 'motifs' ? '#motifCollection' : '#archiveRecordsSection'}" data-collection-link="${collection.id}">${t('library.openCollection', 'Mở collection')}</a>
+        <p class="archive-collection-summary">${clampText(collectionSummary(collection), 74)}</p>
+        ${buildInlineMeta([
+          collectionType(collection),
+          `${count} ${t('library.statsRecordsUnit', 'biểu ghi')}`,
+          newest
+        ])}
+        <button class="text-link text-link-button" type="button" data-collection-link="${collection.id}">${t('library.openCollection', 'Mở collection')}</button>
       </article>`;
   }
 
@@ -228,7 +231,7 @@
       collectionType(collection),
       sample?.duration,
       sample ? (field(sample, 'technique') || field(sample, 'topic')) : ''
-    ].filter(Boolean).slice(0, 3);
+    ].filter(Boolean).slice(0, 2);
     return `
       <article class="archive-pathway-card">
         <div class="archive-pathway-head">
@@ -236,13 +239,13 @@
           <span class="status-pill tone-${collection.status_tone || 'draft'}">${collectionStatus(collection)}</span>
         </div>
         <h3>${collectionTitle(collection)}</h3>
-        <p>${clampText(collectionSummary(collection), 110)}</p>
+        <p>${clampText(collectionSummary(collection), 88)}</p>
         ${buildMetaPairs([
           [t('library.statsRecords', 'Biểu ghi'), counts[collection.id] || 0],
           [t('library.pathwayLatestLabel', 'Mới số hóa'), latestForCollection(items, collection.id)]
         ], 'archive-mini-meta archive-pathway-meta')}
         ${buildTagList(pathwayTags)}
-        <a class="text-link" href="${collection.id === 'motifs' ? '#motifCollection' : '#archiveRecordsSection'}" data-collection-link="${collection.id}">${sample ? t('library.pathwayAction', 'Duyệt nhóm tư liệu') : t('library.pathwayComingSoon', 'Xem trạng thái collection')}</a>
+        <button class="text-link text-link-button" type="button" data-collection-link="${collection.id}">${sample ? t('library.pathwayAction', 'Duyệt nhóm tư liệu') : t('library.pathwayComingSoon', 'Xem trạng thái collection')}</button>
       </article>`;
   }
 
@@ -356,7 +359,7 @@
     const extras = items
       .filter((record) => !picks.some((picked) => picked.id === record.id))
       .sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || parseDate(b.digitized_at) - parseDate(a.digitized_at));
-    return picks.concat(extras).slice(0, 4);
+    return picks.concat(extras).slice(0, 3);
   }
 
   function renderStats(collections, items) {
@@ -504,13 +507,52 @@
     const motifMeta = $('#libraryMotifMeta');
     const motifToggle = $('#libraryMotifToggle');
     const emptyState = $('#libraryEmptyState');
-    const motifSection = $('#motifCollection');
+    const panelLayout = $('#archivePanelLayout');
+    const sidebar = $('#archiveSidebar');
+    const panels = $$('[data-library-panel]');
+    const viewButtons = $$('[data-library-view]');
     const allRecords = state.items.filter((item) => item.record_type !== 'motif');
     const motifRecords = state.items.filter((item) => item.record_type === 'motif').sort((a, b) => a.id.localeCompare(b.id));
 
     let query = '';
     let activeCollectionId = 'all';
     let motifExpanded = false;
+    let activeView = 'pathways';
+
+    function layoutViewFor(view) {
+      return ['collections', 'records', 'motifs'].includes(view);
+    }
+
+    function collectionViewFor(id) {
+      if (id === 'process-videos') return 'videos';
+      if (id === 'motifs') return 'motifs';
+      return 'records';
+    }
+
+    function syncFilterButtons(id) {
+      if (!filterRow) return;
+      const target = filterRow.querySelector(`[data-filter="${id}"]`) || filterRow.querySelector('[data-filter="all"]');
+      $$('.archive-chip', filterRow).forEach((chip) => chip.classList.toggle('is-active', chip === target));
+    }
+
+    function setActiveView(view) {
+      activeView = view;
+      panels.forEach((panel) => {
+        const isActive = panel.dataset.libraryPanel === view;
+        panel.hidden = !isActive;
+        panel.classList.toggle('is-active', isActive);
+      });
+      viewButtons.forEach((button) => button.classList.toggle('is-active', button.dataset.libraryView === view));
+      if (panelLayout) {
+        const useLayout = layoutViewFor(view);
+        panelLayout.hidden = !useLayout;
+        panelLayout.classList.toggle('is-collections-view', view === 'collections');
+        panelLayout.classList.toggle('is-single-view', useLayout && view !== 'collections');
+      }
+      if (sidebar) {
+        sidebar.hidden = view !== 'collections';
+      }
+    }
 
     function setResultsMeta(records) {
       const target = $('#libraryResultsMeta');
@@ -526,15 +568,15 @@
 
     function renderMotifs() {
       if (!motifGrid) return;
-      const visible = motifExpanded ? motifRecords : motifRecords.slice(0, 8);
+      const visible = motifExpanded ? motifRecords : motifRecords.slice(0, 4);
       motifGrid.innerHTML = visible.map(buildMotifCard).join('');
       if (motifMeta) {
         motifMeta.textContent = motifExpanded
           ? t('library.motifExpandedMeta', 'Đang hiển thị toàn bộ collection ký hiệu và hoa văn.')
-          : t('library.motifCollapsedMeta', 'Landing page chỉ hiển thị một phần collection hoa văn để giữ trọng tâm cho toàn bộ kho tư liệu số.');
+          : t('library.motifCollapsedMeta', 'Landing page chỉ hiển thị một phần nhỏ của collection hoa văn.');
       }
       if (motifToggle) {
-        motifToggle.hidden = motifRecords.length <= 8;
+        motifToggle.hidden = motifRecords.length <= 4;
         motifToggle.textContent = motifExpanded
           ? t('library.motifToggleLess', 'Thu gọn collection')
           : t('library.motifToggleMore', 'Xem thêm biểu ghi hoa văn');
@@ -569,26 +611,43 @@
 
       if (activeCollectionId === 'motifs') {
         recordGrid.innerHTML = '';
-        emptyState.hidden = false;
-        $('#libraryEmptyTitle').textContent = t('library.emptyMotifTitle', 'Collection chuyên đề nằm ở phía dưới');
-        $('#libraryEmptyLead').textContent = t('library.emptyMotifLead', 'Hoa văn được tổ chức như một collection chuyên đề. Kéo xuống để duyệt toàn bộ biểu ghi ký hiệu và hoa văn.');
-        motifSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (emptyState) {
+          emptyState.hidden = false;
+          $('#libraryEmptyTitle').textContent = t('library.emptyMotifTitle', 'Collection chuyên đề nằm ở phía dưới');
+          $('#libraryEmptyLead').textContent = t('library.emptyMotifLead', 'Hoa văn được tổ chức như một collection chuyên đề. Mở tab Hoa văn để duyệt toàn bộ biểu ghi ký hiệu và hoa văn.');
+        }
         return;
       }
 
       if (!list.length) {
         recordGrid.innerHTML = '';
-        emptyState.hidden = false;
-        $('#libraryEmptyTitle').textContent = t('library.emptyTitle', 'Không có biểu ghi khớp với bộ lọc hiện tại');
-        $('#libraryEmptyLead').textContent = t('library.emptyLead', 'Thử xoá bộ lọc, đổi từ khóa hoặc chuyển sang một nhóm tư liệu khác để tiếp tục tra cứu.');
+        if (emptyState) {
+          emptyState.hidden = false;
+          $('#libraryEmptyTitle').textContent = t('library.emptyTitle', 'Không có biểu ghi khớp với bộ lọc hiện tại');
+          $('#libraryEmptyLead').textContent = t('library.emptyLead', 'Thử xoá bộ lọc, đổi từ khóa hoặc chuyển sang một nhóm tư liệu khác để tiếp tục tra cứu.');
+        }
         return;
       }
 
-      emptyState.hidden = true;
+      if (emptyState) emptyState.hidden = true;
       recordGrid.innerHTML = list
         .sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || parseDate(b.digitized_at) - parseDate(a.digitized_at))
         .map((record) => buildRecordCard(record, collectionsById))
         .join('');
+    }
+
+    function openCollection(id) {
+      if (!id) return;
+      activeCollectionId = id;
+      syncFilterButtons(id);
+      if (id === 'motifs') {
+        setActiveView('motifs');
+        renderMotifs();
+        return;
+      }
+      const view = collectionViewFor(id);
+      setActiveView(view);
+      renderRecords();
     }
 
     renderPathways(state.collections, state.items, counts);
@@ -596,9 +655,28 @@
     renderHighlights(state.items, collectionsById);
     renderMotifs();
     renderRecords();
+    setActiveView(activeView);
+
+    viewButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const view = button.dataset.libraryView;
+        if (!view) return;
+        if (view === 'records') {
+          activeCollectionId = 'all';
+          syncFilterButtons('all');
+          renderRecords();
+        }
+        setActiveView(view);
+      });
+    });
 
     searchInput?.addEventListener('input', (event) => {
       query = event.target.value.trim();
+      if (activeCollectionId === 'motifs') {
+        activeCollectionId = 'all';
+        syncFilterButtons('all');
+      }
+      setActiveView('records');
       renderRecords();
     });
 
@@ -606,7 +684,8 @@
       query = '';
       activeCollectionId = 'all';
       if (searchInput) searchInput.value = '';
-      $$('.archive-chip', filterRow).forEach((chip, index) => chip.classList.toggle('is-active', index === 0));
+      syncFilterButtons('all');
+      setActiveView('records');
       renderRecords();
     });
 
@@ -619,7 +698,18 @@
       const button = event.target.closest('[data-filter]');
       if (!button) return;
       activeCollectionId = button.dataset.filter || 'all';
-      $$('.archive-chip', filterRow).forEach((chip) => chip.classList.toggle('is-active', chip === button));
+      syncFilterButtons(activeCollectionId);
+      if (activeCollectionId === 'motifs') {
+        setActiveView('motifs');
+        renderMotifs();
+        return;
+      }
+      if (activeCollectionId === 'process-videos') {
+        setActiveView('videos');
+        renderRecords();
+        return;
+      }
+      setActiveView('records');
       renderRecords();
     });
 
@@ -629,15 +719,7 @@
       const id = link.dataset.collectionLink || link.dataset.sidebarLink;
       if (!id) return;
       event.preventDefault();
-      activeCollectionId = id;
-      const filterButton = filterRow?.querySelector(`[data-filter="${id}"]`);
-      if (filterButton) {
-        $$('.archive-chip', filterRow).forEach((chip) => chip.classList.toggle('is-active', chip === filterButton));
-      }
-      renderRecords();
-      if (id !== 'motifs') {
-        document.getElementById('archiveRecordsSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      openCollection(id);
     });
   }
 

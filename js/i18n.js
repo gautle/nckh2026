@@ -361,6 +361,13 @@
         browseKicker: 'Tra cứu kho số',
         browseTitle: 'Tìm biểu ghi hoặc bắt đầu từ một loại tư liệu',
         browseLead: 'Tra cứu nhanh theo từ khóa, collection và trạng thái dữ liệu.',
+        viewPathways: 'Lối vào chính',
+        viewVideos: 'Video quy trình',
+        viewHighlights: 'Biểu ghi đáng chú ý',
+        viewCollections: 'Bộ sưu tập',
+        viewRecords: 'Biểu ghi',
+        viewMotifs: 'Hoa văn',
+        highlightsMore: 'Xem thêm biểu ghi',
         searchPlaceholder: 'Tìm theo tên tư liệu, từ khóa, địa điểm hoặc nguồn...',
         pathwaysKicker: 'Lối vào chính',
         pathwaysTitle: 'Các nhóm tư liệu chính',
@@ -370,7 +377,7 @@
         highlightsLead: 'Một lát cắt ngắn để thấy nhanh những biểu ghi đáng mở trước.',
         collectionsKicker: 'Collection',
         collectionsTitle: 'Các collection hiện có trong kho tư liệu',
-        collectionsLead: 'Mỗi collection là một nhóm tư liệu có thể mở rộng dần theo thời gian.',
+        collectionsLead: 'Mỗi collection là một nhóm tư liệu có thể mở rộng dần.',
         recordsKicker: 'Biểu ghi tra cứu',
         recordsTitle: 'Biểu ghi số hóa có thể mở và đối chiếu ngay',
         recordsLead: 'Mỗi mục cho biết nhanh loại tư liệu, nguồn và trạng thái dữ liệu.',
@@ -383,7 +390,7 @@
         emptyTitle: 'Không có biểu ghi khớp với bộ lọc hiện tại',
         emptyLead: 'Thử xoá bộ lọc, đổi từ khóa hoặc chuyển sang một nhóm tư liệu khác để tiếp tục tra cứu.',
         emptyMotifTitle: 'Collection chuyên đề nằm ở phía dưới',
-        emptyMotifLead: 'Hoa văn được tổ chức như một collection chuyên đề. Kéo xuống để duyệt toàn bộ biểu ghi ký hiệu và hoa văn.',
+        emptyMotifLead: 'Hoa văn được tổ chức như một collection chuyên đề. Mở tab Hoa văn để duyệt toàn bộ biểu ghi ký hiệu và hoa văn.',
         motifKicker: 'Collection chuyên đề',
         motifTitle: 'Bộ sưu tập ký hiệu và hoa văn',
         motifLead: 'Collection này dùng để đối chiếu ký hiệu và tên gọi, như một nhánh chuyên đề bên trong kho tư liệu số.',
@@ -405,10 +412,10 @@
         pathwayComingSoon: 'Xem trạng thái collection',
         sidebar1Kicker: 'Logic lưu trữ',
         sidebar1Title: 'Kho số ưu tiên mô tả, chuẩn hóa và bảo tồn khả năng tra cứu',
-        sidebar1Lead: 'Giá trị của trang này không chỉ nằm ở việc trưng bày file, mà ở việc mỗi tư liệu được đặt vào một cấu trúc biểu ghi có thể tìm, đối chiếu, cập nhật file và mở rộng metadata theo thời gian.',
+        sidebar1Lead: 'Mỗi tư liệu được giữ như một biểu ghi có thể tìm và đối chiếu về sau.',
         sidebar2Kicker: 'Tình trạng dữ liệu',
-        statusActive: 'Đã có file hoặc thumbnail và có thể mở như một hồ sơ tham chiếu cơ bản.',
-        statusDraft: 'Đã có khung biểu ghi và metadata, nhưng còn chờ file thật, diễn giải sâu hơn hoặc xác nhận công bố.',
+        statusActive: 'Đã có file hoặc thumbnail.',
+        statusDraft: 'Đã có hồ sơ nền, còn chờ bổ sung.',
         sidebar3Kicker: 'Duyệt nhanh theo collection',
         openCollection: 'Mở collection',
         viewRecord: 'Xem biểu ghi',
@@ -901,6 +908,13 @@
         browseKicker: 'Archive search',
         browseTitle: 'Search records or begin with a material type',
         browseLead: 'Search quickly by keyword, collection, or record status.',
+        viewPathways: 'Main pathways',
+        viewVideos: 'Process videos',
+        viewHighlights: 'Highlights',
+        viewCollections: 'Collections',
+        viewRecords: 'Records',
+        viewMotifs: 'Motifs',
+        highlightsMore: 'More records',
         searchPlaceholder: 'Search by title, keyword, location, or source...',
         pathwaysKicker: 'Main pathways',
         pathwaysTitle: 'Core material groups',
@@ -910,7 +924,7 @@
         highlightsLead: 'A short scan row for opening the most useful records first.',
         collectionsKicker: 'Collections',
         collectionsTitle: 'Current collections in the repository',
-        collectionsLead: 'Each collection is a material group that can keep growing over time.',
+        collectionsLead: 'Each collection is a material group that can keep growing.',
         recordsKicker: 'Archive records',
         recordsTitle: 'Digitized records available for direct browsing',
         recordsLead: 'Each card shows the essential archive details before you open it.',
@@ -923,7 +937,7 @@
         emptyTitle: 'No records match the current filter',
         emptyLead: 'Try clearing filters, changing the keyword, or switching to another material group.',
         emptyMotifTitle: 'The specialist collection is shown below',
-        emptyMotifLead: 'Motifs are organized as a specialist collection. Scroll down to browse the full set of motif and symbol records.',
+        emptyMotifLead: 'Motifs are organized as a specialist collection. Open the Motifs tab to browse the full set of motif and symbol records.',
         motifKicker: 'Specialist collection',
         motifTitle: 'Motif and symbol collection',
         motifLead: 'This specialist collection supports motif reference and comparison within the wider archive.',
@@ -945,10 +959,10 @@
         pathwayComingSoon: 'View collection status',
         sidebar1Kicker: 'Archival logic',
         sidebar1Title: 'The repository prioritizes description, structure, and long-term retrievability',
-        sidebar1Lead: 'The value of this page is not only that it displays media, but that every item sits inside a record structure that can be searched, updated, cross-linked, and expanded over time.',
+        sidebar1Lead: 'Each item is preserved as a searchable record for future comparison.',
         sidebar2Kicker: 'Record status',
-        statusActive: 'A file or usable thumbnail already exists and can be opened as a reference record.',
-        statusDraft: 'The record structure exists, but the file, deeper interpretation, or publication clearance is still in progress.',
+        statusActive: 'A file or usable thumbnail is available.',
+        statusDraft: 'The base record exists, with more data still to come.',
         sidebar3Kicker: 'Browse collections quickly',
         openCollection: 'Open collection',
         viewRecord: 'View record',
@@ -1686,6 +1700,13 @@
     setText('#libraryBrowseKicker', t('library.browseKicker'));
     setText('#libraryBrowseTitle', t('library.browseTitle'));
     setText('#libraryBrowseLead', t('library.browseLead'));
+    setText('#libraryViewPathways', t('library.viewPathways'));
+    setText('#libraryViewVideos', t('library.viewVideos'));
+    setText('#libraryViewHighlights', t('library.viewHighlights'));
+    setText('#libraryViewCollections', t('library.viewCollections'));
+    setText('#libraryViewRecords', t('library.viewRecords'));
+    setText('#libraryViewMotifs', t('library.viewMotifs'));
+    setText('#libraryHighlightsMore', t('library.highlightsMore'));
     setPlaceholder('#librarySearchInput', t('library.searchPlaceholder'));
     setText('#libraryPathwaysKicker', t('library.pathwaysKicker'));
     setText('#libraryPathwaysTitle', t('library.pathwaysTitle'));

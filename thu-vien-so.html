@@ -60,7 +60,16 @@
       </div>
     </section>
 
-    <section class="section card archive-discovery-panel">
+    <section class="section card archive-view-switcher" aria-label="Chuyển nhóm nội dung thư viện số">
+      <button id="libraryViewPathways" class="archive-view-chip is-active" type="button" data-library-view="pathways">Lối vào chính</button>
+      <button id="libraryViewVideos" class="archive-view-chip" type="button" data-library-view="videos">Video quy trình</button>
+      <button id="libraryViewHighlights" class="archive-view-chip" type="button" data-library-view="highlights">Biểu ghi đáng chú ý</button>
+      <button id="libraryViewCollections" class="archive-view-chip" type="button" data-library-view="collections">Collection</button>
+      <button id="libraryViewRecords" class="archive-view-chip" type="button" data-library-view="records">Biểu ghi</button>
+      <button id="libraryViewMotifs" class="archive-view-chip" type="button" data-library-view="motifs">Hoa văn</button>
+    </section>
+
+    <section class="section card archive-discovery-panel archive-panel is-active" data-library-panel="pathways">
       <div class="archive-section-head archive-section-head-split">
         <div>
           <span id="libraryPathwaysKicker" class="home-section-kicker">Lối vào kho số</span>
@@ -71,7 +80,7 @@
       <div id="libraryPathwaysGrid" class="archive-pathway-grid"></div>
     </section>
 
-    <section class="section card archive-video-panel">
+    <section class="section card archive-video-panel archive-panel" data-library-panel="videos" hidden>
       <div class="archive-section-head archive-section-head-split">
         <div>
           <span id="libraryVideoKicker" class="home-section-kicker">Tư liệu quy trình</span>
@@ -85,7 +94,7 @@
       </div>
     </section>
 
-    <section class="section card archive-highlights-panel">
+    <section class="section card archive-highlights-panel archive-panel" data-library-panel="highlights" hidden>
       <div class="archive-section-head archive-section-head-split">
         <div>
           <span id="libraryHighlightsKicker" class="home-section-kicker">Biểu ghi nổi bật</span>
@@ -95,13 +104,13 @@
       </div>
       <div id="libraryHighlightsGrid" class="archive-highlight-grid"></div>
       <div class="archive-section-actions">
-        <a class="text-link" href="#archiveRecordsSection">Xem thêm biểu ghi</a>
+        <button id="libraryHighlightsMore" class="text-link text-link-button" type="button" data-library-view="records">Xem thêm biểu ghi</button>
       </div>
     </section>
 
-    <section class="section archive-layout">
+    <section class="section archive-layout" id="archivePanelLayout" hidden>
       <div class="archive-primary-column">
-        <section class="card archive-collections-panel">
+        <section class="card archive-collections-panel archive-panel" data-library-panel="collections" hidden>
           <div class="archive-section-head archive-section-head-split">
             <div>
               <span id="libraryCollectionsKicker" class="home-section-kicker">Bộ sưu tập</span>
@@ -112,7 +121,7 @@
           <div id="libraryCollectionsGrid" class="archive-collections-grid"></div>
         </section>
 
-        <section class="card archive-records-panel" id="archiveRecordsSection">
+        <section class="card archive-records-panel archive-panel" id="archiveRecordsSection" data-library-panel="records" hidden>
           <div class="archive-section-head archive-section-head-split">
             <div>
               <span id="libraryRecordsKicker" class="home-section-kicker">Biểu ghi tra cứu</span>
@@ -131,7 +140,7 @@
           </div>
         </section>
 
-        <section class="card archive-featured-panel" id="motifCollection">
+        <section class="card archive-featured-panel archive-panel" id="motifCollection" data-library-panel="motifs" hidden>
           <div class="archive-section-head archive-section-head-split">
             <div>
               <span id="libraryMotifKicker" class="home-section-kicker">Collection chuyên đề</span>
@@ -172,17 +181,17 @@
         </section>
       </div>
 
-      <aside class="archive-sidebar">
+      <aside class="archive-sidebar" id="archiveSidebar">
         <section class="card archive-sidebar-card">
           <span id="librarySidebar1Kicker" class="home-section-kicker">Mục đích lưu trữ</span>
           <h3 id="librarySidebar1Title">Kho số này ưu tiên mô tả, chuẩn hóa và bảo tồn khả năng tra cứu</h3>
-          <p id="librarySidebar1Lead">Điểm quan trọng của trang này không nằm ở việc hiển thị thật nhiều ảnh, mà ở việc mỗi tư liệu được đặt vào một cấu trúc biểu ghi có thể tìm, đối chiếu, thay thế file hoặc mở rộng metadata mà không mất logic lưu trữ.</p>
+          <p id="librarySidebar1Lead">Mỗi tư liệu được giữ như một biểu ghi có thể tìm, đối chiếu và cập nhật dần theo thời gian.</p>
         </section>
         <section class="card archive-sidebar-card">
           <span id="librarySidebar2Kicker" class="home-section-kicker">Tình trạng dữ liệu</span>
           <ul class="archive-status-list">
-            <li><span class="status-pill tone-active">Đã số hóa</span><p id="libraryStatusActive">Đã có file hoặc thumbnail và có thể xem như một hồ sơ tham chiếu cơ bản.</p></li>
-            <li><span class="status-pill tone-draft">Đang bổ sung</span><p id="libraryStatusDraft">Đã có mô tả biểu ghi và metadata khung, nhưng còn chờ file thật hoặc chú giải sâu hơn.</p></li>
+            <li><span class="status-pill tone-active">Đã số hóa</span><p id="libraryStatusActive">Đã có file hoặc thumbnail để mở biểu ghi.</p></li>
+            <li><span class="status-pill tone-draft">Đang bổ sung</span><p id="libraryStatusDraft">Đã có hồ sơ nền, còn chờ file thật hoặc chú giải sâu hơn.</p></li>
           </ul>
         </section>
         <section class="card archive-sidebar-card">
