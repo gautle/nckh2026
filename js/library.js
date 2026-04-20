@@ -137,9 +137,8 @@
   function buildVideoBadge(record) {
     const parts = [
       record.duration,
-      field(record, 'technique') || field(record, 'topic'),
-      field(record, 'location')
-    ].filter(Boolean).slice(0, 3);
+      field(record, 'technique') || field(record, 'topic')
+    ].filter(Boolean).slice(0, 2);
     return buildTagList(parts);
   }
 
@@ -258,12 +257,11 @@
             <span class="status-pill tone-${formatToneClass(record.status_tone)}">${toneLabel(record)}</span>
           </div>
           <h3><a href="${recordLink(record)}">${field(record, 'title')}</a></h3>
-          <p class="archive-record-summary">${clampText(field(record, 'summary'), 110)}</p>
+          <p class="archive-record-summary">${clampText(field(record, 'summary'), 82)}</p>
           ${buildMetaPairs([
             [record.record_type === 'video' ? t('library.techniqueLabel', 'Kỹ thuật') : t('library.collectionLabel', 'Collection'), record.record_type === 'video' ? (field(record, 'technique') || field(record, 'topic') || '—') : (collection ? collectionTitle(collection) : '—')],
             [record.record_type === 'video' ? t('library.durationLabel', 'Thời lượng') : t('library.digitizedLabel', 'Ngày số hóa'), record.record_type === 'video' ? (record.duration || '—') : (record.digitized_at || '—')]
           ], 'archive-mini-meta archive-highlight-meta')}
-          ${record.record_type === 'video' ? buildTagList([record.duration, field(record, 'location')].filter(Boolean).slice(0, 2)) : buildTagList(recordKeywords(record).slice(0, 2))}
           <a class="text-link" href="${recordLink(record)}">${t('library.viewRecord', 'Xem biểu ghi')}</a>
         </div>
       </article>`;
@@ -279,13 +277,11 @@
             <span class="status-pill tone-${formatToneClass(record.status_tone)}">${toneLabel(record)}</span>
           </div>
           <h3><a href="${recordLink(record)}">${field(record, 'title')}</a></h3>
-          <p class="archive-record-subtitle">${field(record, 'subtitle')}</p>
-          <p class="archive-record-summary">${clampText(field(record, 'summary'), 120)}</p>
+          <p class="archive-record-summary">${clampText(field(record, 'summary'), 92)}</p>
           ${buildMetaPairs([
             [t('library.techniqueLabel', 'Kỹ thuật'), field(record, 'technique') || field(record, 'topic') || '—'],
             [t('library.durationLabel', 'Thời lượng'), record.duration || '—'],
-            [t('library.locationLabel', 'Địa điểm'), field(record, 'location') || '—'],
-            [t('library.contributorLabel', 'Người cung cấp / ghi nhận'), field(record, 'contributor') || field(record, 'source') || '—']
+            [t('library.locationLabel', 'Địa điểm'), field(record, 'location') || '—']
           ], 'archive-mini-meta archive-video-meta')}
           ${buildVideoBadge(record)}
           <a class="text-link" href="${recordLink(record)}">${t('library.viewRecord', 'Xem biểu ghi')}</a>
@@ -303,10 +299,10 @@
             <span class="status-pill tone-${formatToneClass(record.status_tone)}">${toneLabel(record)}</span>
           </div>
           <h3><a href="${recordLink(record)}">${field(record, 'title')}</a></h3>
-          <p class="archive-record-summary">${clampText(field(record, 'summary'), 90)}</p>
+          <p class="archive-record-summary">${clampText(field(record, 'summary'), 72)}</p>
           ${buildMetaPairs([
             [t('library.durationLabel', 'Thời lượng'), record.duration || '—'],
-            [t('library.formatLabel', 'Định dạng media'), record.media_format || '—']
+            [t('library.locationLabel', 'Địa điểm'), field(record, 'location') || '—']
           ], 'archive-mini-meta archive-video-meta compact')}
           ${buildVideoBadge(record)}
           <a class="text-link" href="${recordLink(record)}">${t('library.viewRecord', 'Xem biểu ghi')}</a>
@@ -316,9 +312,6 @@
 
   function buildRecordCard(record, collectionsById) {
     const collection = collectionsById.get(record.collection);
-    const primaryTopic = record.record_type === 'video'
-      ? (field(record, 'technique') || field(record, 'topic') || '—')
-      : (field(record, 'topic') || '—');
     return `
       <article class="archive-record-card" data-collection="${record.collection}" data-type="${record.record_type}">
         ${buildThumb(record)}
@@ -328,14 +321,11 @@
             <span class="status-pill tone-${formatToneClass(record.status_tone)}">${toneLabel(record)}</span>
           </div>
           <h3><a href="${recordLink(record)}">${field(record, 'title')}</a></h3>
-          <p class="archive-record-subtitle">${field(record, 'subtitle')}</p>
-          <p class="archive-record-summary">${clampText(field(record, 'summary'), 120)}</p>
+          <p class="archive-record-summary">${clampText(field(record, 'summary'), 90)}</p>
           ${buildMetaPairs([
             [t('library.collectionLabel', 'Collection'), collection ? collectionTitle(collection) : '—'],
             [t('library.digitizedLabel', 'Ngày số hóa'), record.digitized_at || '—']
           ], 'archive-record-meta')}
-          ${buildMetaPairs(recordExtraMeta(record).slice(0, 2), 'archive-mini-meta archive-record-extra')}
-          ${record.record_type === 'video' ? buildTagList([record.duration, field(record, 'location')].filter(Boolean).slice(0, 2)) : buildTagList(recordKeywords(record).slice(0, 2))}
           <a class="text-link" href="${recordLink(record)}">${t('library.viewRecord', 'Xem biểu ghi')}</a>
         </div>
       </article>`;
@@ -349,11 +339,6 @@
           <span class="motif-no">${record.id.replace('motif-', '').padStart(2, '0')}</span>
           <h3><a href="${recordLink(record)}">${field(record, 'title')}</a></h3>
           <p class="motif-hmong">${field(record, 'subtitle')}</p>
-          ${buildMetaPairs([
-            [t('library.sourceLabel', 'Nguồn'), field(record, 'source') || '—'],
-            [t('library.digitizedLabel', 'Ngày số hóa'), record.digitized_at || '—']
-          ], 'archive-mini-meta')}
-          ${buildTagList(recordKeywords(record).slice(0, 2))}
           <a class="text-link" href="${recordLink(record)}">${t('library.viewRecord', 'Xem biểu ghi')}</a>
         </div>
       </article>`;
@@ -371,7 +356,7 @@
     const extras = items
       .filter((record) => !picks.some((picked) => picked.id === record.id))
       .sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || parseDate(b.digitized_at) - parseDate(a.digitized_at));
-    return picks.concat(extras).slice(0, 6);
+    return picks.concat(extras).slice(0, 4);
   }
 
   function renderStats(collections, items) {
@@ -431,7 +416,7 @@
       .filter((item) => item.collection === 'process-videos')
       .sort((a, b) => Number(Boolean(b.featured)) - Number(Boolean(a.featured)) || parseDate(b.digitized_at) - parseDate(a.digitized_at));
     const featured = videos[0];
-    const rest = videos.slice(1, 5);
+    const rest = videos.slice(1, 3);
     featureTarget.innerHTML = featured
       ? buildVideoFeature(featured)
       : `<div class="archive-empty-state is-visible"><h3>${t('library.videoEmptyTitle', 'Chưa có video quy trình công khai')}</h3><p>${t('library.videoEmptyLead', 'Khung lưu trữ và metadata cho video đã sẵn sàng; chỉ cần nạp file thật để mở tuyến tư liệu này.')}</p></div>`;
@@ -541,7 +526,7 @@
 
     function renderMotifs() {
       if (!motifGrid) return;
-      const visible = motifExpanded ? motifRecords : motifRecords.slice(0, 12);
+      const visible = motifExpanded ? motifRecords : motifRecords.slice(0, 8);
       motifGrid.innerHTML = visible.map(buildMotifCard).join('');
       if (motifMeta) {
         motifMeta.textContent = motifExpanded
@@ -549,7 +534,7 @@
           : t('library.motifCollapsedMeta', 'Landing page chỉ hiển thị một phần collection hoa văn để giữ trọng tâm cho toàn bộ kho tư liệu số.');
       }
       if (motifToggle) {
-        motifToggle.hidden = motifRecords.length <= 12;
+        motifToggle.hidden = motifRecords.length <= 8;
         motifToggle.textContent = motifExpanded
           ? t('library.motifToggleLess', 'Thu gọn collection')
           : t('library.motifToggleMore', 'Xem thêm biểu ghi hoa văn');
