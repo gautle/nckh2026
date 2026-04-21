@@ -1909,17 +1909,17 @@ a { color: inherit; text-decoration: none; }
   margin-top: 8px;
   display: grid;
   gap: 8px;
-  max-height: 31vh;
+  max-height: 33vh;
   overflow: auto;
   padding-right: 2px;
 }
 .point-item {
   border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 8px;
-  background: rgba(252, 255, 253, 0.92);
+  border-radius: 12px;
+  padding: 10px;
+  background: rgba(252, 255, 253, 0.96);
   display: grid;
-  gap: 5px;
+  gap: 6px;
 }
 .point-item h4 { margin: 0; font-size: 13px; }
 .point-item .row {
@@ -1939,11 +1939,40 @@ a { color: inherit; text-decoration: none; }
 .map-toolbar {
   position: absolute;
   top: 12px;
+  left: 12px;
   right: 12px;
-  z-index: 4;
+  z-index: 6;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  pointer-events: none;
+}
+.map-toolbar > * {
+  pointer-events: auto;
+}
+.map-toolbar-copy {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid rgba(49, 66, 124, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 12px 26px rgba(31, 47, 90, 0.08);
+}
+.map-toolbar-copy strong {
+  font-size: 14px;
+  line-height: 1.2;
+}
+.map-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 8px;
+}
+.map-panel-toggle {
+  background: rgba(255, 255, 255, 0.9);
 }
 .map-note {
   position: absolute;
@@ -1966,18 +1995,50 @@ a { color: inherit; text-decoration: none; }
   position: absolute;
   top: 16px;
   left: 16px;
-  z-index: 5;
-  width: min(270px, calc(100% - 32px));
-  max-height: calc(100% - 92px);
-  background: rgba(255, 251, 245, 0.88);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 18px 42px rgba(31, 47, 90, 0.12);
+  z-index: 7;
+  width: min(330px, calc(100% - 32px));
+  max-height: calc(100% - 96px);
+  background: rgba(255, 251, 245, 0.94);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 20px 46px rgba(31, 47, 90, 0.16);
+  border: 1px solid rgba(49, 66, 124, 0.12);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(6px) scale(0.98);
+  transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
+}
+.map-shell.is-filter-open .map-floating-sidebar {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
 }
 .sidebar-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 8px;
+}
+.sidebar-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sidebar-close {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.92);
+  color: var(--text);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+.sidebar-close:hover {
+  background: var(--brand);
+  color: #fff;
 }
 .sidebar-head p {
   margin: 2px 0 0;
@@ -2398,7 +2459,8 @@ textarea.input { border-radius: 12px; min-height: 100px; }
   .map-toolbar {
     position: static;
     padding: 12px 12px 0;
-    justify-content: flex-end;
+    align-items: stretch;
+    flex-direction: column;
   }
   .map-note {
     position: static;
@@ -2407,9 +2469,10 @@ textarea.input { border-radius: 12px; min-height: 100px; }
   .map-floating-sidebar {
     position: static;
     width: auto;
-    max-height: none;
+    max-height: min(72vh, 540px);
     margin: 0 12px 12px;
   }
+  .sidebar-close { display: inline-grid; place-items: center; }
   .map-shell {
     display: grid;
   }
@@ -4353,6 +4416,16 @@ textarea.input { border-radius: 12px; min-height: 100px; }
     justify-content: space-between;
     flex-wrap: wrap;
   }
+  .map-toolbar-copy {
+    width: 100%;
+  }
+  .map-toolbar-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+  .map-toolbar-actions > * {
+    flex: 1 1 0;
+  }
 
   .map-note {
     position: static;
@@ -4371,12 +4444,13 @@ textarea.input { border-radius: 12px; min-height: 100px; }
   .map-floating-sidebar {
     position: static;
     width: auto;
-    max-height: none;
+    max-height: min(72vh, 540px);
     margin: 0 12px 12px;
   }
+  .sidebar-close { display: inline-grid; place-items: center; }
 
   .point-list {
-    max-height: 240px;
+    max-height: 220px;
   }
 
   .sidebar .search-box .input,

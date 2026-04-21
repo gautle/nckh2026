@@ -1,6 +1,7 @@
 let allPlaces = [];
 let visiblePlaces = [];
 let embedReady = false;
+let filterPanelOpen = false;
 
 const el = {};
 const MAP_I18N = window.SiteI18n || { lang: 'vi', t: (_key, fallback) => fallback };
@@ -23,7 +24,11 @@ const TXT = {
       : `Đã chọn: ${place.name} (${place.lat.toFixed(5)}, ${place.lng.toFixed(5)}). Hãy định vị điểm trên ArcGIS ở khung bên phải.`)
     : (MAP_I18N.lang === 'en' ? `Selected: ${place.name}.` : `Đã chọn: ${place.name}.`),
   count: (n) => MAP_I18N.lang === 'en' ? `${n} points` : `${n} điểm`,
-  loadFail: MAP_I18N.lang === 'en' ? 'Could not load map data. Waiting for demo data.' : 'Không tải được dữ liệu bản đồ. Đang chờ dữ liệu demo.'
+  loadFail: MAP_I18N.lang === 'en' ? 'Could not load map data. Waiting for demo data.' : 'Không tải được dữ liệu bản đồ. Đang chờ dữ liệu demo.',
+  filterOpen: MAP_I18N.lang === 'en' ? 'Point filters' : 'Bộ lọc điểm',
+  filterClose: MAP_I18N.lang === 'en' ? 'Close filters' : 'Thu gọn bộ lọc',
+  filterButton: (n) => MAP_I18N.lang === 'en' ? `Filters · ${n}` : `Bộ lọc · ${n}`,
+  selectedCount: (n) => MAP_I18N.lang === 'en' ? `${n} records on map` : `${n} điểm đang hiển thị`
 };
 
 function trackMetric(eventName, payload) {
@@ -39,6 +44,49 @@ function getEmbedUrl() {
 function getFullUrl() {
   const full = String(window.ARCGIS_FULL_URL || '').trim();
   return full || getEmbedUrl();
+}
+
+function setFilterPanelOpen(open) {
+  const shell = document.querySelector('.map-shell');
+  const toggle = document.getElementById('mapFilterToggle');
+  const panel = document.getElementById('mapFilterPanel');
+  if (!shell || !toggle || !panel) return;
+
+  filterPanelOpen = !!open;
+  shell.classList.toggle('is-filter-open', filterPanelOpen);
+  toggle.setAttribute('aria-expanded', filterPanelOpen ? 'true' : 'false');
+  toggle.textContent = filterPanelOpen ? TXT.filterClose : TXT.filterButton(visiblePlaces.length || allPlaces.length || 0);
+}
+
+function syncFilterButtonLabel() {
+  const toggle = document.getElementById('mapFilterToggle');
+  if (!toggle) return;
+  toggle.textContent = filterPanelOpen ? TXT.filterClose : TXT.filterButton(visiblePlaces.length || allPlaces.length || 0);
+}
+
+function bindFilterPanel() {
+  const shell = document.querySelector('.map-shell');
+  const toggle = document.getElementById('mapFilterToggle');
+  const panel = document.getElementById('mapFilterPanel');
+  const closeBtn = document.getElementById('mapFilterClose');
+  if (!shell || !toggle || !panel || !closeBtn) return;
+
+  toggle.addEventListener('click', () => setFilterPanelOpen(!filterPanelOpen));
+  closeBtn.addEventListener('click', () => setFilterPanelOpen(false));
+
+  document.addEventListener('click', (event) => {
+    if (!filterPanelOpen) return;
+    if (event.target.closest('#mapFilterPanel') || event.target.closest('#mapFilterToggle')) return;
+    setFilterPanelOpen(false);
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth <= 980) {
+      setFilterPanelOpen(false);
+    }
+  });
+
+  setFilterPanelOpen(false);
 }
 
 function loadArcGISEmbed() {
@@ -150,6 +198,7 @@ function placeCard(place) {
 
 function renderList() {
   el.count.textContent = TXT.count(visiblePlaces.length);
+  syncFilterButtonLabel();
   if (!visiblePlaces.length) {
     el.list.innerHTML = `<div class="point-item">${TXT.noPointsMatch}</div>`;
     return;
@@ -182,6 +231,8 @@ async function setup() {
   el.search = document.getElementById('searchInput');
   el.count = document.getElementById('pointCount');
 
+  bindFilterPanel();
+
   allPlaces = await window.AppData.fetchPlaces();
   if (!Array.isArray(allPlaces)) allPlaces = [];
 
@@ -200,7 +251,7 @@ async function setup() {
   } else {
     applyFilters();
     if (debugEl && !embedReady) {
-      debugEl.textContent = `${TXT.count(allPlaces.length)} • ${TXT.slowHint}`;
+      debugEl.textContent = `${TXT.selectedCount(allPlaces.length)} • ${TXT.slowHint}`;
     }
   }
 
@@ -227,6 +278,7 @@ window.addEventListener('DOMContentLoaded', () => {
   setup().catch(err => {
     document.getElementById('pointList').innerHTML = `<div class="point-item">${TXT.loadFail}</div>`;
     document.getElementById('pointCount').textContent = TXT.count(0);
+    syncFilterButtonLabel();
     console.error(err);
   });
 });

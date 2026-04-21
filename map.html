@@ -38,18 +38,27 @@
     <section class="map-layout">
       <section class="card map-box">
         <div class="map-toolbar">
-          <span class="tag">ArcGIS Web Map</span>
-          <a id="btnOpenArcgisFull" class="btn small" href="#" target="_blank" rel="noopener">Mở bản đồ full</a>
+          <div class="map-toolbar-copy">
+            <span class="tag">ArcGIS Web Map</span>
+            <strong>Bản đồ trải nghiệm</strong>
+          </div>
+          <div class="map-toolbar-actions">
+            <button id="mapFilterToggle" class="btn small map-panel-toggle" type="button" aria-expanded="false" aria-controls="mapFilterPanel">Bộ lọc điểm</button>
+            <a id="btnOpenArcgisFull" class="btn small" href="#" target="_blank" rel="noopener">Mở bản đồ full</a>
+          </div>
         </div>
         <div id="mapHint" class="note map-note">Nhúng ArcGIS đang hoạt động. Bạn có thể kéo/zoom trực tiếp trong khung.</div>
         <div class="map-shell">
-          <aside class="card sidebar map-floating-sidebar">
+          <aside id="mapFilterPanel" class="card sidebar map-floating-sidebar" aria-label="Bộ lọc điểm">
             <div class="sidebar-head">
               <div>
                 <h3>Bộ lọc điểm</h3>
                 <p>Lọc nhanh các điểm trên bản đồ</p>
               </div>
-              <span id="pointCount" class="tag">0 điểm</span>
+              <div class="sidebar-head-actions">
+                <span id="pointCount" class="tag">0 điểm</span>
+                <button id="mapFilterClose" class="sidebar-close" type="button" aria-label="Thu gọn bộ lọc">×</button>
+              </div>
             </div>
 
             <div class="search-box">
